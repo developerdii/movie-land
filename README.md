@@ -1,4 +1,4 @@
-# vuex
+# MOVIE LAND
 
 ## Project setup
 ```
