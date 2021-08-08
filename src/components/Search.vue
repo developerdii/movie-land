@@ -1,7 +1,8 @@
 <template>
   <div id="search">
     <div class="d-flex align-items-center small">
-      <i class="fa fa-search fa-fw text-muted position-absolute pl-3"></i>
+      <i v-if="!loading" class="fa fa-search fa-fw text-muted position-absolute pl-3"></i>
+      <i v-else class="fas fa-spinner fa-spin text-muted position-absolute ml-3"></i>
       <input type="text" v-model="searchText" @click="getTrendingData" class="form-control pl-5"
              placeholder="Search..."/>
     </div>
@@ -97,6 +98,7 @@ export default {
         },
       ],
       isShownSearchList: false,
+      loading: false
     }
   },
   mounted() {
@@ -107,15 +109,25 @@ export default {
     }
   },
   methods: {
-    async getTrendingData(media = this.defaultMediaType) {
-      this.isShownSearchList = true;
-      let response = await api.getTrendingMovies(this.defaultMediaType.type, 'day')
-      this.searchList = response.data.results.slice(0, 5)
+    async getTrendingData() {
+      this.loading = true;
+      try {
+        let response = await api.getTrendingMovies(this.defaultMediaType.type, 'day')
+        if (response.request.status === 200) {
+          this.isShownSearchList = true;
+          this.loading = false;
+          this.searchList = response.data.results.slice(0, 5)
+        }
+      } catch (error) {
+        this.loading = false;
+        throw error.message
+      }
     },
 
     selectMediaType(media) {
       this.defaultMediaType = media;
-      this.getTrendingData()
+      this.isShownSearchList = false;
+      this.getTrendingData();
     },
 
     search() {
@@ -127,7 +139,6 @@ export default {
       let searchBox = document.querySelector('#search input')
       let searchNavBar = document.querySelector('#search-nav-bar')
       if (event.target !== searchBox && event.target !== listElement && event.srcElement.parentElement !== searchNavBar) {
-        console.log(event, searchNavBar)
         this.isShownSearchList = false;
       }
     }
