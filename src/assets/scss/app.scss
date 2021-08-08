@@ -1,0 +1,32 @@
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+#nav {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background-color: #fff;
+  width: 100%;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}
+
+$router-view-padding: 1rem;
+$router-view-margin: 1rem;
+
+#app .router-view {
+  padding: $router-view-padding;
+  margin-top: $router-view-margin;
+  min-height: calc(100vh - #{$router-view-margin} - #{$router-view-padding} - 200px);
+}
