@@ -1,7 +1,7 @@
 <template>
   <nav id="nav" class="navbar navbar-expand-lg navbar-light shadow-sm bg-light">
     <div class="container-xxl">
-      <a class="navbar-brand" href="#">Navbar scroll</a>
+      <a class="navbar-brand" href="#"><img class="w-50" src="../assets/logo.svg" alt=""></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
               aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

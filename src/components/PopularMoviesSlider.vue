@@ -9,7 +9,7 @@
     <div class="carousel-inner" role="listbox">
       <div class="carousel-item" :class="index === 0 ? 'active' : ''" :data-bs-interval="carouselInterval"
            v-for="(movie,index) in popularMovies" :key="index">
-        <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block w-100"
+        <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block popular-movie-img"
              :class="isShownDescription ? 'blurred' : ''" :alt="movie.title">
         <div class="caption d-none d-md-block hide">
           <p>
@@ -85,6 +85,13 @@ export default {
 </script>
 
 <style lang="scss">
+.popular-movie-img {
+  object-position: 100% 0;
+  width: 100%;
+  height: 550px;
+  object-fit: cover
+}
+
 .swipe-animation {
   -webkit-animation: uparrow 1s infinite alternate ease-in-out;
 }
