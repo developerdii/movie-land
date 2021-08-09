@@ -55,8 +55,10 @@
             </div>
             <div class="col-md-10 pl-0">
               <p v-for="(movie,index) in item.known_for" :key="index" class="font-weight-light m-1">
-                <a class="font-weight-light" href="">{{ movie.title + ' - ' }}</a>
-                <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average }}
+                <template v-if="movie.title">
+                  <a class="font-weight-light" href="">{{ movie.title + ' - ' }}</a>
+                  <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average }}
+                </template>
               </p>
             </div>
           </div>
@@ -106,7 +108,6 @@ export default {
           text: 'Person'
         },
       ],
-      clicked: false,
       trendingData: {
         movie: [],
         tv: [],
@@ -114,12 +115,6 @@ export default {
       },
       isShownSearchList: false,
       loading: false
-    }
-  },
-
-  watch: {
-    searchText() {
-      this.clicked = false
     }
   },
 
@@ -170,11 +165,6 @@ export default {
 
     getList() {
       if (this.searchText.length > 2) {
-        if (this.clicked) {
-          this.isShownSearchList = true;
-          return
-        }
-        this.clicked = true;
         this.search();
       } else {
         this.getTrendingData();
