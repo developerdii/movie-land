@@ -85,6 +85,10 @@ export default {
 </script>
 
 <style lang="scss">
+#carouselExampleIndicators {
+  z-index: 0;
+}
+
 .popular-movie-img {
   object-position: 100% 0;
   width: 100%;
