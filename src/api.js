@@ -18,5 +18,9 @@ export default {
 
     getTrendingMovies(mediaType, timeWindow) {
         return axios.get(`/trending/${mediaType}/${timeWindow}`)
-    }
+    },
+
+    getSearch(mediaType, searchText) {
+        return axios.get(`/search/${mediaType}?query=${searchText}`)
+    },
 }

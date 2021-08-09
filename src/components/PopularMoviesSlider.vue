@@ -1,15 +1,15 @@
 <template>
-  <div id="carouselExampleDark" class="carousel carousel-light slide" style="margin: auto;wi" data-bs-ride="carousel"
+  <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
       <button v-for="(movie,index) in popularMovies" :key="index" type="button"
               data-bs-target="#carouselExampleIndicators" :data-bs-slide-to="index" :class="index === 0 ? 'active' : ''"
               :aria-label="'Slide '+(index+1)"></button>
     </div>
-    <div class="carousel-inner" role="listbox">
+    <div class="carousel-inner">
       <div class="carousel-item" :class="index === 0 ? 'active' : ''" :data-bs-interval="carouselInterval"
            v-for="(movie,index) in popularMovies" :key="index">
-        <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block w-100"
+        <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block popular-movie-img"
              :class="isShownDescription ? 'blurred' : ''" :alt="movie.title">
         <div class="caption d-none d-md-block hide">
           <p>
@@ -38,11 +38,11 @@
         </div>
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -85,6 +85,13 @@ export default {
 </script>
 
 <style lang="scss">
+.popular-movie-img {
+  object-position: 100% 0;
+  width: 100%;
+  height: 550px;
+  object-fit: cover
+}
+
 .swipe-animation {
   -webkit-animation: uparrow 1s infinite alternate ease-in-out;
 }
@@ -111,7 +118,7 @@ export default {
 .caption {
   text-align: center;
   width: 100%;
-  padding: 34rem 6rem 3rem 6rem;
+  padding: 22rem 6rem 3rem 6rem;
   position: absolute;
   bottom: 0;
   //height: 100%;
