@@ -106,10 +106,23 @@ export default {
           text: 'Person'
         },
       ],
+      clicked: false,
+      trendingData: {
+        movie: [],
+        tv: [],
+        person: [],
+      },
       isShownSearchList: false,
       loading: false
     }
   },
+
+  watch: {
+    searchText() {
+      this.clicked = false
+    }
+  },
+
   mounted() {
     if (document.addEventListener) {
       document.addEventListener('click', this.hideList);
@@ -120,11 +133,9 @@ export default {
   methods: {
     async getTrendingData() {
       this.loading = true;
-      let storeName = this.defaultMediaType.id + '-trending-data';
-      let storedItem = JSON.parse(localStorage.getItem(storeName));
 
-      if (storedItem) {
-        this.searchList = storedItem;
+      if (this.trendingData[this.defaultMediaType.type].length > 0) {
+        this.searchList = this.trendingData[this.defaultMediaType.type];
         this.loading = false;
         this.isShownSearchList = true;
         return;
@@ -142,7 +153,7 @@ export default {
               return item.poster_path !== null
             }
           }).slice(0, 5);
-          localStorage.setItem(storeName, JSON.stringify(this.searchList));
+          this.trendingData[this.defaultMediaType.type] = this.searchList;
         }
       } catch (error) {
         this.loading = false;
@@ -159,6 +170,11 @@ export default {
 
     getList() {
       if (this.searchText.length > 2) {
+        if (this.clicked) {
+          this.isShownSearchList = true;
+          return
+        }
+        this.clicked = true;
         this.search();
       } else {
         this.getTrendingData();
@@ -184,10 +200,12 @@ export default {
           }).slice(0, 5);
           this.isShownSearchList = true;
           this.loading = false;
+          this.clicked = true;
         }
       } catch (error) {
         this.loading = false;
         this.isShownSearchList = false;
+        this.clicked = false;
         throw error.message;
       }
     },
