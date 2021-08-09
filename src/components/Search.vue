@@ -114,7 +114,21 @@ export default {
         person: [],
       },
       isShownSearchList: false,
-      loading: false
+      loading: false,
+      searchValue: {
+        movie: {
+          name: null,
+          data: null,
+        },
+        tv: {
+          name: null,
+          data: null,
+        },
+        person: {
+          name: null,
+          data: null,
+        },
+      }
     }
   },
 
@@ -176,7 +190,12 @@ export default {
     }, 350),
 
     async search() {
-      if (this.searchText.length < 3) return
+      if (this.searchText.length < 3) return;
+      if (this.searchValue[this.defaultMediaType.type].name === this.defaultMediaType.type + '-' + this.searchText) {
+        this.searchList = this.searchValue[this.defaultMediaType.type].data
+        this.isShownSearchList = true;
+        return
+      }
       this.loading = true;
       try {
         let response = await api.getSearch(this.defaultMediaType.type, this.searchText)
@@ -188,6 +207,8 @@ export default {
               return item.poster_path !== null
             }
           }).slice(0, 5);
+          this.searchValue[this.defaultMediaType.type].name = this.defaultMediaType.type + '-' + this.searchText;
+          this.searchValue[this.defaultMediaType.type].data = this.searchList;
           this.isShownSearchList = true;
           this.loading = false;
           this.clicked = true;
