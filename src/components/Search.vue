@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center small">
       <i v-if="!loading" class="fa fa-search fa-fw text-muted position-absolute pl-3"></i>
       <i v-else class="fas fa-spinner fa-spin text-muted position-absolute ml-3"></i>
-      <input type="text" v-model="searchText" @click="getTrendingData" class="form-control pl-5"
+      <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control pl-5"
              placeholder="Search..."/>
     </div>
     <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed mr-2 mt-3 bg-light shadow-sm"
@@ -14,10 +14,9 @@
            @click="selectMediaType(media)">
           {{ media.text }}</a>
       </nav>
-
       <a href="#" v-for="item in searchList" :key="item.id"
          class="list-group-item list-group-item-action flex-column align-items-start">
-        <div v-if="item.media_type === 'movie'">
+        <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.title }}</h5>
             <small>{{ item.release_date }}</small>
@@ -31,7 +30,7 @@
             </div>
           </div>
         </div>
-        <div v-if="item.media_type === 'tv'">
+        <div v-if="item.media_type === 'tv' || defaultMediaType.type === 'tv'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.name }}</h5>
             <small>{{ item.first_air_date }}</small>
@@ -45,7 +44,7 @@
             </div>
           </div>
         </div>
-        <div v-if="item.media_type === 'person'">
+        <div v-if="item.media_type === 'person' || defaultMediaType.type === 'person'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.name }}</h5>
             <small>Popularity: <span class="text-info">{{ item.popularity }}</span></small>
@@ -63,12 +62,22 @@
           </div>
         </div>
       </a>
+      <div v-if="searchList.length === 0" style="padding: 2rem 3rem;">
+        <div class="w-100 text-center">
+          <h5 class="p-10 m-10">{{ 'Nothing Found' }}</h5>
+        </div>
+        <div class="row mt-1" style="width: 40rem">
+          <div class="col-md-10 pl-0">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import api from "@/api";
+import _ from 'lodash'
 
 export default {
   data() {
@@ -111,15 +120,33 @@ export default {
   methods: {
     async getTrendingData() {
       this.loading = true;
+      let storeName = this.defaultMediaType.id + '-trending-data';
+      let storedItem = JSON.parse(localStorage.getItem(storeName));
+
+      if (storedItem) {
+        this.searchList = storedItem;
+        this.loading = false;
+        this.isShownSearchList = true;
+        return;
+      }
+
       try {
         let response = await api.getTrendingMovies(this.defaultMediaType.type, 'day')
         if (response.request.status === 200) {
           this.isShownSearchList = true;
           this.loading = false;
-          this.searchList = response.data.results.slice(0, 5)
+          this.searchList = response.data.results.filter(item => {
+            if (this.defaultMediaType.id === 3) {
+              return item.profile_path !== null
+            } else {
+              return item.poster_path !== null
+            }
+          }).slice(0, 5);
+          localStorage.setItem(storeName, JSON.stringify(this.searchList));
         }
       } catch (error) {
         this.loading = false;
+        this.isShownSearchList = false;
         throw error.message
       }
     },
@@ -127,11 +154,42 @@ export default {
     selectMediaType(media) {
       this.defaultMediaType = media;
       this.isShownSearchList = false;
-      this.getTrendingData();
+      this.getList()
     },
 
-    search() {
+    getList() {
+      if (this.searchText.length > 2) {
+        this.search();
+      } else {
+        this.getTrendingData();
+      }
+    },
 
+    debounceInput: _.debounce(function () {
+      this.search();
+    }, 350),
+
+    async search() {
+      if (this.searchText.length < 3) return
+      this.loading = true;
+      try {
+        let response = await api.getSearch(this.defaultMediaType.type, this.searchText)
+        if (response.request.status === 200) {
+          this.searchList = response.data.results.filter(item => {
+            if (this.defaultMediaType.id === 3) {
+              return item.profile_path !== null
+            } else {
+              return item.poster_path !== null
+            }
+          }).slice(0, 5);
+          this.isShownSearchList = true;
+          this.loading = false;
+        }
+      } catch (error) {
+        this.loading = false;
+        this.isShownSearchList = false;
+        throw error.message;
+      }
     },
 
     hideList(event) {
