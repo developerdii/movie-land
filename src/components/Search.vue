@@ -132,6 +132,14 @@ export default {
     }
   },
 
+  watch: {
+    searchText(value) {
+      if (value === '') {
+        this.getTrendingData()
+      }
+    }
+  },
+
   mounted() {
     if (document.addEventListener) {
       document.addEventListener('click', this.hideList);
