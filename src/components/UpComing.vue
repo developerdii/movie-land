@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>UP COMING...</h1>
+    <h2 class="container-title mb-0"> {{ title }}</h2>
     <div id="carouselExampleIndicators2" class="carousel slide mb-4" data-bs-ride="carousel">
       <div class="carousel-inner">
         <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in upComingMovies"
@@ -45,7 +45,8 @@ export default {
   mixins: [dateFormatter],
   data() {
     return {
-      upComingMovies: []
+      upComingMovies: [],
+      title: 'COMING SOON'
     }
   },
   async mounted() {
@@ -92,6 +93,14 @@ $movie-card-radius: 1.2rem;
     border-radius: 0 0 calc(#{$movie-card-radius} / 2) calc(#{$movie-card-radius} / 2);
     border-top: solid rgb(255, 255, 255, .2) .05rem;
   }
+}
+
+.container-title {
+  background: linear-gradient(180deg, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+  padding: 0.2rem 0.5rem;
+  clear: both;
+  color: #1B1B1B;
+  border-top: 0.2rem solid #351C75;
 }
 
 

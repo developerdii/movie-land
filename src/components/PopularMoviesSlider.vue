@@ -2,7 +2,7 @@
   <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
-      <button v-for="(movie,index) in popularMovies" :key="index" type="button"
+      <button v-for="(mosevie,index) in popularMovies" :key="index" type="button"
               data-bs-target="#carouselExampleIndicators" :data-bs-slide-to="index" :class="index === 0 ? 'active' : ''"
               :aria-label="'Slide '+(index+1)"></button>
     </div>
@@ -29,7 +29,7 @@
                 <p class="description m-1">
                   <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average + ' / 10' }}
                 </p>
-                <p class="m-1">
+                <p class="movie-link m-1">
                   <a href="">{{ movie.title }} <i class="fas fa-external-link-alt"></i></a>
                 </p>
               </div>
@@ -140,6 +140,10 @@ export default {
     font-family: Candara, sans-serif;
     color: #FFFFFFB3;
     font-style: italic;
+  }
+
+  .movie-link {
+    font-size: 1.2rem;
   }
 
   .description-enter,
