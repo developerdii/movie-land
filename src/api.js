@@ -23,4 +23,8 @@ export default {
     getSearch(mediaType, searchText) {
         return axios.get(`/search/${mediaType}?query=${searchText}`)
     },
+
+    getUpComing() {
+        return axios.get(`/movie/upcoming`)
+    },
 }

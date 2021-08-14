@@ -2,7 +2,7 @@
   <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
-      <button v-for="(movie,index) in popularMovies" :key="index" type="button"
+      <button v-for="(mosevie,index) in popularMovies" :key="index" type="button"
               data-bs-target="#carouselExampleIndicators" :data-bs-slide-to="index" :class="index === 0 ? 'active' : ''"
               :aria-label="'Slide '+(index+1)"></button>
     </div>
@@ -29,7 +29,7 @@
                 <p class="description m-1">
                   <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average + ' / 10' }}
                 </p>
-                <p class="description m-1">
+                <p class="movie-link m-1">
                   <a href="">{{ movie.title }} <i class="fas fa-external-link-alt"></i></a>
                 </p>
               </div>
@@ -39,11 +39,11 @@
       </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="carousel-control-prev-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
   </div>
@@ -85,6 +85,10 @@ export default {
 </script>
 
 <style lang="scss">
+#carouselExampleIndicators {
+  z-index: 0;
+}
+
 .popular-movie-img {
   object-position: 100% 0;
   width: 100%;
@@ -127,11 +131,19 @@ export default {
 
   .title {
     font-size: 2rem;
-    letter-spacing: 3px;
+    letter-spacing: .5px;
+    color: lightcyan;
+    text-transform: uppercase;
   }
 
   .description {
     font-family: Candara, sans-serif;
+    color: #FFFFFFB3;
+    font-style: italic;
+  }
+
+  .movie-link {
+    font-size: 1.2rem;
   }
 
   .description-enter,
