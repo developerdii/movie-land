@@ -29,7 +29,7 @@
                 <p class="description m-1">
                   <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average + ' / 10' }}
                 </p>
-                <p class="description m-1">
+                <p class="m-1">
                   <a href="">{{ movie.title }} <i class="fas fa-external-link-alt"></i></a>
                 </p>
               </div>
@@ -131,11 +131,15 @@ export default {
 
   .title {
     font-size: 2rem;
-    letter-spacing: 3px;
+    letter-spacing: .5px;
+    color: lightcyan;
+    text-transform: uppercase;
   }
 
   .description {
     font-family: Candara, sans-serif;
+    color: #FFFFFFB3;
+    font-style: italic;
   }
 
   .description-enter,

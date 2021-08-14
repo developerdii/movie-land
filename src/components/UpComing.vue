@@ -68,7 +68,7 @@ $movie-card-radius: 1.2rem;
   flex-direction: column;
 
   img {
-    border-radius: calc(#{$movie-card-radius} - 0.2rem);
+    border-radius: calc(#{$movie-card-radius} - 0.2rem) calc(#{$movie-card-radius} - 0.2rem) 0 0;
     -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, black), color-stop(0.35, black), color-stop(0.5, black), color-stop(0.65, black), color-stop(0.85, rgba(0, 0, 0, 0.6)), color-stop(1, transparent));
   }
 
@@ -86,10 +86,11 @@ $movie-card-radius: 1.2rem;
   .footer {
     margin-top: auto;
     font-size: 80%;
-    color: rgb(255,255,255,.9);
+    color: #FFFFFFB3;
+    font-weight: bolder;
     background-color: rgba(15, 15, 14, 0.15);
     border-radius: 0 0 calc(#{$movie-card-radius} / 2) calc(#{$movie-card-radius} / 2);
-    border-top: solid rgb(255,255,255,.2) .05rem;
+    border-top: solid rgb(255, 255, 255, .2) .05rem;
   }
 }
 
