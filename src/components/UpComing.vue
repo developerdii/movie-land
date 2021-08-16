@@ -5,7 +5,7 @@
       <div class="carousel-inner">
         <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in upComingMovies"
              :key="index" data-bs-interval="300033">
-          <div class="row p-3">
+          <div class="row pr-3 pl-3">
             <div class="col-md-2 p-1 d-flex" v-for="(movie,movieIndex) in row" :key="movieIndex">
               <div class="movie-card">
                 <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path"
