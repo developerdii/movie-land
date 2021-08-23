@@ -6,9 +6,9 @@
       <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control pl-5"
              placeholder="Search..."/>
     </div>
-    <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed mr-2 mt-3 bg-light shadow-sm"
-         style="right: 0;">
-      <nav id="search-nav-bar" class="nav nav-pills flex-column flex-sm-row">
+    <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed mr-2 mt-1 bg-light shadow-sm"
+         style="right: 0; overflow-y: auto; max-height: 92vh">
+      <nav id="search-nav-bar" class="nav nav-pills sticky-top bg-light shadow-sm flex-column flex-sm-row">
         <a v-for="media in mediaTypes" :key="media.id" class="flex-sm-fill text-sm-center nav-link shadow m-1"
            :class="defaultMediaType.id === media.id ? 'active' : ''" aria-current="page"
            @click="selectMediaType(media)">
@@ -19,7 +19,7 @@
         <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.title }}</h5>
-            <small>{{ item.release_date }}</small>
+            <small>{{ getFormattedDate(item.release_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
             <div class="col-md-2 pr-0">
@@ -33,7 +33,7 @@
         <div v-if="item.media_type === 'tv' || defaultMediaType.type === 'tv'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.name }}</h5>
-            <small>{{ item.first_air_date }}</small>
+            <small>{{ getFormattedDate(item.first_air_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
             <div class="col-md-2 pr-0">
@@ -80,8 +80,10 @@
 <script>
 import api from "@/api";
 import _ from 'lodash'
+import dateFormatter from "@/mixins/dateFormatter";
 
 export default {
+  mixins: [dateFormatter],
   data() {
     return {
       searchText: '',
@@ -169,7 +171,7 @@ export default {
             } else {
               return item.poster_path !== null
             }
-          }).slice(0, 5);
+          }).slice(0, 15);
           this.trendingData[this.defaultMediaType.type] = this.searchList;
         }
       } catch (error) {
@@ -240,7 +242,26 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
+/* width */
+#search-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+#search-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+#search-list::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+#search-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 #search input {
   border-radius: 2rem;
 }

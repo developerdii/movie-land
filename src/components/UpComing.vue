@@ -61,7 +61,7 @@ export default {
 <style lang="scss">
 $movie-card-radius: 1.2rem;
 .movie-card {
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 2px 0, rgba(60, 64, 67, 0.15) 0 1px 3px 1px;
   color: #fff;
   background: linear-gradient(0deg, #273b4f 0%, #34495e 100%);
   border-radius: $movie-card-radius $movie-card-radius calc(#{$movie-card-radius} / 2) calc(#{$movie-card-radius} / 2);
@@ -101,12 +101,12 @@ $movie-card-radius: 1.2rem;
   background: linear-gradient(180deg, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
   padding: 0.2rem 0.5rem;
   clear: both;
-  color: #1B1B1B;
+  color: #2c3e50;
   border-top: 0.2rem solid #351C75;
-  font-family: Calibri, sans-serif;
 }
 
 #carouselExampleIndicators2 {
+  z-index: 0;
   .carousel-control-prev {
     background: radial-gradient(circle closest-side, rgba(0,0,0,.1), transparent);
     margin: 10rem 0;
