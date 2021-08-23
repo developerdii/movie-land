@@ -6,10 +6,9 @@
         <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in upComingMovies"
              :key="index" data-bs-interval="300033">
           <div class="row pr-3 pl-3">
-            <div class="col-md-2 p-1 d-flex" v-for="(movie,movieIndex) in row" :key="movieIndex">
+            <div class="col-md-2 p-1 d-flex" v-for="(movie,movieIndex) in row" :key="movieIndex" @click="route(movie.id)">
               <div class="movie-card">
-                <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path"
-                     alt="Card image cap">
+                <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
                 <p class="description p-2 text-center mb-0 pb-0">
                   {{ movie.title }}
                 </p>
@@ -55,6 +54,11 @@ export default {
         }
     )
   },
+  methods: {
+    route(id) {
+      this.$store.commit('routeToClicked',{path: 'movie', query: id})
+    }
+  }
 }
 </script>
 
@@ -98,7 +102,7 @@ $movie-card-radius: 1.2rem;
 }
 
 .container-title {
-  background: linear-gradient(180deg, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+  background: linear-gradient(180deg, rgba(247, 247, 247, 1) 0%, rgba(247, 247, 247, 0) 100%);
   padding: 0.2rem 0.5rem;
   clear: both;
   color: #2c3e50;
@@ -107,12 +111,14 @@ $movie-card-radius: 1.2rem;
 
 #carouselExampleIndicators2 {
   z-index: 0;
+
   .carousel-control-prev {
-    background: radial-gradient(circle closest-side, rgba(0,0,0,.1), transparent);
+    background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
     margin: 10rem 0;
   }
+
   .carousel-control-next {
-    background: radial-gradient(circle closest-side, rgba(0,0,0,.1), transparent);
+    background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
     border-radius: 10px;
     margin: 10rem 0;
   }

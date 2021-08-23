@@ -27,4 +27,8 @@ export default {
     getUpComing() {
         return axios.get(`/movie/upcoming`)
     },
+
+    getMovieDetails(movieId) {
+        return axios.get(`/movie/${movieId}`)
+    },
 }
