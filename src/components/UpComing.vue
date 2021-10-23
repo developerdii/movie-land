@@ -67,7 +67,9 @@ $movie-card-radius: 1.2rem;
 .movie-card {
   box-shadow: rgba(60, 64, 67, 0.3) 0 1px 2px 0, rgba(60, 64, 67, 0.15) 0 1px 3px 1px;
   color: #fff;
-  background: linear-gradient(0deg, #273b4f 0%, #34495e 100%);
+  //background: linear-gradient(0deg, #273b4f 0%, #34495e 100%);
+  background-color: #2d3436;
+  background-image: linear-gradient(315deg, #2d3436 0%, #000000 74%);
   border-radius: $movie-card-radius $movie-card-radius calc(#{$movie-card-radius} / 2) calc(#{$movie-card-radius} / 2);
   cursor: pointer;
   display: flex;

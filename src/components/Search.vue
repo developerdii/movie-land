@@ -14,7 +14,7 @@
            @click="selectMediaType(media)">
           {{ media.text }}</a>
       </nav>
-      <a href="#" v-for="item in searchList" :key="item.id"
+      <a href="javascript:void(0)" v-for="item in searchList" :key="item.id"
          class="list-group-item list-group-item-action flex-column align-items-start">
         <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">

@@ -8,7 +8,6 @@ export default new Vuex.Store({
     state: {},
     mutations: {
         routeToClicked(state, data) {
-            console.log(data)
             router.push(`${data.path}/${data.query}`)
         }
     },

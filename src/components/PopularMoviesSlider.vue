@@ -24,13 +24,10 @@
           <transition name="description">
             <div class="row popular-movie-card" v-if="isShownDescription">
               <div class="col-md-12">
-                <img class="card-img-top w-25" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path"
-                     alt="Card image cap">
-                <p class="description m-1">
-                  <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average + ' / 10' }}
-                </p>
+                <img class="card-img-top w-25" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
+                <rating class="m-1" :value="movie.vote_average"></rating>
                 <p class="movie-link m-1">
-                  <a href="">{{ movie.title }} <i class="fas fa-external-link-alt"></i></a>
+                  <router-link :to="'movie/'+movie.id">{{ movie.title }} <i class="fas fa-external-link-alt"></i></router-link>
                 </p>
               </div>
             </div>
@@ -38,11 +35,13 @@
         </div>
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="prev">
       <span class="carousel-control-prev-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="next">
       <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -50,6 +49,7 @@
 </template>
 <script>
 import api from "@/api";
+import Rating from "@/components/Rating";
 
 export default {
   data() {
@@ -58,6 +58,9 @@ export default {
       isShownDescription: false,
       carouselInterval: 5000,
     }
+  },
+  components: {
+    Rating
   },
   methods: {
     hoverCarousel() {
@@ -137,7 +140,6 @@ export default {
   }
 
   .description {
-    font-family: Candara, sans-serif;
     color: #FFFFFFB3;
     font-style: italic;
   }
