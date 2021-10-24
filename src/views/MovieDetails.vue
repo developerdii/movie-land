@@ -46,22 +46,33 @@ export default {
       loading: false,
     }
   },
+  watch: {
+    $route() {
+      this.getData();
+    }
+
+  },
   computed: {
     movieTitle() {
       return `${this.movieData.title} (${this.getFormattedDate(this.movieData.release_date,'YYYY')})`
     }
   },
   async mounted() {
-    this.loading = true;
-    try {
-      let response = await api.getMovieDetails(this.$route.params.id)
-      if (response.status === 200) {
-        this.movieData = response.data
-        this.loading = false;
+    await this.getData()
+  },
+  methods: {
+   async getData() {
+      this.loading = true;
+      try {
+        let response = await api.getMovieDetails(this.$route.query.id)
+        if (response.status === 200) {
+          this.movieData = response.data
+          this.loading = false;
 
+        }
+      } catch (error) {
+        this.loading = false;
       }
-    } catch (error) {
-      this.loading = false;
     }
   }
 

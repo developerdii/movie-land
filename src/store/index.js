@@ -8,7 +8,7 @@ export default new Vuex.Store({
     state: {},
     mutations: {
         routeToClicked(state, data) {
-            router.push(`${data.path}/${data.query}`)
+            router.push({ path: data.path, query: { id: data.query } })
         }
     },
     actions: {},

@@ -11,7 +11,8 @@ const routes = [
     component: Home
   },
   {
-    path: '/movie/:id',
+    path: '/movie',
+    query: 'id',
     name: 'MovieDetails',
     component: () => import('../views/MovieDetails.vue')
   }
