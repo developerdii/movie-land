@@ -2,7 +2,7 @@
   <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
-      <button v-for="(mosevie,index) in popularMovies" :key="index" type="button"
+      <button v-for="(movie,index) in popularMovies" :key="index" type="button"
               data-bs-target="#carouselExampleIndicators" :data-bs-slide-to="index" :class="index === 0 ? 'active' : ''"
               :aria-label="'Slide '+(index+1)"></button>
     </div>
@@ -27,7 +27,7 @@
                 <img class="card-img-top w-25" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
                 <rating class="m-1" :value="movie.vote_average"></rating>
                 <p class="movie-link m-1">
-                  <router-link :to="'movie/'+movie.id">{{ movie.title }} <i class="fas fa-external-link-alt"></i></router-link>
+                  <router-link :to="'movie?id='+movie.id">{{ movie.title }} <i class="fas fa-external-link-alt"></i></router-link>
                 </p>
               </div>
             </div>

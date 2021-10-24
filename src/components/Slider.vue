@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot name="title"></slot>
-    <div id="carouselExampleIndicators2" class="carousel slide mb-4" data-bs-ride="carousel">
+    <div id="carouselExampleIndicators2" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <slot name="card"></slot>
       </div>
@@ -57,6 +57,9 @@ $movie-card-radius: 1.2rem;
     background-color: rgba(15, 15, 14, 0.15);
     border-radius: 0 0 calc(#{$movie-card-radius} / 2) calc(#{$movie-card-radius} / 2);
     border-top: solid rgb(255, 255, 255, .2) .05rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 80px;
   }
 }
 

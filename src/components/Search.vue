@@ -14,7 +14,7 @@
            @click="selectMediaType(media)">
           {{ media.text }}</a>
       </nav>
-      <a href="javascript:void(0)" @click="route(item.id)" v-for="item in searchList" :key="item.id"
+      <a href="javascript:void(0)" @click="route(item.media_type || defaultMediaType.type,item.id)" v-for="item in searchList" :key="item.id"
          class="list-group-item list-group-item-action flex-column align-items-start">
         <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">
@@ -56,7 +56,7 @@
             <div class="col-md-10 pl-0">
               <p v-for="(movie,index) in item.known_for" :key="index" class="font-weight-light m-1">
                 <template v-if="movie.title">
-                  <a class="font-weight-light" @click="route(movie.id)">{{ movie.title + ' - ' }}</a>
+                  <a class="font-weight-light" href="javascript:void(0);" @click="route('movie', movie.id)">{{ movie.title + ' - ' }}</a>
                   <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average }}
                 </template>
               </p>
@@ -240,8 +240,9 @@ export default {
       }
     },
 
-    route(id) {
-      this.$store.commit('routeToClicked', {path: 'movie', query: id})
+    route(media, id) {
+      console.log(media)
+      this.$store.commit('routeToClicked', {path: media, query: id})
     }
   }
 }

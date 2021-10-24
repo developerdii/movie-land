@@ -31,4 +31,8 @@ export default {
     getMovieDetails(movieId) {
         return axios.get(`/movie/${movieId}`)
     },
+
+    getMovieCredits(movieId) {
+        return axios.get(`/movie/${movieId}/credits`)
+    }
 }
