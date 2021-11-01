@@ -76,8 +76,7 @@ export default {
   watch: {
     $route() {
       Object.assign(this.$data, this.$options.data());
-      this.getData();
-      this.getCredits();
+      this.loadPage();
     }
 
   },
@@ -86,11 +85,17 @@ export default {
       return `${this.movieData.title} (${this.getFormattedDate(this.movieData.release_date, 'YYYY')})`
     }
   },
-  async mounted() {
-    await this.getData();
-    await this.getCredits();
+  mounted() {
+    this.loadPage();
   },
   methods: {
+    async loadPage() {
+      this.loading = true;
+      await this.getData();
+      await this.getCredits();
+      this.loading = false;
+    },
+
     async getData() {
       try {
         let response = await api.getMovieDetails(this.$route.query.id)
