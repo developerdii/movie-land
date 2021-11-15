@@ -54,7 +54,7 @@
           </div>
         </div>
         <div v-if="recommendations" class="row mt-2">
-          <movie-slider :id="'recommendations'" :movie-data="recommendations" :show-footer="false"
+          <movie-slider id="recommendations" :movie-data="recommendations" :show-footer="false"
                         title="Recommendations"></movie-slider>
         </div>
       </div>
