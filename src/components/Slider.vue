@@ -1,16 +1,16 @@
 <template>
   <div>
     <slot name="title"></slot>
-    <div id="carouselExampleIndicators2" class="carousel slide" data-bs-ride="carousel">
+    <div :id="id" class="carousel slide" style="z-index: 0" data-bs-ride="carousel">
       <div class="carousel-inner">
         <slot name="card"></slot>
       </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators2"
+      <button class="carousel-control-prev" type="button" :data-bs-target="'#' + id"
               data-bs-slide="prev">
         <span class="carousel-control-prev-icon p-3" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
       </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators2"
+      <button class="carousel-control-next" type="button" :data-bs-target="'#' + id"
               data-bs-slide="next">
         <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
@@ -18,6 +18,17 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    id: {
+      type: String,
+      default: 'carouselExampleIndicators2'
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 $movie-card-radius: 1.2rem;
@@ -71,19 +82,15 @@ $movie-card-radius: 1.2rem;
   border-top: 0.2rem solid #351C75;
 }
 
-#carouselExampleIndicators2 {
-  z-index: 0;
+.carousel-control-prev {
+  background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
+  margin: 10rem 0;
+}
 
-  .carousel-control-prev {
-    background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
-    margin: 10rem 0;
-  }
-
-  .carousel-control-next {
-    background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
-    border-radius: 10px;
-    margin: 10rem 0;
-  }
+.carousel-control-next {
+  background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
+  border-radius: 10px;
+  margin: 10rem 0;
 }
 
 

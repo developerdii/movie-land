@@ -1,5 +1,5 @@
 <template>
-  <slider>
+  <slider :id="id">
     <div v-if="title" slot="title">
       <h2 class="container-title mb-0"> {{ title }}</h2>
     </div>
@@ -45,6 +45,11 @@ export default {
     },
 
     title: {
+      type: String,
+      default: null
+    },
+
+    id: {
       type: String,
       default: null
     }

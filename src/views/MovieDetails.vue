@@ -47,6 +47,9 @@
             </div>
           </div>
         </div>
+        <div v-if="recommendations" class="row mt-2">
+          <movie-slider :id="'recommendations'" :movie-data="recommendations" :show-footer="false" title="Recommendations"></movie-slider>
+        </div>
       </div>
     </div>
   </div>
@@ -57,19 +60,22 @@ import api from "@/api";
 import Rating from "@/components/Rating";
 import dateFormatter from '../mixins/dateFormatter';
 import Slider from '../components/Slider'
+import MovieSlider from '../components/MovieSlider'
 import _ from "lodash";
 
 export default {
   mixins: [dateFormatter],
   components: {
     Rating,
-    Slider
+    Slider,
+    MovieSlider
   },
 
   data() {
     return {
       movieData: {},
       cast: [],
+      recommendations: [],
       loading: false,
     }
   },
@@ -85,14 +91,17 @@ export default {
       return `${this.movieData.title} (${this.getFormattedDate(this.movieData.release_date, 'YYYY')})`
     }
   },
+
   mounted() {
     this.loadPage();
   },
+
   methods: {
     async loadPage() {
       this.loading = true;
       await this.getData();
       await this.getCredits();
+      await this.getRecommendations();
       this.loading = false;
     },
 
@@ -106,11 +115,23 @@ export default {
         console.log(error)
       }
     },
+
     async getCredits() {
       try {
         let response = await api.getMovieCredits(this.$route.query.id)
         if (response.status === 200) {
           this.cast = _.chunk(response.data.cast.filter(person => person.profile_path), 4);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getRecommendations() {
+      try {
+        let response = await api.getRecommendationsMovies(this.$route.query.id)
+        if (response.status === 200) {
+          this.recommendations = _.chunk(response.data.results, 6);
         }
       } catch (error) {
         console.log(error);
