@@ -21,7 +21,8 @@
             <img :src="'https://image.tmdb.org/t/p/w500'+movieData.poster_path" class="rounded">
           </div>
           <div class="col-md-7">
-          <span v-for="tags in movieData.genres" :key="tags.id" class="badge bg-secondary mr-1 mb-2">
+          <div v-if="selectedTab === Enums.SLIDER">
+            <span v-for="tags in movieData.genres" :key="tags.id" class="badge bg-secondary mr-1 mb-2">
              <h6 class="mb-0">{{ tags.name }}</h6>
           </span>
             <p class="lead mt-5">
@@ -29,8 +30,23 @@
             </p>
             <p v-if="movieData.tagline" class="mt-5 blockquote-footer font-italic" style="font-size: 1rem">
               {{ movieData.tagline }}</p>
+          </div>
             <div class="column-footer">
-              <slider>
+              <ul class="nav justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link nav-icon" :class="selectedTab === Enums.SLIDER ? 'text-primary' : ''"
+                     href="javascript:void();" @click="selectViewTab(Enums.SLIDER)">
+                    <i class="fa fa-th-large"></i>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link nav-icon" :class="selectedTab === Enums.LIST ? 'text-primary' : ''"
+                     href="javascript:void();" @click="selectViewTab(Enums.LIST)">
+                    <i class="fa fa-bars"></i>
+                  </a>
+                </li>
+              </ul>
+              <slider v-if="selectedTab === Enums.SLIDER">
                 <div slot="card">
                   <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in cast"
                        :key="index" data-bs-interval="300033">
@@ -50,6 +66,13 @@
                   </div>
                 </div>
               </slider>
+              <div v-if="selectedTab === Enums.LIST">
+                <div class="row">
+                    <div class="list-group col-md-6" v-for="listGroup in cast" :key="listGroup">
+                      <li class="list-group-item" v-for="person in listGroup" :key="person">{{ person.name }}</li>
+                    </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -68,6 +91,7 @@ import Rating from "@/components/Rating";
 import dateFormatter from '../mixins/dateFormatter';
 import Slider from '../components/Slider'
 import MovieSlider from '../components/MovieSlider'
+import Enums from '../enums'
 import _ from "lodash";
 
 export default {
@@ -82,8 +106,11 @@ export default {
     return {
       movieData: {},
       cast: [],
+      fullCastData: [],
       recommendations: [],
       loading: false,
+      selectedTab: Enums.SLIDER,
+      Enums
     }
   },
   watch: {
@@ -96,6 +123,10 @@ export default {
   computed: {
     movieTitle() {
       return `${this.movieData.title} (${this.getFormattedDate(this.movieData.release_date, 'YYYY')})`
+    },
+
+    castViewSize() {
+      return this.selectedTab === Enums.SLIDER ? 4 : 12;
     }
   },
 
@@ -127,11 +158,16 @@ export default {
       try {
         let response = await api.getMovieCredits(this.$route.query.id)
         if (response.status === 200) {
-          this.cast = _.chunk(response.data.cast.filter(person => person.profile_path), 4);
+          this.fullCastData = response.data.cast;
+          this.chunkCredits(this.fullCastData);
         }
       } catch (error) {
         console.log(error);
       }
+    },
+
+    chunkCredits(data) {
+      this.cast = _.chunk(data.filter(person => person.profile_path), this.castViewSize);
     },
 
     async getRecommendations() {
@@ -145,16 +181,29 @@ export default {
       }
     },
 
+    selectViewTab(id) {
+      this.selectedTab = id;
+      this.chunkCredits(this.fullCastData);
+    }
+
   }
 
 }
 </script>
 
-<style>
+<style lang="scss">
 .column-footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: auto;
+}
+
+.nav-icon {
+  color: gray;
+}
+
+.active {
+  color: red;
 }
 </style>

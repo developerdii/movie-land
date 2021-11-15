@@ -241,7 +241,6 @@ export default {
     },
 
     route(media, id) {
-      console.log(media)
       this.$store.commit('routeToClicked', {path: media, query: id})
     }
   }
