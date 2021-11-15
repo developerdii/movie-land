@@ -3,10 +3,16 @@
     <div class="container-title">
       <div class="mb-2">
         <span class="font-weight-bold">
-          <span class="display-4">
-            {{ movieTitle }}
-          </span>
-          <rating :value="movieData.vote_average" class="float-right mt-2" style="font-size: 2rem"/>
+          <div class="row">
+            <div class="col-md-10">
+              <span class="display-4">
+                {{ movieTitle }}
+              </span>
+            </div>
+            <div class="col-md-2">
+              <rating :value="movieData.vote_average" class="float-right mt-2" style="font-size: 2rem"/>
+            </div>
+          </div>
         </span>
       </div>
       <div class="container-xxl">
@@ -48,7 +54,8 @@
           </div>
         </div>
         <div v-if="recommendations" class="row mt-2">
-          <movie-slider :id="'recommendations'" :movie-data="recommendations" :show-footer="false" title="Recommendations"></movie-slider>
+          <movie-slider :id="'recommendations'" :movie-data="recommendations" :show-footer="false"
+                        title="Recommendations"></movie-slider>
         </div>
       </div>
     </div>

@@ -23,8 +23,7 @@
 export default {
   props: {
     id: {
-      type: String,
-      default: 'carouselExampleIndicators2'
+      type: String
     }
   }
 }

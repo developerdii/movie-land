@@ -51,7 +51,7 @@ export default {
 
     id: {
       type: String,
-      default: null
+      default: 'carouselExampleIndicators2'
     }
   },
 
