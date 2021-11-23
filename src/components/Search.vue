@@ -3,8 +3,20 @@
     <div class="d-flex align-items-center small">
       <i v-if="!loading" class="fa fa-search fa-fw text-muted position-absolute pl-3"></i>
       <i v-else class="fas fa-spinner fa-spin text-muted position-absolute ml-3"></i>
-      <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control pl-5"
+      <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control border-0 pl-5"
              placeholder="Search..."/>
+
+<!--      <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">-->
+<!--        <div class="input-group">-->
+<!--          <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control bg-white border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">-->
+<!--          <div class="input-group-append">-->
+<!--            <button class="btn btn-info" type="button">-->
+<!--              <i v-if="!loading" class="fa fa-search fa-fw"></i>-->
+<!--              <i v-else class="fas fa-spinner fa-spin"></i>-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </form>-->
     </div>
     <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed mr-2 mt-1 bg-light shadow-sm"
          style="right: 0; overflow-y: auto; max-height: 92vh">
@@ -267,7 +279,8 @@ export default {
   background: #555;
 }
 #search input {
-  border-radius: 2rem;
+  //border-radius: 2rem;
+  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px 0 inset;
 }
 
 .search-list-description {
