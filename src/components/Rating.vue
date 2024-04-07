@@ -1,6 +1,6 @@
 <template>
   <p>
-    <i class="fas fa-star" style="color: orange"></i> {{ value + ' / 10' }}
+    <i class="fas fa-star" style="color: orange"></i> {{ value.toFixed(1) + ' / 10' }}
   </p>
 </template>
 
