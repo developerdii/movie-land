@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOVIELAND — Fall 2: Deadpoint</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root{--bg:#f6f7fa;--ink:#171b25;--navy:#2c3e50;--muted:#596273;--gold:#e99a16;--gold2:#f5a623;--purple:#351c75;--line:#e7e9ef}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden}
+a{text-decoration:none}
+.navbar{background:#fff;border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:1.15rem;letter-spacing:-.4px;color:var(--ink)}.brand span{color:var(--gold)}
+.navbar .nav-link{color:var(--navy);font-weight:600;font-size:.92rem}.navbar .nav-link:hover,.navbar .nav-link.active{color:var(--gold)}
+.search-wrap{position:relative;width:100%}@media(min-width:992px){.search-wrap{width:400px}}
+.search-panel{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 45px rgba(23,27,37,.16);z-index:1050;overflow:hidden;display:none}
+.search-panel.open{display:block}
+.search-tabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+.search-tab{flex:1;border:0;background:#f1f2f6;border-radius:9px;padding:.5rem;font-size:.85rem;font-weight:700;color:var(--navy);cursor:pointer}
+.search-tab.active{background:var(--ink);color:#fff}
+.search-results{max-height:min(60vh,460px);overflow-y:auto}
+.search-result{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid #f0f1f5;color:inherit}
+.search-result:hover{background:#f8f9fb}
+.thumb{width:46px;height:66px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:.62rem;font-weight:800;text-align:center;padding:4px}
+.result-title{font-weight:700;font-size:.92rem;color:var(--ink)}
+.result-title .year{color:var(--muted);font-weight:600}
+.result-desc{font-size:.8rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.panel-empty{padding:26px 16px;text-align:center;color:var(--muted)}
+.section-title{border-top:3px solid var(--purple);padding-top:.55rem;color:var(--navy);font-weight:800;letter-spacing:-.4px}
+.eyebrow{color:var(--gold);font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.film-title{font-weight:900;letter-spacing:-1px}
+.meta{color:var(--muted);font-size:.9rem}.meta .rating{color:var(--gold);font-weight:700}
+.cover{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:2/3;background:linear-gradient(150deg,#2d3a4a,#141a24 60%,#0e1219);display:flex;align-items:flex-end;padding:18px;color:#fff;box-shadow:0 14px 34px rgba(23,27,37,.18)}
+.cover .cover-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(23,27,37,.5);display:grid;place-items:center;color:var(--gold);font-size:1.7rem}
+.cover-sub{color:#cdd2da;font-size:.85rem}
+.btn-gold{background:var(--gold);border:0;color:#17171b;font-weight:700;border-radius:999px;padding:.7rem 1.2rem}.btn-gold:hover{background:#ffd16c;color:#17171b}
+.synopsis{color:var(--navy);line-height:1.7}
+.fact{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.fact .label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.fact .value{font-weight:700;color:var(--ink)}
+.person-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;height:100%}
+.avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.2rem}
+.person-card .name{font-weight:700;color:var(--ink);font-size:.9rem}
+.person-card .role{color:var(--muted);font-size:.78rem}
+.poster{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:2/3;display:flex;align-items:flex-end;padding:12px;color:#fff;transition:transform .2s ease}
+.poster:hover{transform:translateY(-4px)}
+.poster .poster-title{font-weight:700;font-size:.86rem;margin:0 0 2px}
+.poster .poster-sub{font-size:.74rem;color:#d7dae0;margin:0}
+.poster .score{position:absolute;top:10px;left:10px;background:rgba(23,27,37,.6);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 7px;font-size:.72rem;font-weight:700}
+.poster .score i{color:var(--gold)}
+footer{border-top:1px solid var(--line);background:#fff}
+@media(max-width:575px){.film-title{font-size:1.75rem}.cover{max-width:340px;margin:0 auto}}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top py-2">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#filmDetail">
+      <svg width="34" height="34" viewBox="0 0 64 64" role="img" aria-label="Movieland"><defs><linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE28A"/><stop offset="1" stop-color="#F5A623"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="#171B25"/><rect x="8" y="8" width="48" height="11" rx="4" fill="#F5A623"/><rect x="8" y="45" width="48" height="11" rx="4" fill="#F5A623"/><g fill="#171B25"><rect x="17" y="9" width="6" height="9" rx="1.5"/><rect x="29" y="9" width="6" height="9" rx="1.5"/><rect x="41" y="9" width="6" height="9" rx="1.5"/><rect x="17" y="46" width="6" height="9" rx="1.5"/><rect x="29" y="46" width="6" height="9" rx="1.5"/><rect x="41" y="46" width="6" height="9" rx="1.5"/></g><path d="M26 25a3.5 3.5 0 0 1 5.2-3L44 29.9a2.4 2.4 0 0 1 0 4.2l-12.8 7.9a3.5 3.5 0 0 1-5.2-3V25Z" fill="url(#brandGrad)"/></svg>
+      <span class="brand">MOVIE<span>LAND</span></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Menüyü aç"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto my-2 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link active" href="#filmDetail">Anasayfa</a></li>
+        <li class="nav-item"><a class="nav-link" href="#cast">Oyuncular</a></li>
+        <li class="nav-item"><a class="nav-link" href="#recommendations">Öneriler</a></li>
+      </ul>
+      <div class="search-wrap my-2 my-lg-0">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Film, dizi, kişi ara..." autocomplete="off" aria-label="Ara">
+          <button class="btn btn-outline-secondary border-start-0" type="button" id="clearBtn" aria-label="Temizle"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="search-panel" id="searchPanel">
+          <div class="search-tabs" id="searchTabs">
+            <button class="search-tab active" data-tab="movie" type="button">Movie</button>
+            <button class="search-tab" data-tab="tv" type="button">TV</button>
+            <button class="search-tab" data-tab="person" type="button">Person</button>
+          </div>
+          <div class="search-results" id="searchResults"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4 py-lg-5">
+  <section id="filmDetail" class="mb-5">
+    <div class="mb-4">
+      <div class="eyebrow mb-1">Film · 2026</div>
+      <h1 class="film-title display-4 mb-2">Fall 2: Deadpoint</h1>
+      <div class="meta d-flex flex-wrap align-items-center gap-2 gap-lg-3">
+        <span class="rating"><i class="bi bi-star-fill me-1"></i>8.4 / 10</span>
+        <span class="text-muted">•</span>
+        <span>1s 52dk</span>
+        <span class="text-muted">•</span>
+        <span class="d-flex flex-wrap gap-1"><span class="badge text-bg-light border">Gerilim</span><span class="badge text-bg-light border">Aksiyon</span><span class="badge text-bg-light border">Macera</span></span>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4 col-xl-3">
+        <div class="cover">
+          <div class="cover-play"><i class="bi bi-play-fill"></i></div>
+          <div class="position-relative w-100">
+            <h2 class="h4 mb-1">Fall 2: Deadpoint</h2>
+            <div class="cover-sub">Gerilim · 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8 col-xl-9">
+        <p class="synopsis mb-4">Efsanevi serbest tırmanıcı Mara Voss, yıllar önce kaza geçirdiği vahşi kaya duvarına geri döner. Yaklaşan fırtınayla birlikte tırmanış bir hayatta kalma mücadelesine dönüşür; her tutuş, düşüşün son noktasına bir adım daha yaklaştırır.</p>
+        <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#trailerModal"><i class="bi bi-play-fill me-2"></i>Fragmanı Oynat</button>
+        <div class="row g-2 mt-4">
+          <div class="col-6 col-md-3"><div class="fact"><div class="label">Yönetmen</div><div class="value">Nora Lindqvist</div></div></div>
+          <div class="col-6 col-md-3"><div class="fact"><div class="label">Süre</div><div class="value">112 dk</div></div></div>
+          <div class="col-6 col-md-3"><div class="fact"><div class="label">Dil</div><div class="value">Türkçe</div></div></div>
+          <div class="col-6 col-md-3"><div class="fact"><div class="label">Yıl</div><div class="value">2026</div></div></div>
+        </div>
+      </div>
+    </div>
+    <section id="cast" class="mt-5">
+      <h2 class="section-title h4 mb-4">Oyuncular ve Ekip</h2>
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3">
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#5a6b8c,#2c3e50)">ED</div><div class="name">Elif Demir</div><div class="role">Mara Voss</div></div></div>
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#8c5a6b,#4a2c3e)">KA</div><div class="name">Kerem Aydın</div><div class="role">James Hale</div></div></div>
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#6b8c5a,#2c4a2c)">ZK</div><div class="name">Zeynep Kaya</div><div class="role">Dr. Ilana Reyes</div></div></div>
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#8c7a5a,#4a3d2c)">NL</div><div class="name">Nora Lindqvist</div><div class="role">Yönetmen</div></div></div>
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#5a8c86,#2c4a46)">MO</div><div class="name">Mert Okan</div><div class="role">Görüntü Yönetmeni</div></div></div>
+        <div class="col"><div class="person-card"><div class="avatar" style="background:linear-gradient(135deg,#7a5a8c,#3d2c4a)">SA</div><div class="name">Selin Aras</div><div class="role">Senarist</div></div></div>
+      </div>
+    </section>
+
+    <section id="recommendations" class="mt-5">
+      <h2 class="section-title h4 mb-4">Önerilen Filmler</h2>
+      <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#3a4a5a,#141a24)"><span class="score"><i class="bi bi-star-fill me-1"></i>8.1</span><div><p class="poster-title">Uçurumun Kenarı</p><p class="poster-sub">Gerilim · 2026</p></div></div></div>
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#4a3a5a,#241420)"><span class="score"><i class="bi bi-star-fill me-1"></i>8.2</span><div><p class="poster-title">Kızıl Sırt</p><p class="poster-sub">Macera · 2025</p></div></div></div>
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#3a5a4a,#14241a)"><span class="score"><i class="bi bi-star-fill me-1"></i>7.8</span><div><p class="poster-title">Son İniş</p><p class="poster-sub">Aksiyon · 2026</p></div></div></div>
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#5a4a3a,#241a14)"><span class="score"><i class="bi bi-star-fill me-1"></i>8.2</span><div><p class="poster-title">Yaban</p><p class="poster-sub">Macera · 2025</p></div></div></div>
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#3a5a5a,#142424)"><span class="score"><i class="bi bi-star-fill me-1"></i>8.1</span><div><p class="poster-title">Yörünge</p><p class="poster-sub">Dram · 2024</p></div></div></div>
+        <div class="col"><div class="poster" style="background:linear-gradient(160deg,#5a3a4a,#24141e)"><span class="score"><i class="bi bi-star-fill me-1"></i>7.7</span><div><p class="poster-title">Gece Yolu</p><p class="poster-sub">Dram · 2026</p></div></div></div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="py-4 mt-4">
+  <div class="container d-flex flex-wrap justify-content-between gap-2 align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="footGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE28A"/><stop offset="1" stop-color="#F5A623"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="#171B25"/><rect x="8" y="8" width="48" height="11" rx="4" fill="#F5A623"/><rect x="8" y="45" width="48" height="11" rx="4" fill="#F5A623"/><g fill="#171B25"><rect x="17" y="9" width="6" height="9" rx="1.5"/><rect x="29" y="9" width="6" height="9" rx="1.5"/><rect x="41" y="9" width="6" height="9" rx="1.5"/><rect x="17" y="46" width="6" height="9" rx="1.5"/><rect x="29" y="46" width="6" height="9" rx="1.5"/><rect x="41" y="46" width="6" height="9" rx="1.5"/></g><path d="M26 25a3.5 3.5 0 0 1 5.2-3L44 29.9a2.4 2.4 0 0 1 0 4.2l-12.8 7.9a3.5 3.5 0 0 1-5.2-3V25Z" fill="url(#footGrad)"/></svg>
+      <span class="brand fs-6">MOVIE<span>LAND</span></span>
+    </div>
+    <div class="small text-muted">© 2026 MOVIELAND — İyi filmler, güzel hikâyeler.</div>
+  </div>
+</footer>
+<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="trailerModalLabel">Fall 2: Deadpoint — Fragman</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <div class="ratio ratio-16x9 d-flex align-items-center justify-content-center" style="background:linear-gradient(160deg,#2d3a4a,#0e1219)">
+          <div class="text-center text-white-50">
+            <i class="bi bi-play-circle" style="font-size:4rem;color:#e99a16"></i>
+            <p class="mb-0 mt-2">Fragman önizlemesi (mockup)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const DATA = {
+  movie: [
+    { title: 'Fall 2: Deadpoint', year: 2026, desc: 'Efsanevi tırmanıcı Mara Voss, fırtınada vahşi kaya duvarına geri dönüyor.' },
+    { title: 'Uçurumun Kenarı', year: 2026, desc: 'Bir dağ kurtarma ekibi, çığ altında kalanları kurtarmak için yarışıyor.' },
+    { title: 'Kızıl Sırt', year: 2025, desc: 'Yalnız bir dağcı, keşfedilmemiş bir zirvenin sırrını çözüyor.' },
+    { title: 'Son İniş', year: 2026, desc: 'Emekli pilot, son bir görevde fırtınanın içine dalıyor.' },
+    { title: 'Yaban', year: 2025, desc: 'Şehirden kaçan bir yazar, ormanda izole bir yaşam kuruyor.' },
+    { title: 'Yörünge', year: 2024, desc: 'Bir astronot, yalnız geçirdiği görevde sinyalin kaynağını arıyor.' }
+  ],
+  tv: [
+    { title: 'Kayıp Frekans', year: 2025, desc: 'Bir radyo sunucusu, gece yayınına gelen gizemli sinyali araştırıyor.' },
+    { title: 'Kuzey Yolu', year: 2025, desc: 'Bir aile, kış fırtınasında kaybolan kasabasına geri dönüyor.' },
+    { title: 'Gece Vardiyası', year: 2024, desc: 'Acil servis ekibi, en zorlu gecede ayakta kalmaya çalışıyor.' },
+    { title: 'Derin Sular', year: 2025, desc: 'Bir dalgıç ekibi, batık bir gemide unutulmuş bir sırrı buluyor.' }
+  ],
+  person: [
+    { title: 'Elif Demir', year: 1988, desc: 'Oyuncu — Fall 2: Deadpoint, Kızıl Sırt' },
+    { title: 'Kerem Aydın', year: 1985, desc: 'Oyuncu — Fall 2: Deadpoint, Gece Vardiyası' },
+    { title: 'Zeynep Kaya', year: 1992, desc: 'Oyuncu — Fall 2: Deadpoint, Derin Sular' },
+    { title: 'Nora Lindqvist', year: 1979, desc: 'Yönetmen — Fall 2: Deadpoint, Uçurumun Kenarı' }
+  ]
+};
+
+const GRADIENTS = [
+  'linear-gradient(160deg,#3a4a5a,#141a24)',
+  'linear-gradient(160deg,#4a3a5a,#241420)',
+  'linear-gradient(160deg,#3a5a4a,#14241a)',
+  'linear-gradient(160deg,#5a4a3a,#241a14)',
+  'linear-gradient(160deg,#3a5a5a,#142424)',
+  'linear-gradient(160deg,#5a3a4a,#24141e)'
+];
+
+const input = document.getElementById('searchInput');
+const panel = document.getElementById('searchPanel');
+const clearBtn = document.getElementById('clearBtn');
+const results = document.getElementById('searchResults');
+const tabs = document.querySelectorAll('.search-tab');
+let activeTab = 'movie';
+
+function renderResults(query) {
+  const list = DATA[activeTab];
+  const q = query.trim().toLowerCase();
+  const filtered = q ? list.filter(i => i.title.toLowerCase().includes(q)) : list;
+  if (!filtered.length) {
+    results.innerHTML = '<div class="panel-empty"><i class="bi bi-search fs-3 d-block mb-2"></i>Sonuç bulunamadı</div>';
+    return;
+  }
+  results.innerHTML = filtered.map((item, i) =>
+    '<a class="search-result" href="#filmDetail" onclick="closePanel()">' +
+      '<div class="thumb" style="background:' + GRADIENTS[i % GRADIENTS.length] + '">' + item.title.slice(0, 2).toUpperCase() + '</div>' +
+      '<div class="flex-grow-1">' +
+        '<div class="result-title">' + item.title + ' <span class="year">(' + item.year + ')</span></div>' +
+        '<div class="result-desc">' + item.desc + '</div>' +
+      '</div>' +
+    '</a>'
+  ).join('');
+}
+
+function openPanel() { panel.classList.add('open'); }
+function closePanel() { panel.classList.remove('open'); }
+
+input.addEventListener('input', () => { openPanel(); renderResults(input.value); });
+input.addEventListener('focus', () => { openPanel(); renderResults(input.value); });
+clearBtn.addEventListener('click', () => { input.value = ''; closePanel(); input.focus(); });
+
+tabs.forEach(tab => tab.addEventListener('click', () => {
+  tabs.forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  activeTab = tab.dataset.tab;
+  renderResults(input.value);
+}));
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) closePanel(); });
+
+renderResults('');
+</script>
+
+
+
+</body>
+</html>

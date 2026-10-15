@@ -30,6 +30,11 @@
               </p>
               <p v-if="movieData.tagline" class="mt-5 blockquote-footer fst-italic" style="font-size: 1rem">
                 {{ movieData.tagline }}</p>
+              <div class="d-flex flex-wrap gap-2 mt-4 align-items-center">
+                <button class="btn btn-outline-danger btn-sm" @click="toggleFavorite"><i class="bi bi-heart me-1"></i>Favorilere Ekle</button>
+                <button class="btn btn-outline-primary btn-sm" @click="toggleWatchlist"><i class="bi bi-bookmark me-1"></i>İzleme Listesine Ekle</button>
+                <span v-if="statusMessage" class="text-success small">{{ statusMessage }}</span>
+              </div>
             </div>
             <div class="column-footer">
               <ul class="nav justify-content-center">
@@ -109,6 +114,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 import Rating from '@/components/Rating.vue'
 import Slider from '../components/Slider.vue'
 import MovieSlider from '../components/MovieSlider.vue'
@@ -125,6 +131,40 @@ const recommendations = ref([])
 const loading = ref(false)
 const selectedTab = ref(Enums.SLIDER)
 const page = ref(0)
+const statusMessage = ref('')
+
+const auth = useAuthStore()
+const movieId = computed(() => Number(route.query.id))
+
+async function toggleFavorite() {
+  if (!auth.isAuthenticated) {
+    await auth.startLogin()
+    return
+  }
+  try {
+    await api.markFavorite(auth.accountId, auth.sessionId, movieId.value, true)
+    statusMessage.value = 'Favorilere eklendi'
+  } catch (e) {
+    statusMessage.value = 'Hata oluştu'
+    console.log(e)
+  }
+  setTimeout(() => (statusMessage.value = ''), 2500)
+}
+
+async function toggleWatchlist() {
+  if (!auth.isAuthenticated) {
+    await auth.startLogin()
+    return
+  }
+  try {
+    await api.addToWatchlist(auth.accountId, auth.sessionId, movieId.value, true)
+    statusMessage.value = 'İzleme listesine eklendi'
+  } catch (e) {
+    statusMessage.value = 'Hata oluştu'
+    console.log(e)
+  }
+  setTimeout(() => (statusMessage.value = ''), 2500)
+}
 
 const movieTitle = computed(() =>
   `${movieData.value.title} (${formatDate(movieData.value.release_date, 'YYYY')})`

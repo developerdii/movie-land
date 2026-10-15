@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101116">
+  <title>MOVIELAND — Film keşfet</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--ink:#101116;--panel:#191b23;--muted:#a1a4ae;--gold:#f5b63e;--line:#292b34}
+    *{box-sizing:border-box}body{background:var(--ink);color:#f7f5f0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    .navbar{background:rgba(16,17,22,.94);border-bottom:1px solid #252630;backdrop-filter:blur(16px)}
+    .brandmark{width:34px;height:34px;border-radius:10px;background:var(--gold);color:#15161b;display:grid;place-items:center;font-size:19px}
+    .brand{font-weight:900;letter-spacing:-1px;font-size:21px}.brand span{color:var(--gold)}
+    .nav-link{color:#b8bac2!important;font-size:14px}.nav-link:hover,.nav-link.active{color:#fff!important}
+    .search{background:#20212a;border:1px solid #31323c;border-radius:999px;color:white;padding:.65rem 1rem}.search::placeholder{color:#8e919c}
+    .btn-gold{background:var(--gold);border:0;color:#17171b;font-weight:750;border-radius:999px;padding:.72rem 1.15rem}.btn-gold:hover{background:#ffd16c;color:#17171b}
+    .hero{position:relative;min-height:500px;border-radius:22px;overflow:hidden;background:linear-gradient(90deg,rgba(12,13,18,.96) 0%,rgba(12,13,18,.76) 42%,rgba(12,13,18,.12) 100%),linear-gradient(0deg,rgba(12,13,18,.92),transparent 52%),url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2000&q=85') center 44%/cover}
+    .hero-content{position:relative;z-index:1;max-width:580px;padding:76px 0 64px 7%}.eyebrow{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:2.6px;text-transform:uppercase}.hero h1{font-size:clamp(2.8rem,6vw,5.3rem);font-weight:900;line-height:.96;letter-spacing:-.065em;margin:18px 0}.hero p{color:#c8c8cb;max-width:490px;line-height:1.65}.meta{color:#c1c1c5;font-size:13px}.meta .rating{color:var(--gold)}
+    .section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}.section-head h2{font-size:23px;font-weight:800;letter-spacing:-.5px;margin:0}.section-head a{color:var(--gold);text-decoration:none;font-size:13px;font-weight:650}
+    .poster{position:relative;overflow:hidden;border-radius:15px;background:#24252b;aspect-ratio:2/2.85;transition:transform .22s ease}.poster:hover{transform:translateY(-5px)}.poster img{width:100%;height:100%;object-fit:cover;display:block}.poster:after{content:"";position:absolute;inset:38% 0 0;background:linear-gradient(transparent,rgba(8,9,12,.92))}.poster-info{position:absolute;z-index:2;left:14px;right:12px;bottom:13px}.poster-info h3{font-size:15px;font-weight:750;margin:0 0 5px}.poster-info p{font-size:12px;color:#c4c4ca;margin:0}.score{position:absolute;z-index:2;top:11px;left:11px;background:rgba(14,15,20,.78);border:1px solid #ffffff20;border-radius:7px;padding:5px 8px;font-size:12px;font-weight:750}.score i{color:var(--gold)}
+    .genre{background:#1b1c24;border:1px solid #2b2c36;color:#e4e3df;border-radius:999px;padding:10px 16px;font-size:13px;white-space:nowrap}.genre:hover,.genre.selected{background:var(--gold);color:#17171b;border-color:var(--gold)}
+    .feature{background:linear-gradient(135deg,#1e2029,#17181f);border:1px solid #2b2d37;border-radius:17px;padding:20px;height:100%}.feature i{color:var(--gold);font-size:22px}.feature h3{font-size:15px;font-weight:750;margin:14px 0 7px}.feature p{color:var(--muted);font-size:13px;margin:0;line-height:1.55}
+    footer{border-top:1px solid var(--line);color:#858792;font-size:13px}
+    @media(max-width:767px){.hero{min-height:480px;background-position:58% center}.hero-content{padding:62px 24px 38px}.search{margin-top:12px}.section-head h2{font-size:20px}.poster-info{left:10px;bottom:10px}.poster-info h3{font-size:13px}}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container py-2">
+      <a class="navbar-brand d-flex align-items-center gap-2 me-lg-5" href="#"><span class="brandmark"><i class="bi bi-play-fill"></i></span><span class="brand">MOVIE<span>LAND</span></span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav gap-lg-3 me-auto"><li class="nav-item"><a class="nav-link active" href="#">Keşfet</a></li><li class="nav-item"><a class="nav-link" href="#popular">Filmler</a></li><li class="nav-item"><a class="nav-link" href="#genres">Kategoriler</a></li><li class="nav-item"><a class="nav-link" href="#coming">Yakında</a></li></ul>
+        <div class="d-flex gap-2 align-items-center mt-3 mt-lg-0"><div class="position-relative"><i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-secondary"></i><input class="form-control search ps-5" style="width:min(250px,70vw)" placeholder="Film veya oyuncu ara"></div><button class="btn btn-gold d-none d-sm-inline-flex">Giriş yap</button></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4 py-lg-5">
+    <section class="hero mb-5">
+      <div class="hero-content">
+        <div class="eyebrow"><i class="bi bi-stars me-2"></i>Haftanın seçkisi</div>
+        <h1>Her hikâye<br>bir yerde başlar.</h1>
+        <div class="meta d-flex flex-wrap gap-3 mb-3"><span><i class="bi bi-star-fill rating me-1"></i>8.7</span><span>2025</span><span>Bilim Kurgu</span><span>2 sa 14 dk</span></div>
+        <p>Geleceğin kıyısında, insanlığın en büyük sorusu yeniden soruluyor: Ev dediğimiz yer gerçekten neresi?</p>
+        <div class="d-flex gap-2 mt-4"><button class="btn btn-gold"><i class="bi bi-play-fill me-1"></i>Filmi keşfet</button><button class="btn btn-outline-light rounded-pill px-3"><i class="bi bi-bookmark-plus me-1"></i>Listeme ekle</button></div>
+      </div>
+    </section>
+
+    <section id="popular" class="mb-5">
+      <div class="section-head"><div><div class="eyebrow mb-2">İzleyicilerin favorileri</div><h2>Şimdi popüler</h2></div><a href="#">Tümünü gör <i class="bi bi-arrow-right ms-1"></i></a></div>
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-3 g-lg-4">
+        <div class="col"><article class="poster"><img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=700&q=80" alt="Karanlık salonda film izleyen seyirci"><span class="score"><i class="bi bi-star-fill me-1"></i>8.9</span><div class="poster-info"><h3>Gece Vardiyası</h3><p>Gerilim · 2025</p></div></article></div>
+        <div class="col"><article class="poster"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abb1?auto=format&fit=crop&w=700&q=80" alt="Sinematik şehir manzarası"><span class="score"><i class="bi bi-star-fill me-1"></i>8.5</span><div class="poster-info"><h3>Son Işık</h3><p>Bilim Kurgu · 2024</p></div></article></div>
+        <div class="col"><article class="poster"><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80" alt="Sisli orman"><span class="score"><i class="bi bi-star-fill me-1"></i>8.2</span><div class="poster-info"><h3>Yaban</h3><p>Macera · 2025</p></div></article></div>
+        <div class="col"><article class="poster"><img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=700&q=80" alt="Yıldızlı gece gökyüzü"><span class="score"><i class="bi bi-star-fill me-1"></i>8.1</span><div class="poster-info"><h3>Yörünge</h3><p>Dram · 2024</p></div></article></div>
+        <div class="col"><article class="poster"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=80" alt="Gün batımında dağlar"><span class="score"><i class="bi bi-star-fill me-1"></i>7.9</span><div class="poster-info"><h3>Uzak Kıyı</h3><p>Romantik · 2025</p></div></article></div>
+      </div>
+    </section>
+
+    <section id="genres" class="mb-5">
+      <div class="section-head"><div><div class="eyebrow mb-2">Ruh hâline göre seç</div><h2>Bir tür seç, keşfe çık</h2></div></div>
+      <div class="d-flex flex-wrap gap-2"><button class="genre selected"><i class="bi bi-grid me-2"></i>Tümü</button><button class="genre">Aksiyon</button><button class="genre">Bilim Kurgu</button><button class="genre">Dram</button><button class="genre">Gerilim</button><button class="genre">Komedi</button><button class="genre">Animasyon</button><button class="genre">Belgesel</button></div>
+    </section>
+
+    <section id="coming" class="mb-5">
+      <div class="section-head"><div><div class="eyebrow mb-2">Takvimine ekle</div><h2>Çok yakında</h2></div><a href="#">Vizyon takvimi <i class="bi bi-arrow-right ms-1"></i></a></div>
+      <div class="row g-3">
+        <div class="col-md-4"><div class="feature d-flex gap-3 align-items-center"><i class="bi bi-film"></i><div><h3 class="mb-1">Kayıp Frekans</h3><p>Bilim Kurgu · 24 Ekim 2025</p></div><span class="ms-auto badge rounded-pill text-bg-dark">12 gün</span></div></div>
+        <div class="col-md-4"><div class="feature d-flex gap-3 align-items-center"><i class="bi bi-camera-reels"></i><div><h3 class="mb-1">Kuzey Yolu</h3><p>Dram · 31 Ekim 2025</p></div><span class="ms-auto badge rounded-pill text-bg-dark">19 gün</span></div></div>
+        <div class="col-md-4"><div class="feature d-flex gap-3 align-items-center"><i class="bi bi-ticket-perforated"></i><div><h3 class="mb-1">Son Perde</h3><p>Gerilim · 7 Kasım 2025</p></div><span class="ms-auto badge rounded-pill text-bg-dark">26 gün</span></div></div>
+      </div>
+    </section>
+
+    <section class="row g-3 mb-5">
+      <div class="col-md-4"><div class="feature"><i class="bi bi-search-heart"></i><h3>Sana göre keşif</h3><p>İzleme zevkine göre yeni favorini bul.</p></div></div>
+      <div class="col-md-4"><div class="feature"><i class="bi bi-collection-play"></i><h3>Kendi listelerin</h3><p>İzlediklerini ve izlemek istediklerini bir arada tut.</p></div></div>
+      <div class="col-md-4"><div class="feature"><i class="bi bi-chat-square-text"></i><h3>Gerçek yorumlar</h3><p>Topluluğun değerlendirmelerini oku, kendi fikrini paylaş.</p></div></div>
+    </section>
+  </main>
+  <footer class="py-4"><div class="container d-flex flex-wrap justify-content-between gap-2"><span>© 2025 MOVIELAND</span><span>İyi filmler, güzel hikâyeler.</span></div></footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
