@@ -46,7 +46,8 @@ export default {
     return api.get('/discover/movie', {
       params: {
         'primary_release_date.gte': fromDate,
-        sort_by: 'primary_release_date.asc'
+        'with_runtime.gte': 60,
+        sort_by: 'popularity.desc'
       }
     })
   },

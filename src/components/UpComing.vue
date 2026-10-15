@@ -1,5 +1,5 @@
 <template>
-  <movie-slider v-if="upComingMovies.length" :movie-data="upComingMovies" :title="title" :show-footer="true" :show-indicators="true" :show-position="false"></movie-slider>
+  <movie-slider v-if="upComingMovies.length" :movie-data="upComingMovies" :title="title" :show-footer="true" :show-position="false"></movie-slider>
 </template>
 
 <script setup>

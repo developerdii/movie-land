@@ -22,7 +22,7 @@
               <div>
                 <h3 class="hover-title mb-1">{{ movie.title }}</h3>
                 <rating :value="movie.vote_average"></rating>
-                <router-link class="btn btn-gold btn-sm mt-2" :to="{ path: 'movie', query: { id: movie.id } }">
+                <router-link class="btn btn-gold mt-3" :to="{ path: 'movie', query: { id: movie.id } }">
                   <i class="bi bi-play-fill me-1"></i>View Details
                 </router-link>
               </div>
@@ -91,19 +91,21 @@ onBeforeUnmount(() => {
 .popular-movie-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.5rem;
   text-align: left;
-  max-width: 480px;
+  margin-top: 1.5rem;
 }
 
 .poster-thumb {
-  width: 110px;
-  border-radius: 10px;
+  width: 170px;
+  border-radius: 12px;
   flex-shrink: 0;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
 }
 
 .hover-title {
-  font-size: 1.4rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: #fff;
   margin: 0;
@@ -114,12 +116,14 @@ onBeforeUnmount(() => {
 }
 
 .caption {
-  text-align: center;
-  width: 100%;
-  padding: 22rem 6rem 3rem 6rem;
   position: absolute;
-  bottom: 0;
-  //height: 100%;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
   color: #fff;
   background: linear-gradient(0deg, rgba(3, 3, 8, 1) 0%, rgba(1, 1, 3, 0.6306897759103641) 53%, rgba(1, 1, 2, 0.5130427170868348) 71%, rgba(1, 1, 1, 0.35898109243697474) 83%, rgba(0, 0, 0, 0) 100%);
 
