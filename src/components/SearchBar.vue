@@ -418,12 +418,15 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   background: var(--mls-surface);
   border: 1px solid var(--mls-border);
   border-radius: 12px;
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition: border-color .15s ease;
 }
 
-#search .ml-search-inputwrap:focus-within {
+#search:focus-within .ml-search-inputwrap {
   border-color: var(--ml-brand-accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ml-brand-accent) 14%, transparent);
+}
+
+#search:focus-within .ml-search-panel {
+  border-color: var(--ml-brand-accent);
 }
 
 #search .ml-search-inputwrap.is-open {
