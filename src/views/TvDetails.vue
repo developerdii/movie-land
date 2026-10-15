@@ -1,12 +1,12 @@
 <template>
   <div v-if="!loading" class="container-xxl">
     <div class="mb-3">
-      <div class="eyebrow mb-1">Dizi</div>
+      <div class="eyebrow mb-1">TV Series</div>
       <h1 class="h2 fw-bold mb-2">{{ tv.name }} <span v-if="tv.first_air_date" class="text-muted fw-normal">({{ tv.first_air_date.slice(0, 4) }})</span></h1>
       <div class="d-flex flex-wrap align-items-center gap-2 gap-lg-3 text-muted small">
         <span v-if="tv.vote_average" class="text-warning fw-bold"><i class="bi bi-star-fill me-1"></i>{{ tv.vote_average.toFixed(1) }} / 10</span>
-        <span v-if="tv.number_of_seasons">• {{ tv.number_of_seasons }} sezon</span>
-        <span v-if="tv.episode_run_time && tv.episode_run_time.length">• {{ tv.episode_run_time[0] }} dk</span>
+        <span v-if="tv.number_of_seasons">• {{ tv.number_of_seasons }} seasons</span>
+        <span v-if="tv.episode_run_time && tv.episode_run_time.length">• {{ tv.episode_run_time[0] }} min</span>
         <span class="d-flex flex-wrap gap-1"><span v-for="g in tv.genres" :key="g.id" class="badge text-bg-light border">{{ g.name }}</span></span>
       </div>
     </div>
@@ -23,7 +23,7 @@
     </div>
 
     <section v-if="cast.length" class="mt-5">
-      <h2 class="section-title h4 mb-4">Oyuncular</h2>
+      <h2 class="section-title h4 mb-4">Cast</h2>
       <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3">
         <div v-for="person in cast" :key="person.id" class="col">
           <div class="movie-card" @click="goTo('person', person.id)">
@@ -37,7 +37,7 @@
     </section>
 
     <section v-if="recommendations.length" class="mt-5">
-      <h2 class="section-title h4 mb-4">Önerilen Diziler</h2>
+      <h2 class="section-title h4 mb-4">Recommended TV Shows</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
         <div v-for="rec in recommendations" :key="rec.id" class="col">
           <div class="movie-card" @click="goTo('tv', rec.id)">

@@ -82,48 +82,6 @@ export default {
 
   getTvRecommendations(tvId) {
     return api.get(`/tv/${tvId}/recommendations`)
-  },
-
-  // Authentication — session flow (powers account features)
-  createRequestToken() {
-    return api.get('/authentication/token/new')
-  },
-
-  createSession(requestToken) {
-    return api.post('/authentication/session/new', { request_token: requestToken })
-  },
-
-  deleteSession(sessionId) {
-    return api.delete('/authentication/session', { params: { session_id: sessionId } })
-  },
-
-  // Account — favorites / watchlist (session_id auth)
-  getAccount(sessionId) {
-    return api.get('/account', { params: { session_id: sessionId } })
-  },
-
-  getFavoriteMovies(accountId, sessionId, page = 1) {
-    return api.get(`/account/${accountId}/favorite/movies`, { params: { session_id: sessionId, page } })
-  },
-
-  getWatchlistMovies(accountId, sessionId, page = 1) {
-    return api.get(`/account/${accountId}/watchlist/movies`, { params: { session_id: sessionId, page } })
-  },
-
-  markFavorite(accountId, sessionId, mediaId, favorite) {
-    return api.post(
-      `/account/${accountId}/favorite`,
-      { media_type: 'movie', media_id: mediaId, favorite },
-      { params: { session_id: sessionId } }
-    )
-  },
-
-  addToWatchlist(accountId, sessionId, mediaId, watchlist) {
-    return api.post(
-      `/account/${accountId}/watchlist`,
-      { media_type: 'movie', media_id: mediaId, watchlist },
-      { params: { session_id: sessionId } }
-    )
   }
 }
 

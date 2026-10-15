@@ -6,19 +6,19 @@
         <div v-else class="person-profile-placeholder"><i class="bi bi-person"></i></div>
       </div>
       <div class="col-md-9 col-lg-10">
-        <div class="eyebrow mb-1">Kişi</div>
+        <div class="eyebrow mb-1">Person</div>
         <h1 class="h2 fw-bold mb-2">{{ person.name }}</h1>
         <div class="d-flex flex-wrap gap-2 gap-lg-3 text-muted small">
           <span v-if="person.known_for_department">{{ person.known_for_department }}</span>
           <span v-if="person.birthday">• {{ formatDate(person.birthday, 'MMM Do YY') }}</span>
-          <span v-if="person.popularity">• Popülerlik {{ person.popularity.toFixed(0) }}</span>
+          <span v-if="person.popularity">• Popularity {{ person.popularity.toFixed(0) }}</span>
         </div>
         <p v-if="person.biography" class="mt-4 text-muted" style="max-width: 60rem; line-height: 1.7">{{ person.biography }}</p>
       </div>
     </div>
 
     <section v-if="movieCredits.length" class="mt-5">
-      <h2 class="section-title h4 mb-4">Filmografi — Filmler</h2>
+      <h2 class="section-title h4 mb-4">Filmography — Movies</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
         <div v-for="movie in movieCredits" :key="movie.id" class="col">
           <div class="movie-card" @click="goTo('movie', movie.id)">
@@ -32,7 +32,7 @@
     </section>
 
     <section v-if="tvCredits.length" class="mt-5">
-      <h2 class="section-title h4 mb-4">Filmografi — Diziler</h2>
+      <h2 class="section-title h4 mb-4">Filmography — TV Shows</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
         <div v-for="tv in tvCredits" :key="tv.id" class="col">
           <div class="movie-card" @click="goTo('tv', tv.id)">

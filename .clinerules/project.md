@@ -16,8 +16,7 @@ npm run lint:fix   # ESLint autofix
 
 ## Key facts
 - Router uses **hash history** (`createWebHashHistory`) so deep links work on static hosting (GitHub Pages).
-- Routes: `/` (Home), `/movie?id={id}` (MovieDetails), `/tv?id={id}` (TvDetails), `/person?id={id}` (PersonDetails), `/favorites` (Favorites), `/watchlist` (Watchlist).
+- Routes: `/` (Home), `/movie?id={id}` (MovieDetails), `/tv?id={id}` (TvDetails), `/person?id={id}` (PersonDetails).
 - TMDB auth comes from `VITE_TMDB_ACCESS_TOKEN` (see `.env.example`); `src/api.js` owns the axios instance, base URL and NProgress interceptors.
-- Account features (favorites, watchlist) use TMDB session auth; the session id is stored in `localStorage` and managed by `src/stores/auth.js`.
 - `public/service-worker.js` is a one-off cleanup worker that removes the old Vue CLI PWA service worker (which cached the previous site).
 - Live: https://developerdii.github.io/movie-land/

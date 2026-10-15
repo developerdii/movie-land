@@ -12,7 +12,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 
 ## API versioning
 - **v3** (`/3/`) — read-only data (movies, TV, people, search, trending). This is the current standard and what MovieLand uses.
-- **v4** (`/4/`) — account/user data. MovieLand implements favorites + watchlist via the **v3 account endpoints** (`/3/account/...`) with `session_id` auth — the current documented approach for account features.
+- **v4** (`/4/`) — account/user data (favorites, watchlist, ratings, lists). Not used by MovieLand (requires user authentication).
 - **v2** — deprecated and removed years ago; there is no v2 to migrate from.
 
 ## Endpoints (via `src/api.js`)
@@ -31,18 +31,6 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
 | `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
 | `getTvRecommendations(tvId)` | `GET /tv/{id}/recommendations` | `TvDetails` |
-
-### Auth & account (session_id)
-| Method | Endpoint | Used by |
-| --- | --- | --- |
-| `createRequestToken` | `GET /authentication/token/new` | `auth.startLogin` |
-| `createSession(token)` | `POST /authentication/session/new` | `auth.completeLogin` |
-| `deleteSession(id)` | `DELETE /authentication/session` | `auth.logout` |
-| `getAccount(session)` | `GET /account` | `auth.loadAccount` (returns `id` = account_id) |
-| `getFavoriteMovies` | `GET /account/{id}/favorite/movies` | `Favorites` |
-| `getWatchlistMovies` | `GET /account/{id}/watchlist/movies` | `Watchlist` |
-| `markFavorite` | `POST /account/{id}/favorite` | `MovieDetails` |
-| `addToWatchlist` | `POST /account/{id}/watchlist` | `MovieDetails` |
 
 ## Response shapes (fields the UI relies on)
 - List endpoints return `{ results: [...] }` with items:

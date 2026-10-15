@@ -15,9 +15,8 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
   - `PopularMoviesSlider` — hero carousel from `movie/popular`; auto-cycles and pauses on hover.
   - `UpComing` — wraps `MovieSlider` with `movie/upcoming` data.
   - `Rating` — renders `vote_average` as `x.x / 10`.
-- **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`, `Favorites`, `Watchlist`.
+- **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`.
 - **`src/utils/`** — pure helpers: `date.js` (`formatDate`) and `collection.js` (`chunk`, `debounce`).
-- **`src/stores/auth.js`** — Pinia store for TMDB session auth: `sessionId`, `accountId`, `username`/`name`, and `startLogin`/`completeLogin`/`loadAccount`/`logout`.
 - **`src/enums.js`** — frozen view-mode enum: `LIST = 1`, `SLIDER = 2`.
 
 ## Rules of thumb
