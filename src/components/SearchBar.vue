@@ -1,6 +1,6 @@
 <template>
   <div id="search" ref="rootEl">
-    <div class="ml-search-inputwrap">
+    <div class="ml-search-inputwrap" :class="{ 'is-open': open }">
       <label class="visually-hidden" for="ml-search-input">Search movies, TV and people</label>
       <i v-if="!loading" class="bi bi-search ml-search-icon" aria-hidden="true"></i>
       <span v-else class="spinner-border spinner-border-sm ml-search-spinner" role="status" aria-hidden="true"></span>
@@ -47,6 +47,7 @@
         v-if="displayResults.length"
         id="ml-search-list"
         class="ml-search-list"
+        :class="{ 'is-keyboard': keyboardNav }"
         role="listbox"
         aria-label="Search results"
       >
@@ -60,7 +61,7 @@
           :aria-selected="index === activeIndex"
           :href="item.href"
           @click.prevent="openItem(item)"
-          @mouseenter="activeIndex = index"
+          @mouseenter="onRowHover(index)"
         >
           <span
             v-if="item.isPerson && !item.hasImage"
@@ -100,7 +101,6 @@
           <span class="ml-search-hint"><span class="ml-search-key">Enter</span><span>to open</span></span>
           <span class="ml-search-hint"><span class="ml-search-key">Esc</span><span>to close</span></span>
         </span>
-        <a class="ml-search-seeall" href="#" @click.prevent>{{ allLabel }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>
       </div>
     </div>
   </div>
@@ -135,6 +135,7 @@ const trendingCache = reactive({ movie: [], tv: [], person: [] })
 const searchCache = reactive({ movie: [], tv: [], person: [] })
 const genreMap = ref({})
 let genresLoaded = false
+const keyboardNav = ref(false)
 
 function filterResults(list, type) {
   return list.filter(item => type === 'person' || item.poster_path !== null)
@@ -228,12 +229,6 @@ const heading = computed(() => {
   if (!query.value.trim()) return 'Popular now'
   return counts[activeType.value] + ' ' + activeType.value + ' results'
 })
-
-const allLabel = computed(() => {
-  const q = query.value.trim()
-  return q ? 'See all results for “' + q + '”' : 'Browse all'
-})
-
 
 function syncTrendingCounts() {
   counts.movie = trendingCache.movie.length
@@ -350,17 +345,29 @@ function closePanel() {
   activeIndex.value = 0
 }
 
+function onRowHover(index) {
+  keyboardNav.value = false
+  activeIndex.value = index
+}
+
+function scrollActiveIntoView() {
+  const el = document.getElementById('ml-search-opt-' + activeIndex.value)
+  if (el) el.scrollIntoView({ block: 'nearest' })
+}
+
 function onKeydown(e) {
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault()
+    keyboardNav.value = true
     if (!open.value) {
       onFocus()
       return
     }
-    e.preventDefault()
     const n = results.value.length
     if (!n) return
     if (e.key === 'ArrowDown') activeIndex.value = (activeIndex.value + 1) % n
     else activeIndex.value = (activeIndex.value - 1 + n) % n
+    scrollActiveIntoView()
   } else if (e.key === 'Enter') {
     const item = displayResults.value[activeIndex.value]
     if (open.value && item) {
@@ -417,6 +424,11 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
 #search .ml-search-inputwrap:focus-within {
   border-color: var(--ml-brand-accent);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--ml-brand-accent) 14%, transparent);
+}
+
+#search .ml-search-inputwrap.is-open {
+  border-bottom-color: transparent;
+  border-radius: 12px 12px 0 0;
 }
 
 #search .ml-search-icon {
@@ -575,8 +587,11 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   transition: background-color .12s ease;
 }
 
-#search .ml-search-item:hover,
 #search .ml-search-item.is-active {
+  background: var(--mls-surface-2);
+}
+
+#search .ml-search-list:not(.is-keyboard) .ml-search-item:hover {
   background: var(--mls-surface-2);
 }
 
@@ -676,8 +691,8 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   transition: color .12s ease;
 }
 
-#search .ml-search-item:hover .ml-search-chevron,
-#search .ml-search-item.is-active .ml-search-chevron {
+#search .ml-search-item.is-active .ml-search-chevron,
+#search .ml-search-list:not(.is-keyboard) .ml-search-item:hover .ml-search-chevron {
   color: var(--ml-brand-accent);
 }
 
@@ -740,28 +755,9 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   font-variant-numeric: tabular-nums;
 }
 
-#search .ml-search-seeall {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--ml-brand-accent);
-  transition: background-color .12s ease;
-}
-
-#search .ml-search-seeall:hover {
-  background: var(--mls-surface-2);
-}
-
 #search .ml-search-tab:focus-visible,
 #search .ml-search-item:focus-visible,
-#search .ml-search-clear:focus-visible,
-#search .ml-search-seeall:focus-visible {
+#search .ml-search-clear:focus-visible {
   outline: 2px solid var(--ml-brand-accent);
   outline-offset: 2px;
 }
