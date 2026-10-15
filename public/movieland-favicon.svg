@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Movieland</title>
+  <desc>Golden play symbol inside a dark film strip icon.</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFE28A"/>
+      <stop offset="1" stop-color="#F5A623"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="17" fill="#171B25"/>
+  <rect x="8" y="8" width="48" height="11" rx="4" fill="#F5A623"/>
+  <rect x="8" y="45" width="48" height="11" rx="4" fill="#F5A623"/>
+  <g fill="#171B25">
+    <rect x="17" y="9" width="6" height="9" rx="1.5"/>
+    <rect x="29" y="9" width="6" height="9" rx="1.5"/>
+    <rect x="41" y="9" width="6" height="9" rx="1.5"/>
+    <rect x="17" y="46" width="6" height="9" rx="1.5"/>
+    <rect x="29" y="46" width="6" height="9" rx="1.5"/>
+    <rect x="41" y="46" width="6" height="9" rx="1.5"/>
+  </g>
+  <path d="M26 25a3.5 3.5 0 0 1 5.2-3L44 29.9a2.4 2.4 0 0 1 0 4.2l-12.8 7.9a3.5 3.5 0 0 1-5.2-3V25Z" fill="url(#g)"/>
+</svg>

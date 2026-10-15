@@ -37,4 +37,4 @@ VITE_TMDB_ACCESS_TOKEN=your_tmdb_api_read_access_token
 See `.env.example`.
 
 ## Deployment
-Deployment is handled by GitHub Actions (`.github/workflows/deploy.yml`): pushing to `main` builds and deploys to GitHub Pages. Set the `VITE_TMDB_ACCESS_TOKEN` secret in the repo settings and configure Pages to use the "GitHub Actions" source.
+Deployment is handled by GitHub Actions (`.github/workflows/deploy.yml`): pushing to `main` builds and deploys to GitHub Pages. The TMDB API Read Access Token (read-only, public) is embedded directly in the workflow, so no secret is required. Configure Pages to use the "GitHub Actions" source.

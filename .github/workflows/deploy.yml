@@ -33,7 +33,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_TMDB_ACCESS_TOKEN: ${{ secrets.VITE_TMDB_ACCESS_TOKEN }}
+          # TMDB API Read Access Token. This is a read-only, public token (it is
+          # already present in the deployed bundle and git history), so it is
+          # safe to keep here directly. Use a repo secret instead if preferred.
+          VITE_TMDB_ACCESS_TOKEN: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTYxOGM1MmJmYTRkMDg3M2E1OTQ1YzZmNDI3ODU5MyIsInN1YiI6IjYwZWIzYzg1MTQwYmFkMDA3MzJhZGNiMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.vFdHQnOomnHwXEGPBdNp-5dGJ-s4AzdpnXgTTO6P_Lc
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
