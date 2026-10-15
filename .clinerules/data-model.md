@@ -25,6 +25,12 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getMovieDetails(movieId)` | `GET /movie/{id}` | `MovieDetails` |
 | `getMovieCredits(movieId)` | `GET /movie/{id}/credits` | `MovieDetails` |
 | `getRecommendationsMovies(movieId)` | `GET /movie/{id}/recommendations` | `MovieDetails` |
+| `getPersonDetails(personId)` | `GET /person/{id}` | `PersonDetails` |
+| `getPersonMovieCredits(personId)` | `GET /person/{id}/movie_credits` | `PersonDetails` |
+| `getPersonTvCredits(personId)` | `GET /person/{id}/tv_credits` | `PersonDetails` |
+| `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
+| `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
+| `getTvRecommendations(tvId)` | `GET /tv/{id}/recommendations` | `TvDetails` |
 
 ### Auth & account (session_id)
 | Method | Endpoint | Used by |

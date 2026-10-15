@@ -1,5 +1,5 @@
 <template>
-  <nav id="nav" class="navbar navbar-expand-lg navbar-light shadow-sm bg-light">
+  <nav id="nav" class="navbar navbar-expand-lg navbar-light py-2">
     <div class="container-xxl">
       <router-link class="navbar-brand d-flex align-items-center" to="/"><img src="../assets/movieland-logo.svg" alt="Movieland" style="height: 40px; width: auto"></router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"

@@ -58,6 +58,32 @@ export default {
     return api.get(`/movie/${movieId}/recommendations`)
   },
 
+  // People
+  getPersonDetails(personId) {
+    return api.get(`/person/${personId}`)
+  },
+
+  getPersonMovieCredits(personId) {
+    return api.get(`/person/${personId}/movie_credits`)
+  },
+
+  getPersonTvCredits(personId) {
+    return api.get(`/person/${personId}/tv_credits`)
+  },
+
+  // TV
+  getTvDetails(tvId) {
+    return api.get(`/tv/${tvId}`)
+  },
+
+  getTvCredits(tvId) {
+    return api.get(`/tv/${tvId}/credits`)
+  },
+
+  getTvRecommendations(tvId) {
+    return api.get(`/tv/${tvId}/recommendations`)
+  },
+
   // Authentication — session flow (powers account features)
   createRequestToken() {
     return api.get('/authentication/token/new')

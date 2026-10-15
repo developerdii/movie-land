@@ -1,31 +1,105 @@
+:root {
+  --ml-bg: #f6f7fa;
+  --ml-surface: #ffffff;
+  --ml-ink: #171b25;
+  --ml-navy: #2c3e50;
+  --ml-muted: #596273;
+  --ml-gold: #e99a16;
+  --ml-gold2: #f5a623;
+  --ml-purple: #351c75;
+  --ml-line: #e7e9ef;
+}
+
+body {
+  background: var(--ml-bg);
+  color: var(--ml-ink);
+}
+
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-
 
 #nav {
   position: sticky;
-  z-index: 1;
+  z-index: 1030;
   top: 0;
   background-color: #fff;
+  border-bottom: 1px solid var(--ml-line);
   width: 100%;
 
   a {
     font-weight: bold;
-    color: #2c3e50;
+    color: var(--ml-navy);
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: var(--ml-gold);
     }
   }
 }
 
-$router-view-padding: 1rem;
-$router-view-margin: 1rem;
-
 #app .router-view {
-  padding: $router-view-padding;
-  margin-top: $router-view-margin;
-  min-height: calc(100vh - #{$router-view-margin} - #{$router-view-padding} - 200px);
+  padding: 1rem;
+  margin-top: 1rem;
+  min-height: calc(100vh - 240px);
+}
+
+/* Shared section title with the brand's thin purple divider */
+.section-title {
+  border-top: 3px solid var(--ml-purple);
+  padding-top: 0.55rem;
+  color: var(--ml-navy);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.eyebrow {
+  color: var(--ml-gold);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.poster-placeholder {
+  aspect-ratio: 2/3;
+  border-radius: 0.5rem;
+  background: linear-gradient(160deg, #2d3a4a, #141a24);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.person-profile-placeholder {
+  aspect-ratio: 2/3;
+  border-radius: 0.5rem;
+  background: linear-gradient(160deg, #5a6b8c, #2c3e50);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+.fact {
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-line);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.fact .label {
+  font-size: 0.72rem;
+  color: var(--ml-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fact .value {
+  font-weight: 700;
+  color: var(--ml-ink);
 }
