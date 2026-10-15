@@ -1,12 +1,14 @@
 <template>
   <slider :id="id">
-    <div v-if="title" slot="title">
-      <h2 class="container-title mb-0"> {{ title }}</h2>
-    </div>
-    <div slot="card">
+    <template #title>
+      <div v-if="title">
+        <h2 class="container-title mb-0">{{ title }}</h2>
+      </div>
+    </template>
+    <template #card>
       <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in movieData"
-           :key="index" data-bs-interval="300033">
-        <div class="row pr-3 pl-3">
+           :key="index">
+        <div class="row pe-3 ps-3">
           <div class="col-md-2 p-1 d-flex" v-for="(movie,movieIndex) in row" :key="movieIndex" @click="route(movie.id)">
             <div class="movie-card">
               <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
@@ -20,11 +22,11 @@
           </div>
         </div>
       </div>
-    </div>
+    </template>
   </slider>
 </template>
 <script>
-import Slider from './Slider'
+import Slider from './Slider.vue'
 import dateFormatter from "@/mixins/dateFormatter";
 
 export default {
@@ -57,7 +59,7 @@ export default {
 
   methods: {
     route(id) {
-      this.$store.commit('routeToClicked', {path: 'movie', query: id})
+      this.$router.push({ path: 'movie', query: { id } })
     }
   }
 }

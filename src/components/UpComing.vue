@@ -1,5 +1,5 @@
 <template>
-  <movie-slider :movie-data="upComingMovies" :title="title" :show-footer="true">
+  <movie-slider v-if="upComingMovies.length" :movie-data="upComingMovies" :title="title" :show-footer="true">
 
   </movie-slider>
 </template>
@@ -7,7 +7,7 @@
 <script>
 import _ from 'lodash'
 import api from "@/api";
-import MovieSlider from '../components/MovieSlider'
+import MovieSlider from '../components/MovieSlider.vue'
 
 export default {
   components: {MovieSlider},
@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     route(id) {
-      this.$store.commit('routeToClicked', {path: 'movie', query: id})
+      this.$router.push({ path: 'movie', query: { id } })
     }
   }
 }

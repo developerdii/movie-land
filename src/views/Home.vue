@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import Slider from '../components/PopularMoviesSlider'
-import UpComing from "@/components/UpComing";
+import Slider from '../components/PopularMoviesSlider.vue'
+import UpComing from "@/components/UpComing.vue";
 
 export default {
   name: 'Home',

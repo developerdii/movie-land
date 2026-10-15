@@ -1,24 +1,13 @@
 <template>
   <div id="search">
     <div class="d-flex align-items-center small">
-      <i v-if="!loading" class="fa fa-search fa-fw text-muted position-absolute pl-3"></i>
-      <i v-else class="fas fa-spinner fa-spin text-muted position-absolute ml-3"></i>
-      <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control border-0 pl-5"
+      <i v-if="!loading" class="bi bi-search text-muted position-absolute ps-3"></i>
+      <span v-else class="spinner-border spinner-border-sm text-muted position-absolute ms-3" role="status" aria-hidden="true"></span>
+      <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control border-0 ps-5"
              placeholder="Search..."/>
 
-<!--      <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">-->
-<!--        <div class="input-group">-->
-<!--          <input type="text" v-model="searchText" @click="getList" @keyup="debounceInput" class="form-control bg-white border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">-->
-<!--          <div class="input-group-append">-->
-<!--            <button class="btn btn-info" type="button">-->
-<!--              <i v-if="!loading" class="fa fa-search fa-fw"></i>-->
-<!--              <i v-else class="fas fa-spinner fa-spin"></i>-->
-<!--            </button>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </form>-->
     </div>
-    <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed mr-2 mt-1 bg-light shadow-sm"
+    <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed me-2 mt-1 bg-light shadow-sm"
          style="right: 0; overflow-y: auto; max-height: 92vh">
       <nav id="search-nav-bar" class="nav nav-pills sticky-top bg-light shadow-sm flex-column flex-sm-row">
         <a v-for="media in mediaTypes" :key="media.id" class="flex-sm-fill text-sm-center nav-link shadow m-1"
@@ -34,10 +23,10 @@
             <small>{{ getFormattedDate(item.release_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pr-0">
+            <div class="col-md-2 pe-0">
               <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.poster_path">
             </div>
-            <div class="col-md-10 pl-0">
+            <div class="col-md-10 ps-0">
               <small class="search-list-description"> {{ item.overview }}</small>
             </div>
           </div>
@@ -48,10 +37,10 @@
             <small>{{ getFormattedDate(item.first_air_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pr-0">
+            <div class="col-md-2 pe-0">
               <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.poster_path">
             </div>
-            <div class="col-md-10 pl-0">
+            <div class="col-md-10 ps-0">
               <small class="search-list-description"> {{ item.overview }}</small>
             </div>
           </div>
@@ -62,14 +51,14 @@
             <small>Popularity: <span class="text-info">{{ item.popularity }}</span></small>
           </div>
           <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pr-0">
+            <div class="col-md-2 pe-0">
               <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.profile_path">
             </div>
-            <div class="col-md-10 pl-0">
-              <p v-for="(movie,index) in item.known_for" :key="index" class="font-weight-light m-1">
+            <div class="col-md-10 ps-0">
+              <p v-for="(movie,index) in item.known_for" :key="index" class="fw-light m-1">
                 <template v-if="movie.title">
-                  <a class="font-weight-light" href="javascript:void(0);" @click="route('movie', movie.id)">{{ movie.title + ' - ' }}</a>
-                  <i class="fas fa-star" style="color: orange"></i> {{ movie.vote_average }}
+                  <a class="fw-light" href="javascript:void(0);" @click="route('movie', movie.id)">{{ movie.title + ' - ' }}</a>
+                  <i class="bi bi-star-fill" style="color: orange"></i> {{ movie.vote_average }}
                 </template>
               </p>
             </div>
@@ -81,7 +70,7 @@
           <h5 class="p-10 m-10">{{ 'Nothing Found' }}</h5>
         </div>
         <div class="row mt-1" style="width: 40rem">
-          <div class="col-md-10 pl-0">
+          <div class="col-md-10 ps-0">
           </div>
         </div>
       </div>
@@ -253,7 +242,7 @@ export default {
     },
 
     route(media, id) {
-      this.$store.commit('routeToClicked', {path: media, query: id})
+      this.$router.push({ path: media, query: { id } })
     }
   }
 }

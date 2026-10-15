@@ -1,5 +1,8 @@
 # MOVIE LAND
+
 https://developerdii.github.io/movie-land/
+
+A Vue 3 SPA for browsing movies & TV via the TMDB API.
 
 ## Project setup
 ```
@@ -8,7 +11,7 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -16,15 +19,22 @@ npm run serve
 npm run build
 ```
 
-### Run your end-to-end tests
+### Preview the production build locally
 ```
-npm run test:e2e
+npm run preview
 ```
 
-### Lints and fixes files
+### Lint
 ```
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Environment
+Create a `.env.local` file with your TMDB API Read Access Token:
+```
+VITE_TMDB_ACCESS_TOKEN=your_tmdb_api_read_access_token
+```
+See `.env.example`.
+
+## Deployment
+Deployment is handled by GitHub Actions (`.github/workflows/deploy.yml`): pushing to `main` builds and deploys to GitHub Pages. Set the `VITE_TMDB_ACCESS_TOKEN` secret in the repo settings and configure Pages to use the "GitHub Actions" source.

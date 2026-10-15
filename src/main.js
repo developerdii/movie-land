@@ -1,32 +1,18 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
-import './registerServiceWorker'
 import router from './router'
-import store from './store'
-import moment from "moment";
-import axios from 'axios'
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css';
 
-Vue.config.productionTip = false
+import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.min.css'
+import '@/assets/scss/app.scss'
 
-Vue.use(moment)
+const app = createApp(App)
 
-NProgress.configure({ parent: '#app' });
-NProgress.configure({ showSpinner: false });
+app.use(createPinia())
+app.use(router)
 
-axios.interceptors.request.use(config => {
-  NProgress.start()
-  return config
-})
+app.mount('#app')
 
-axios.interceptors.response.use(response => {
-  NProgress.done()
-  return response
-})
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')

@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot name="title"></slot>
-    <div :id="id" class="carousel slide" style="z-index: 0" data-bs-ride="carousel">
+    <div ref="carousel" :id="id" class="carousel slide" style="z-index: 0">
       <div class="carousel-inner">
         <slot name="card"></slot>
       </div>
@@ -20,12 +20,20 @@
 </template>
 
 <script>
+import { Carousel } from 'bootstrap'
+
 export default {
   props: {
     id: {
       type: String,
       default: 'carouselExampleIndicators2'
     }
+  },
+  mounted() {
+    this.carousel = new Carousel(this.$refs.carousel, { wrap: true })
+  },
+  beforeUnmount() {
+    this.carousel?.dispose()
   }
 }
 </script>

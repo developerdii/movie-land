@@ -1,8 +1,5 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
-
-Vue.use(VueRouter)
+import { createRouter, createWebHashHistory } from 'vue-router'
+import Home from '../views/Home.vue'
 
 const routes = [
   {
@@ -12,16 +9,15 @@ const routes = [
   },
   {
     path: '/movie',
-    query: 'id',
     name: 'MovieDetails',
     component: () => import('../views/MovieDetails.vue')
   }
 ]
 
-const router = new VueRouter({
-  // mode: 'history',
-  base: process.env.BASE_URL,
+// Hash history is used so deep links (e.g. /movie?id=123) work on static
+// hosting like GitHub Pages, which has no server-side SPA fallback.
+export default createRouter({
+  history: createWebHashHistory(),
   routes
 })
 
-export default router

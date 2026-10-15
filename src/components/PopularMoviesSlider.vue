@@ -1,5 +1,5 @@
 <template>
-  <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel"
+  <div id="carouselExampleIndicators" ref="carousel" class="carousel slide carousel-fade"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
       <button v-for="(movie,index) in popularMovies" :key="index" type="button"
@@ -7,15 +7,15 @@
               :aria-label="'Slide '+(index+1)"></button>
     </div>
     <div class="carousel-inner">
-      <div class="carousel-item" :class="index === 0 ? 'active' : ''" :data-bs-interval="carouselInterval"
+      <div class="carousel-item" :class="index === 0 ? 'active' : ''"
            v-for="(movie,index) in popularMovies" :key="index">
         <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block popular-movie-img"
              :class="isShownDescription ? 'blurred' : ''" :alt="movie.title">
         <div class="caption d-none d-md-block hide">
           <p>
-            <i v-if="!isShownDescription" class="fas fa-angle-up swipe-animation"
+            <i v-if="!isShownDescription" class="bi bi-chevron-up swipe-animation"
                style="font-size: 2rem;opacity: 0.6; "></i>
-            <i v-else class="fas fa-angle-down swipe-animation" style="font-size: 2rem;opacity: 0.6; "></i>
+            <i v-else class="bi bi-chevron-down swipe-animation" style="font-size: 2rem;opacity: 0.6; "></i>
           </p>
           <span v-if="!isShownDescription" class="title">{{ movie.title }}</span>
           <p class="description m-1" v-show="!isShownDescription">
@@ -27,7 +27,7 @@
                 <img class="card-img-top w-25" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
                 <rating class="m-1" :value="movie.vote_average"></rating>
                 <p class="movie-link m-1">
-                  <router-link :to="'movie?id='+movie.id">{{ movie.title }} <i class="fas fa-external-link-alt"></i></router-link>
+                  <router-link :to="{ path: 'movie', query: { id: movie.id } }">{{ movie.title }} <i class="bi bi-box-arrow-up-right"></i></router-link>
                 </p>
               </div>
             </div>
@@ -49,14 +49,14 @@
 </template>
 <script>
 import api from "@/api";
-import Rating from "@/components/Rating";
+import Rating from "@/components/Rating.vue";
+import { Carousel } from 'bootstrap'
 
 export default {
   data() {
     return {
       popularMovies: [],
       isShownDescription: false,
-      carouselInterval: 5000,
     }
   },
   components: {
@@ -65,25 +65,22 @@ export default {
   methods: {
     hoverCarousel() {
       this.isShownDescription = true;
-      this.carouselInterval = 100000;
+      this.carousel?.pause();
     },
     unHoverCarousel() {
       this.isShownDescription = false;
-      this.carouselInterval = 5000;
+      this.carousel?.cycle();
     }
   },
   async mounted() {
-    await api.getPopularMovies().then(response => {
-          response.data.results.forEach((movie, index) => {
-            if (movie.backdrop_path === null) {
-              response.data.results.splice(index, 1)
-            }
-          })
-          this.popularMovies = response.data.results
-        }
-    )
+    const response = await api.getPopularMovies()
+    this.popularMovies = response.data.results.filter(movie => movie.backdrop_path !== null)
+    await this.$nextTick()
+    this.carousel = new Carousel(this.$refs.carousel, { interval: 5000, ride: 'carousel', wrap: true })
+  },
+  beforeUnmount() {
+    this.carousel?.dispose()
   }
-
 }
 </script>
 

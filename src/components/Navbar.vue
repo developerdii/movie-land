@@ -22,18 +22,18 @@
           <!--            </li>-->
 
         </ul>
-        <search></search>
+        <search-bar></search-bar>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
-import Search from "@/components/Search";
+import SearchBar from "@/components/SearchBar.vue";
 
 export default {
   components: {
-    Search
+    SearchBar
   }
 }
 </script>

@@ -2,7 +2,7 @@
   <div v-if="!loading" class="container-xxl">
     <div class="container-title">
       <div class="mb-2">
-        <span class="font-weight-bold">
+        <span class="fw-bold">
           <div class="row">
             <div class="col-md-10">
               <span class="display-4">
@@ -10,7 +10,7 @@
               </span>
             </div>
             <div class="col-md-2">
-              <rating :value="movieData.vote_average" class="float-right mt-2" style="font-size: 2rem"/>
+              <rating :value="movieData.vote_average" class="float-end mt-2" style="font-size: 2rem"/>
             </div>
           </div>
         </span>
@@ -22,13 +22,13 @@
           </div>
           <div class="col-md-7">
             <div v-if="selectedTab === Enums.SLIDER">
-            <span v-for="tags in movieData.genres" :key="tags.id" class="badge bg-secondary mr-1 mb-2">
+            <span v-for="tags in movieData.genres" :key="tags.id" class="badge bg-secondary me-1 mb-2">
              <h6 class="mb-0">{{ tags.name }}</h6>
           </span>
               <p class="lead mt-5">
                 {{ movieData.overview }}
               </p>
-              <p v-if="movieData.tagline" class="mt-5 blockquote-footer font-italic" style="font-size: 1rem">
+              <p v-if="movieData.tagline" class="mt-5 blockquote-footer fst-italic" style="font-size: 1rem">
                 {{ movieData.tagline }}</p>
             </div>
             <div class="column-footer">
@@ -36,22 +36,22 @@
                 <li class="nav-item">
                   <a class="nav-link nav-icon" :class="selectedTab === Enums.SLIDER ? 'text-primary' : ''"
                      href="javascript:void(0);" @click="selectViewTab(Enums.SLIDER)">
-                    <i class="fa fa-th-large"></i>
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link nav-icon" :class="selectedTab === Enums.LIST ? 'text-primary' : ''"
                      href="javascript:void(0);" @click="selectViewTab(Enums.LIST)">
-                    <i class="fa fa-bars"></i>
+                    <i class="bi bi-list"></i>
                   </a>
                 </li>
               </ul>
               <div class="row">
-                <slider v-if="selectedTab === Enums.SLIDER">
-                  <div slot="card">
+                <slider v-if="selectedTab === Enums.SLIDER && cast.length">
+                  <template #card>
                     <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row,index) in cast"
-                         :key="index" data-bs-interval="300033">
-                      <div class="row pr-3 pl-3">
+                         :key="index">
+                      <div class="row pe-3 ps-3">
                         <div class="col-md-3 p-1 d-flex" v-for="(person,personIndex) in row" :key="personIndex">
                           <div class="movie-card">
                             <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500'+person.profile_path">
@@ -65,13 +65,13 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </template>
                 </slider>
                 <div v-if="selectedTab === Enums.LIST">
                   <div style="min-height: 60vh">
                     <div class="row border rounded bg-white" style="width: 45rem;" v-for="(person, index) in cast[page]" :key="index">
-                      <div class="col-md-2 pl-0">
-                        <img class="rounded-left" style="width: 60%;" :src="'https://image.tmdb.org/t/p/w500'+person.profile_path">
+                      <div class="col-md-2 ps-0">
+                        <img class="rounded-start" style="width: 60%;" :src="'https://image.tmdb.org/t/p/w500'+person.profile_path">
                       </div>
                       <div class="col-md-10">
                         <p class="lead"><strong>{{ person.name }}</strong></p>
@@ -80,14 +80,14 @@
                     </div>
                   </div>
                   <div class="pt-2">
-                    <ul class="pagination float-right mr-5 mb-0" style="font-size: 1.5rem">
+                    <ul class="pagination float-end me-5 mb-0" style="font-size: 1.5rem">
                       <li @click="changePage(true)"><a :class="disableNext ? 'disable-paginate' : ''" href="javascript:void(0);">
-                        <i class="fas fa-chevron-right"></i>
+                        <i class="bi bi-chevron-right"></i>
                       </a></li>
                     </ul>
-                    <ul class="pagination float-left mb-0" style="font-size: 1.5rem">
+                    <ul class="pagination float-start mb-0" style="font-size: 1.5rem">
                       <li @click="changePage(false)"><a :class="disablePrevious ? 'disable-paginate' : ''" href="javascript:void(0);">
-                        <i class="fas fa-chevron-left"></i>
+                        <i class="bi bi-chevron-left"></i>
                       </a></li>
                     </ul>
                   </div>
@@ -96,7 +96,7 @@
             </div>
           </div>
         </div>
-        <div v-if="recommendations" class="row mt-2">
+        <div v-if="recommendations.length" class="row mt-2">
           <movie-slider id="recommendations" :movie-data="recommendations" :show-footer="false"
                         title="Recommendations"></movie-slider>
         </div>
@@ -107,10 +107,10 @@
 
 <script>
 import api from "@/api";
-import Rating from "@/components/Rating";
+import Rating from "@/components/Rating.vue";
 import dateFormatter from '../mixins/dateFormatter';
-import Slider from '../components/Slider'
-import MovieSlider from '../components/MovieSlider'
+import Slider from '../components/Slider.vue'
+import MovieSlider from '../components/MovieSlider.vue'
 import Enums from '../enums'
 import _ from "lodash";
 
