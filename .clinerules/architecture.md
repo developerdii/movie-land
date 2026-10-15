@@ -6,18 +6,19 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
 ```
 
 ## Layers
-- **`src/api.js`** — the ONLY network/TMDB seam. Creates a dedicated axios instance (`baseURL`, `Authorization: Bearer ${VITE_TMDB_ACCESS_TOKEN}`), attaches NProgress request/response interceptors, and exposes named methods: `getPopularMovies`, `getTrendingMovies(mediaType, timeWindow)`, `getSearch(mediaType, searchText)`, `getUpComing`, `getMovieDetails(id)`, `getMovieCredits(id)`, `getRecommendationsMovies(id)`.
+- **`src/api.js`** — the ONLY network/TMDB seam. A dedicated axios instance (`baseURL`, `Authorization: Bearer ${VITE_TMDB_ACCESS_TOKEN}`) with NProgress interceptors; all TMDB methods are listed in `data-model.md`.
 - **`src/components/`**:
   - `Navbar` — sticky nav, hosts `SearchBar`.
   - `SearchBar` — debounced (350 ms) search across movie/tv/person with client-side caching (`searchValue`, `trendingData`).
-  - `Slider` — reusable Bootstrap carousel shell (slots `title` and `card`); initializes its `Carousel` in `onMounted()` (manual nav only).
+  - `Slider` — reusable Bootstrap carousel shell (slots `title` and `card`); props `showIndicators` (dots) and `showPosition` ("N / M" badge); initializes its `Carousel` in `onMounted()` (manual nav only).
   - `MovieSlider` — renders `Slider` with chunked rows of 6 movies.
   - `PopularMoviesSlider` — hero carousel from `movie/popular`; auto-cycles and pauses on hover.
-  - `UpComing` — wraps `MovieSlider` with `movie/upcoming` data.
+  - `UpComing` — wraps `MovieSlider` with upcoming movies from the discover endpoint (see `data-model.md`).
   - `Rating` — renders `vote_average` as `x.x / 10`.
 - **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`.
 - **`src/utils/`** — pure helpers: `date.js` (`formatDate`) and `collection.js` (`chunk`, `debounce`).
-- **`src/enums.js`** — frozen view-mode enum: `LIST = 1`, `SLIDER = 2`.
+- **`src/composables/usePagination.js`** — `usePagination(items, pageSize)` for client-side list pagination.
+- **`src/components/PaginationControls.vue`** — prev/next + "page X / Y" pagination controls.
 
 ## Rules of thumb
 - All TMDB calls go through `src/api.js`; never inline axios/fetch in components.
