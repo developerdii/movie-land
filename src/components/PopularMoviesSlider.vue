@@ -12,23 +12,19 @@
         <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block popular-movie-img"
              :class="isShownDescription ? 'blurred' : ''" :alt="movie.title">
         <div class="caption d-none d-md-block hide">
-          <p>
-            <i v-if="!isShownDescription" class="bi bi-chevron-up swipe-animation"
-               style="font-size: 2rem;opacity: 0.6; "></i>
-            <i v-else class="bi bi-chevron-down swipe-animation" style="font-size: 2rem;opacity: 0.6; "></i>
-          </p>
           <span v-if="!isShownDescription" class="title">{{ movie.title }}</span>
           <p class="description m-1" v-show="!isShownDescription">
             {{ movie.overview }}
           </p>
           <transition name="description">
-            <div class="row popular-movie-card" v-if="isShownDescription">
-              <div class="col-md-12">
-                <img class="card-img-top w-25" :src="'https://image.tmdb.org/t/p/w500'+movie.poster_path">
-                <rating class="m-1" :value="movie.vote_average"></rating>
-                <p class="movie-link m-1">
-                  <router-link :to="{ path: 'movie', query: { id: movie.id } }">{{ movie.title }} <i class="bi bi-box-arrow-up-right"></i></router-link>
-                </p>
+            <div class="popular-movie-card" v-if="isShownDescription">
+              <img class="poster-thumb" :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" :alt="movie.title">
+              <div>
+                <h3 class="hover-title mb-1">{{ movie.title }}</h3>
+                <rating :value="movie.vote_average"></rating>
+                <router-link class="btn btn-gold btn-sm mt-2" :to="{ path: 'movie', query: { id: movie.id } }">
+                  <i class="bi bi-play-fill me-1"></i>View Details
+                </router-link>
               </div>
             </div>
           </transition>
@@ -45,9 +41,6 @@
       <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
-    <div v-if="totalSlides > 1" class="hero-position">
-      <span class="badge text-bg-dark">{{ activeSlide }} / {{ totalSlides }}</span>
-    </div>
   </div>
 </template>
 <script setup>
@@ -59,8 +52,6 @@ import { Carousel } from 'bootstrap'
 const popularMovies = ref([])
 const isShownDescription = ref(false)
 const carouselEl = ref(null)
-const activeSlide = ref(1)
-const totalSlides = ref(0)
 let carousel = null
 
 function hoverCarousel() {
@@ -78,10 +69,6 @@ onMounted(async () => {
   popularMovies.value = response.data.results.filter(movie => movie.backdrop_path !== null)
   await nextTick()
   carousel = new Carousel(carouselEl.value, { interval: 5000, ride: 'carousel', wrap: true })
-  totalSlides.value = popularMovies.value.length
-  carouselEl.value.addEventListener('slid.bs.carousel', (e) => {
-    activeSlide.value = (e.to || 0) + 1
-  })
 })
 
 onBeforeUnmount(() => {
@@ -94,13 +81,6 @@ onBeforeUnmount(() => {
   z-index: 0;
 }
 
-.hero-position {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  z-index: 2;
-}
-
 .popular-movie-img {
   object-position: 100% 0;
   width: 100%;
@@ -108,23 +88,25 @@ onBeforeUnmount(() => {
   object-fit: cover
 }
 
-.swipe-animation {
-  -webkit-animation: uparrow 1s infinite alternate ease-in-out;
-}
-
-@-webkit-keyframes uparrow {
-  0% {
-    -webkit-transform: translateY(0);
-    opacity: 0.4
-  }
-  100% {
-    -webkit-transform: translateY(-0.4em);
-    opacity: 0.9
-  }
-}
-
 .popular-movie-card {
-  padding-top: 6rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  max-width: 480px;
+}
+
+.poster-thumb {
+  width: 110px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.hover-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
 }
 
 .blurred {
@@ -151,10 +133,6 @@ onBeforeUnmount(() => {
   .description {
     color: #FFFFFFB3;
     font-style: italic;
-  }
-
-  .movie-link {
-    font-size: 1.2rem;
   }
 
   .description-enter,

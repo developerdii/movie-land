@@ -5,6 +5,11 @@
       <div class="carousel-inner">
         <slot name="card"></slot>
       </div>
+      <div v-if="showIndicators && totalSlides > 1" class="carousel-indicators">
+        <button v-for="n in totalSlides" :key="n" type="button"
+                :data-bs-target="'#' + id" :data-bs-slide-to="n - 1"
+                :class="n === activeSlide ? 'active' : ''" :aria-label="'Slide ' + n"></button>
+      </div>
       <button class="carousel-control-prev" type="button" :data-bs-target="'#' + id"
               data-bs-slide="prev">
         <span class="carousel-control-prev-icon p-3" aria-hidden="true"></span>
@@ -15,7 +20,7 @@
         <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
-      <div v-if="totalSlides > 1" class="carousel-position">
+      <div v-if="showPosition && totalSlides > 1" class="carousel-position">
         <span class="badge text-bg-dark">{{ activeSlide }} / {{ totalSlides }}</span>
       </div>
     </div>
@@ -30,6 +35,14 @@ defineProps({
   id: {
     type: String,
     default: 'carouselExampleIndicators2'
+  },
+  showIndicators: {
+    type: Boolean,
+    default: false
+  },
+  showPosition: {
+    type: Boolean,
+    default: true
   }
 })
 

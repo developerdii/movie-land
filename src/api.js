@@ -42,8 +42,13 @@ export default {
     return api.get(`/search/${mediaType}`, { params: { query: searchText } })
   },
 
-  getUpComing() {
-    return api.get('/movie/upcoming')
+  getUpComing(fromDate) {
+    return api.get('/discover/movie', {
+      params: {
+        'primary_release_date.gte': fromDate,
+        sort_by: 'primary_release_date.asc'
+      }
+    })
   },
 
   getMovieDetails(movieId) {

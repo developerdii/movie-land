@@ -1,5 +1,5 @@
 <template>
-  <slider :id="id">
+  <slider :id="id" :show-indicators="showIndicators" :show-position="showPosition">
     <template #title>
       <div v-if="title">
         <h2 class="container-title mb-0">{{ title }}</h2>
@@ -30,7 +30,9 @@ defineProps({
   movieData: { type: Array, default: null },
   showFooter: { type: Boolean, default: true },
   title: { type: String, default: null },
-  id: { type: String, default: 'carouselExampleIndicators2' }
+  id: { type: String, default: 'carouselExampleIndicators2' },
+  showIndicators: { type: Boolean, default: false },
+  showPosition: { type: Boolean, default: true }
 })
 
 const router = useRouter()

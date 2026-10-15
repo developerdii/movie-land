@@ -103,3 +103,16 @@ body {
   font-weight: 700;
   color: var(--ml-ink);
 }
+
+.btn-gold {
+  background: var(--ml-gold);
+  border: 0;
+  color: #17171b;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.btn-gold:hover {
+  background: #ffd16c;
+  color: #17171b;
+}
