@@ -15,6 +15,9 @@
         <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
+      <div v-if="totalSlides > 1" class="carousel-position">
+        <span class="badge text-bg-dark">{{ activeSlide }} / {{ totalSlides }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -31,10 +34,16 @@ defineProps({
 })
 
 const carouselEl = ref(null)
+const activeSlide = ref(1)
+const totalSlides = ref(0)
 let carousel = null
 
 onMounted(() => {
   carousel = new Carousel(carouselEl.value, { wrap: true })
+  totalSlides.value = carouselEl.value.querySelectorAll('.carousel-item').length
+  carouselEl.value.addEventListener('slid.bs.carousel', (e) => {
+    activeSlide.value = (e.to || 0) + 1
+  })
 })
 
 onBeforeUnmount(() => {
@@ -103,6 +112,13 @@ $movie-card-radius: 1.2rem;
   background: radial-gradient(circle closest-side, rgba(0, 0, 0, .1), transparent);
   border-radius: 10px;
   margin: 10rem 0;
+}
+
+.carousel-position {
+  position: absolute;
+  top: 0.5rem;
+  right: 1.25rem;
+  z-index: 2;
 }
 
 

@@ -45,6 +45,9 @@
       <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
+    <div v-if="totalSlides > 1" class="hero-position">
+      <span class="badge text-bg-dark">{{ activeSlide }} / {{ totalSlides }}</span>
+    </div>
   </div>
 </template>
 <script setup>
@@ -56,6 +59,8 @@ import { Carousel } from 'bootstrap'
 const popularMovies = ref([])
 const isShownDescription = ref(false)
 const carouselEl = ref(null)
+const activeSlide = ref(1)
+const totalSlides = ref(0)
 let carousel = null
 
 function hoverCarousel() {
@@ -73,6 +78,10 @@ onMounted(async () => {
   popularMovies.value = response.data.results.filter(movie => movie.backdrop_path !== null)
   await nextTick()
   carousel = new Carousel(carouselEl.value, { interval: 5000, ride: 'carousel', wrap: true })
+  totalSlides.value = popularMovies.value.length
+  carouselEl.value.addEventListener('slid.bs.carousel', (e) => {
+    activeSlide.value = (e.to || 0) + 1
+  })
 })
 
 onBeforeUnmount(() => {
@@ -83,6 +92,13 @@ onBeforeUnmount(() => {
 <style lang="scss">
 #carouselExampleIndicators {
   z-index: 0;
+}
+
+.hero-position {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  z-index: 2;
 }
 
 .popular-movie-img {

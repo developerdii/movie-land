@@ -52,15 +52,18 @@
         </template>
       </slider>
 
-      <div v-else class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3">
-        <div v-for="person in cast" :key="person.id" class="col">
-          <div class="movie-card" @click="goTo('person', person.id)">
-            <img v-if="person.profile_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name">
-            <div v-else class="poster-placeholder"><i class="bi bi-person"></i></div>
-            <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
-            <div class="p-2 text-center footer">{{ person.character }}</div>
+      <div v-else>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3">
+          <div v-for="person in pagedCast" :key="person.id" class="col">
+            <div class="movie-card" @click="goTo('person', person.id)">
+              <img v-if="person.profile_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name">
+              <div v-else class="poster-placeholder"><i class="bi bi-person"></i></div>
+              <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
+              <div class="p-2 text-center footer">{{ person.character }}</div>
+            </div>
           </div>
         </div>
+        <pagination-controls :page="castPage" :page-count="castPageCount" :can-prev="castCanPrev" :can-next="castCanNext" @prev="castPrev" @next="castNext" />
       </div>
     </section>
 
@@ -79,6 +82,8 @@ import Slider from '../components/Slider.vue'
 import MovieSlider from '../components/MovieSlider.vue'
 import { formatDate } from '@/utils/date'
 import { chunk } from '@/utils/collection'
+import { usePagination } from '@/composables/usePagination'
+import PaginationControls from '../components/PaginationControls.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,6 +93,16 @@ const cast = ref([])
 const recommendations = ref([])
 const loading = ref(true)
 const showCastAsList = ref(false)
+
+const {
+  page: castPage,
+  pageCount: castPageCount,
+  pageItems: pagedCast,
+  canPrev: castCanPrev,
+  canNext: castCanNext,
+  nextPage: castNext,
+  prevPage: castPrev
+} = usePagination(cast, 12)
 
 const castChunks = computed(() => chunk(cast.value, 4))
 const recommendationChunks = computed(() => chunk(recommendations.value, 6))
@@ -105,8 +120,8 @@ async function loadPage() {
       api.getRecommendationsMovies(route.query.id)
     ])
     movieData.value = d.data
-    cast.value = (c.data.cast || []).filter(p => p.profile_path).slice(0, 24)
-    recommendations.value = (r.data.results || []).slice(0, 12)
+    cast.value = (c.data.cast || []).filter(p => p.profile_path)
+    recommendations.value = (r.data.results || [])
   } catch (e) {
     console.log(e)
   } finally {

@@ -25,7 +25,7 @@
     <section v-if="cast.length" class="mt-5">
       <h2 class="section-title h4 mb-4">Cast</h2>
       <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3">
-        <div v-for="person in cast" :key="person.id" class="col">
+        <div v-for="person in pagedCast" :key="person.id" class="col">
           <div class="movie-card" @click="goTo('person', person.id)">
             <img v-if="person.profile_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name">
             <div v-else class="poster-placeholder"><i class="bi bi-person"></i></div>
@@ -34,12 +34,13 @@
           </div>
         </div>
       </div>
+      <pagination-controls :page="castPage" :page-count="castPageCount" :can-prev="castCanPrev" :can-next="castCanNext" @prev="castPrevPage" @next="castNextPage" />
     </section>
 
     <section v-if="recommendations.length" class="mt-5">
       <h2 class="section-title h4 mb-4">Recommended TV Shows</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
-        <div v-for="rec in recommendations" :key="rec.id" class="col">
+        <div v-for="rec in pagedRecommendations" :key="rec.id" class="col">
           <div class="movie-card" @click="goTo('tv', rec.id)">
             <img v-if="rec.poster_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + rec.poster_path" :alt="rec.name">
             <div v-else class="poster-placeholder"><i class="bi bi-film"></i></div>
@@ -48,6 +49,7 @@
           </div>
         </div>
       </div>
+      <pagination-controls :page="recPage" :page-count="recPageCount" :can-prev="recCanPrev" :can-next="recCanNext" @prev="recPrevPage" @next="recNextPage" />
     </section>
   </div>
 </template>
@@ -56,6 +58,8 @@
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
+import { usePagination } from '@/composables/usePagination'
+import PaginationControls from '../components/PaginationControls.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -64,6 +68,10 @@ const tv = ref({})
 const cast = ref([])
 const recommendations = ref([])
 const loading = ref(true)
+
+const { page: castPage, pageCount: castPageCount, pageItems: pagedCast, canPrev: castCanPrev, canNext: castCanNext, nextPage: castNextPage, prevPage: castPrevPage } = usePagination(cast, 12)
+
+const { page: recPage, pageCount: recPageCount, pageItems: pagedRecommendations, canPrev: recCanPrev, canNext: recCanNext, nextPage: recNextPage, prevPage: recPrevPage } = usePagination(recommendations, 12)
 
 function goTo(media, id) {
   router.push({ path: media, query: { id } })
@@ -79,8 +87,8 @@ async function load() {
       api.getTvRecommendations(id)
     ])
     tv.value = d.data
-    cast.value = (c.data.cast || []).slice(0, 12)
-    recommendations.value = (r.data.results || []).slice(0, 12)
+    cast.value = (c.data.cast || [])
+    recommendations.value = (r.data.results || [])
   } catch (e) {
     console.log(e)
   } finally {

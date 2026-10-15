@@ -20,7 +20,7 @@
     <section v-if="movieCredits.length" class="mt-5">
       <h2 class="section-title h4 mb-4">Filmography — Movies</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
-        <div v-for="movie in movieCredits" :key="movie.id" class="col">
+        <div v-for="movie in pagedMovieCredits" :key="movie.id" class="col">
           <div class="movie-card" @click="goTo('movie', movie.id)">
             <img v-if="movie.poster_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" :alt="movie.title">
             <div v-else class="poster-placeholder"><i class="bi bi-film"></i></div>
@@ -29,12 +29,13 @@
           </div>
         </div>
       </div>
+      <pagination-controls :page="moviePage" :page-count="moviePageCount" :can-prev="movieCanPrev" :can-next="movieCanNext" @prev="moviePrevPage" @next="movieNextPage" />
     </section>
 
     <section v-if="tvCredits.length" class="mt-5">
       <h2 class="section-title h4 mb-4">Filmography — TV Shows</h2>
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
-        <div v-for="tv in tvCredits" :key="tv.id" class="col">
+        <div v-for="tv in pagedTvCredits" :key="tv.id" class="col">
           <div class="movie-card" @click="goTo('tv', tv.id)">
             <img v-if="tv.poster_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + tv.poster_path" :alt="tv.name">
             <div v-else class="poster-placeholder"><i class="bi bi-film"></i></div>
@@ -43,6 +44,7 @@
           </div>
         </div>
       </div>
+      <pagination-controls :page="tvPage" :page-count="tvPageCount" :can-prev="tvCanPrev" :can-next="tvCanNext" @prev="tvPrevPage" @next="tvNextPage" />
     </section>
   </div>
 </template>
@@ -52,6 +54,8 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/utils/date'
+import { usePagination } from '@/composables/usePagination'
+import PaginationControls from '../components/PaginationControls.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,6 +64,10 @@ const person = ref({})
 const movieCredits = ref([])
 const tvCredits = ref([])
 const loading = ref(true)
+
+const { page: moviePage, pageCount: moviePageCount, pageItems: pagedMovieCredits, canPrev: movieCanPrev, canNext: movieCanNext, nextPage: movieNextPage, prevPage: moviePrevPage } = usePagination(movieCredits, 12)
+
+const { page: tvPage, pageCount: tvPageCount, pageItems: pagedTvCredits, canPrev: tvCanPrev, canNext: tvCanNext, nextPage: tvNextPage, prevPage: tvPrevPage } = usePagination(tvCredits, 12)
 
 function goTo(media, id) {
   router.push({ path: media, query: { id } })
@@ -75,8 +83,8 @@ async function load() {
       api.getPersonTvCredits(id)
     ])
     person.value = d.data
-    movieCredits.value = (m.data.cast || []).slice(0, 12)
-    tvCredits.value = (t.data.cast || []).slice(0, 12)
+    movieCredits.value = (m.data.cast || [])
+    tvCredits.value = (t.data.cast || [])
   } catch (e) {
     console.log(e)
   } finally {
