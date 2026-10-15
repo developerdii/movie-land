@@ -14,7 +14,7 @@
 - Icons are Bootstrap Icons (`bi bi-*`).
 - Reuse `.movie-card`, `.container-title` and existing carousel styles before adding new ones.
 - Detail route pages share `.detail-page`, `.detail-heading`, `.detail-content`, `.detail-poster`, `.detail-overview`, and `.detail-section` styles from `src/assets/scss/app.scss`; keep film and TV metadata in the heading row and avoid nested fact cards.
-- Keep search panel sizing and result styles in `SearchBar.vue`; use flex result rows, readable regular-weight summaries, and responsive widths.
+- Keep the search dropdown (light surface, tabs, result rows, footer) and its styles in `SearchBar.vue`; scope its rules with the `#search` id and keep accents on the brand gold token.
 
 ## Dates, images, IDs
 - Dates: `formatDate(date, format)` from `@/utils/date`. Use `'YYYY'` for a standalone year and `'MMM Do YY'` for a single compact release date.

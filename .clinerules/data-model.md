@@ -19,6 +19,8 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | Method | Endpoint | Used by |
 | --- | --- | --- |
 | `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider` |
+| `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags) |
+| `getTvGenres()` | `GET /genre/tv/list` | `SearchBar` (genre tags) |
 | `getTrendingMovies(mediaType, timeWindow)` | `GET /trending/{media_type}/{time_window}` | `SearchBar` (default list) |
 | `getSearch(mediaType, searchText)` | `GET /search/{media_type}?query={text}` | `SearchBar` |
 | `getUpComing(fromDate)` | `GET /discover/movie` (see Discover below) | `UpComing` |
@@ -58,7 +60,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 
 ## Domain conventions
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); the cast slider uses **4**.
-- Search drops results with null `poster_path` (movie/tv) or `profile_path` (person); caps at 15 (trending) / 5 (search).
+- Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (trending) / 5 (search); tab counts use `total_results` (search) or list length (trending). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department` and `popularity`.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM Do'`, and `'MMM Do YY'`.
 - Lists are paginated client-side with `usePagination(items, pageSize)` (`@/composables/usePagination`) + `PaginationControls`; no `.slice()` limits anywhere.
 

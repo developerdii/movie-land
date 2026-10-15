@@ -34,6 +34,14 @@ export default {
     return api.get('/movie/popular')
   },
 
+  getMovieGenres() {
+    return api.get('/genre/movie/list')
+  },
+
+  getTvGenres() {
+    return api.get('/genre/tv/list')
+  },
+
   getTrendingMovies(mediaType, timeWindow) {
     return api.get(`/trending/${mediaType}/${timeWindow}`)
   },

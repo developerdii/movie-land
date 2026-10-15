@@ -10,7 +10,7 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
 - **`src/components/`**:
   - `AsyncImage` — shared lazy-loaded artwork frame with reserved aspect ratio and movie/person fallback icon.
   - `Navbar` — sticky nav, hosts `SearchBar`.
-  - `SearchBar` — debounced (350 ms) search across movie/tv/person with client-side caching (`searchValue`, `trendingData`) and a responsive fixed result panel.
+  - `SearchBar` — light search dropdown with a 250 ms debounced query, Movie/TV/Person tabs with per-type counts, genre (movie/TV) and department (person) tags, per-type cached trending/search results, and keyboard navigation (↑/↓/Enter/Esc).
   - `Slider` — reusable Bootstrap carousel shell (slots `title` and `card`); props `showIndicators` (dots) and `showPosition` ("N / M" badge); initializes its `Carousel` in `onMounted()` (manual nav only).
   - `MovieSlider` — renders `Slider` with chunked rows of 6 movies.
   - `PopularMoviesSlider` — hero carousel from `movie/popular`; auto-cycles and pauses on hover.
