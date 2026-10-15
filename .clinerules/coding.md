@@ -20,6 +20,7 @@
 - Dates: `formatDate(date, format)` from `@/utils/date`. Use `'YYYY'` for a standalone year and `'MMM Do YY'` for a single compact release date.
 - Languages: use `getLanguageName(code)` from `@/utils/language`; omit English from detail metadata and show other language names instead of ISO codes.
 - Images: full URL `'https://image.tmdb.org/t/p/w500' + poster_path` (or `/original/` for backdrops).
+- Card and detail artwork: use the shared `AsyncImage` component so the image frame reserves its dimensions before loading and shows a movie/person icon fallback until the image loads or when it fails.
 - IDs: TMDB numeric ids; detail navigation uses `?id=`.
 
 ## API

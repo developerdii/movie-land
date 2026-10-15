@@ -2,8 +2,7 @@
   <div v-if="!loading" class="container-xxl detail-page">
     <div class="row g-4 detail-content person-detail-content">
       <div class="col-5 col-sm-4 col-lg-3">
-        <img v-if="person.profile_path" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" class="rounded detail-poster" :alt="person.name">
-        <div v-else class="person-profile-placeholder"><i class="bi bi-person"></i></div>
+        <async-image kind="person" frame-class="detail-poster" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
       </div>
       <div class="col-12 col-sm-8 col-lg-9">
         <h1 class="h2 fw-bold mb-2">{{ person.name }}</h1>
@@ -26,8 +25,7 @@
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
         <div v-for="movie in pagedMovieCredits" :key="movie.id" class="col">
           <div class="movie-card" @click="goTo('movie', movie.id)">
-            <img v-if="movie.poster_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" :alt="movie.title">
-            <div v-else class="poster-placeholder"><i class="bi bi-film"></i></div>
+            <async-image frame-class="card-img-frame" :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" :alt="movie.title" />
             <p class="description p-2 text-center mb-0 pb-0">{{ movie.title }}</p>
             <div class="p-2 text-center footer">{{ movie.release_date ? movie.release_date.slice(0, 4) : '' }}</div>
           </div>
@@ -41,8 +39,7 @@
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
         <div v-for="tv in pagedTvCredits" :key="tv.id" class="col">
           <div class="movie-card" @click="goTo('tv', tv.id)">
-            <img v-if="tv.poster_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + tv.poster_path" :alt="tv.name">
-            <div v-else class="poster-placeholder"><i class="bi bi-film"></i></div>
+            <async-image frame-class="card-img-frame" :src="tv.poster_path ? 'https://image.tmdb.org/t/p/w500' + tv.poster_path : ''" :alt="tv.name" />
             <p class="description p-2 text-center mb-0 pb-0">{{ tv.name }}</p>
             <div class="p-2 text-center footer">{{ tv.first_air_date ? tv.first_air_date.slice(0, 4) : '' }}</div>
           </div>
@@ -60,6 +57,7 @@ import api from '@/api'
 import { formatDate } from '@/utils/date'
 import { usePagination } from '@/composables/usePagination'
 import PaginationControls from '../components/PaginationControls.vue'
+import AsyncImage from '../components/AsyncImage.vue'
 
 const route = useRoute()
 const router = useRouter()

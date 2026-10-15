@@ -10,7 +10,7 @@
         <div class="row pe-3 ps-3">
           <div class="col-md-2 p-1 d-flex" v-for="(movie, movieIndex) in row" :key="movieIndex" @click="route(movie.id)">
             <div class="movie-card">
-              <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" :alt="movie.title">
+              <async-image :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" :alt="movie.title" frame-class="card-img-frame" image-class="card-img-top" />
               <p class="description p-2 text-center mb-0 pb-0">{{ movie.title }}</p>
               <div v-if="showFooter" class="p-2 text-center footer">{{ formatDate(movie.release_date, 'MMM Do YY') }}</div>
             </div>
@@ -24,6 +24,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import Slider from './Slider.vue'
+import AsyncImage from './AsyncImage.vue'
 import { formatDate } from '@/utils/date'
 
 defineProps({

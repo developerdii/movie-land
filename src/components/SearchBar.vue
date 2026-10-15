@@ -22,7 +22,7 @@
             <small>{{ formatDate(item.release_date, 'YYYY') }}</small>
           </div>
           <div class="search-result-body">
-            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.poster_path" :alt="item.title">
+            <async-image frame-class="search-result-image" :src="item.poster_path ? 'https://image.tmdb.org/t/p/w342'+item.poster_path : ''" :alt="item.title" />
             <p class="search-list-description mb-0">{{ item.overview || 'No overview available.' }}</p>
           </div>
         </div>
@@ -32,7 +32,7 @@
             <small>{{ formatDate(item.first_air_date, 'YYYY') }}</small>
           </div>
           <div class="search-result-body">
-            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.poster_path" :alt="item.name">
+            <async-image frame-class="search-result-image" :src="item.poster_path ? 'https://image.tmdb.org/t/p/w342'+item.poster_path : ''" :alt="item.name" />
             <p class="search-list-description mb-0">{{ item.overview || 'No overview available.' }}</p>
           </div>
         </div>
@@ -42,7 +42,7 @@
             <small>Popularity: <span class="fw-semibold" style="color: var(--ml-brand-accent)">{{ item.popularity }}</span></small>
           </div>
           <div class="search-result-body">
-            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.profile_path" :alt="item.name">
+            <async-image kind="person" frame-class="search-result-image" :src="item.profile_path ? 'https://image.tmdb.org/t/p/w342'+item.profile_path : ''" :alt="item.name" />
             <div class="search-result-copy">
               <p v-for="(movie,index) in item.known_for" :key="index" class="known-for-item mb-1">
                 <template v-if="movie.title">
@@ -73,6 +73,7 @@ import { useRouter } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/utils/date'
 import { debounce } from '@/utils/collection'
+import AsyncImage from './AsyncImage.vue'
 
 const router = useRouter()
 
@@ -194,7 +195,7 @@ onBeforeUnmount(() => {
 .search-result > div > .d-flex { align-items: baseline; gap: 1rem; }
 .search-result > div > .d-flex small { flex: 0 0 auto; color: #737d8a; }
 .search-result-body { display: flex; align-items: flex-start; gap: .9rem; width: 100%; margin-top: .65rem; }
-.search-result-image { display: block; width: 68px; height: 100px; object-fit: cover; border-radius: 7px; flex: 0 0 68px; background: #e9edf2; }
+.search-result-image { display: block; width: 68px; height: 100px; border-radius: 7px; flex: 0 0 68px; background: #f2f3f5; }
 .search-list-description { flex: 1; min-width: 0; color: #596273; line-height: 1.5; font-size: .9rem; font-weight: 400; }
 .search-result-copy { min-width: 0; flex: 1; font-size: .9rem; }
 .known-for-item { color: #596273; }

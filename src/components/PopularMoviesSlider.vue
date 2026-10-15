@@ -9,10 +9,10 @@
     <div class="carousel-inner">
       <div class="carousel-item" :class="index === 0 ? 'active' : ''"
            v-for="(movie,index) in popularMovies" :key="index">
-        <img :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block popular-movie-img" :alt="movie.title">
+        <async-image :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block" frame-class="popular-movie-img" image-class="popular-movie-img-content" :aspect-ratio="'auto'" :alt="movie.title" />
         <div class="caption">
           <div class="popular-movie-card">
-            <img class="poster-thumb" :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" :alt="`${movie.title} poster`">
+            <async-image class="poster-thumb" :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" image-class="poster-thumb-image" :alt="`${movie.title} poster`" />
             <div class="popular-movie-copy">
               <span class="hero-kicker">Popular right now</span>
               <h2 class="hover-title mb-2">{{ movie.title }}</h2>
@@ -44,6 +44,7 @@
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '@/api'
 import Rating from '@/components/Rating.vue'
+import AsyncImage from '@/components/AsyncImage.vue'
 import { Carousel } from 'bootstrap'
 
 const popularMovies = ref([])
@@ -79,11 +80,15 @@ onBeforeUnmount(() => {
 }
 
 .popular-movie-img {
+  position: relative;
+  aspect-ratio: auto !important;
   object-position: 100% 0;
   width: 100%;
   height: clamp(360px, 43vw, 570px);
   object-fit: cover
 }
+
+.popular-movie-img-content { object-position: 100% 0; }
 
 .popular-movie-card {
   display: flex;
@@ -95,13 +100,17 @@ onBeforeUnmount(() => {
   margin-left: 9%;
 }
 
-.poster-thumb {
+.poster-thumb.media-image-frame {
+  display: block;
   width: clamp(145px, 18vw, 230px);
+  aspect-ratio: 2 / 3;
   border-radius: 10px;
   flex-shrink: 0;
+  overflow: hidden;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
   transition: transform .3s ease;
 }
+.poster-thumb-image { border-radius: 10px; box-shadow: 0 14px 34px rgba(0, 0, 0, .5); transition: transform .3s ease; }
 
 .hover-title {
   font-size: clamp(1.7rem, 3.2vw, 3rem);
@@ -137,7 +146,7 @@ onBeforeUnmount(() => {
   .popular-movie-img { height: 360px; }
   .caption { padding: .75rem 0; }
   .popular-movie-card { width: 90%; margin-left: 6%; gap: .8rem; }
-  .poster-thumb { width: clamp(90px, 27vw, 150px); max-height: 230px; }
+  .poster-thumb.media-image-frame { width: clamp(90px, 27vw, 150px); max-height: 230px; }
   .hover-title { font-size: clamp(1.15rem, 5vw, 1.7rem); }
   .hero-kicker { font-size: .62rem; margin-bottom: .25rem; }
   .popular-movie-copy .btn { padding: .4rem .8rem; font-size: .82rem; }

@@ -12,8 +12,7 @@
 
     <div class="row g-4 detail-content">
       <div class="col-5 col-sm-4 col-lg-3">
-        <img v-if="movieData.poster_path" :src="'https://image.tmdb.org/t/p/w500' + movieData.poster_path" class="rounded detail-poster" :alt="movieData.title">
-        <div v-else class="person-profile-placeholder"><i class="bi bi-film"></i></div>
+        <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
       </div>
       <div class="col-12 col-sm-8 col-lg-9 detail-copy">
         <div v-if="movieData.vote_average" class="detail-rating"><i class="bi bi-star-fill"></i><span>{{ movieData.vote_average.toFixed(1) }} <small>/ 10</small></span></div>
@@ -51,7 +50,7 @@
             <div class="row pe-3 ps-3">
               <div class="col-md-3 p-1 d-flex" v-for="person in row" :key="person.id">
                 <div class="movie-card" @click="goTo('person', person.id)">
-                  <img class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name">
+                  <async-image kind="person" frame-class="card-img-frame" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
                   <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
                   <div class="p-2 text-center footer">{{ person.character }}</div>
                 </div>
@@ -65,16 +64,13 @@
         <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 cast-list-grid">
           <div v-for="person in pagedCast" :key="person.id" class="col">
             <div class="movie-card" @click="goTo('person', person.id)">
-              <div class="cast-card-image">
-                <img v-if="person.profile_path" class="card-img-top" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name">
-                <div v-else class="poster-placeholder"><i class="bi bi-person"></i></div>
-              </div>
+              <async-image kind="person" frame-class="cast-card-image" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
               <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
               <div class="p-2 text-center footer">{{ person.character }}</div>
             </div>
           </div>
           <div v-for="slot in (castPageCount > 1 ? 12 - pagedCast.length : 0)" :key="`cast-placeholder-${slot}`" class="col cast-list-placeholder" aria-hidden="true">
-            <div class="movie-card"><div class="cast-card-image"><div class="poster-placeholder"></div></div><p class="description p-2 mb-0"></p><div class="footer p-2"></div></div>
+            <div class="movie-card"><async-image kind="person" frame-class="cast-card-image" /><p class="description p-2 mb-0"></p><div class="footer p-2"></div></div>
           </div>
         </div>
         <pagination-controls :page="castPage" :page-count="castPageCount" :can-prev="castCanPrev" :can-next="castCanNext" @prev="castPrev" @next="castNext" />
@@ -99,6 +95,7 @@ import { chunk } from '@/utils/collection'
 import { usePagination } from '@/composables/usePagination'
 import PaginationControls from '../components/PaginationControls.vue'
 import { getLanguageName } from '@/utils/language'
+import AsyncImage from '../components/AsyncImage.vue'
 
 const route = useRoute()
 const router = useRouter()

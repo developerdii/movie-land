@@ -8,6 +8,7 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
 ## Layers
 - **`src/api.js`** — the ONLY network/TMDB seam. A dedicated axios instance (`baseURL`, `Authorization: Bearer ${VITE_TMDB_ACCESS_TOKEN}`) with NProgress interceptors; all TMDB methods are listed in `data-model.md`.
 - **`src/components/`**:
+  - `AsyncImage` — shared lazy-loaded artwork frame with reserved aspect ratio and movie/person fallback icon.
   - `Navbar` — sticky nav, hosts `SearchBar`.
   - `SearchBar` — debounced (350 ms) search across movie/tv/person with client-side caching (`searchValue`, `trendingData`) and a responsive fixed result panel.
   - `Slider` — reusable Bootstrap carousel shell (slots `title` and `card`); props `showIndicators` (dots) and `showPosition` ("N / M" badge); initializes its `Carousel` in `onMounted()` (manual nav only).
