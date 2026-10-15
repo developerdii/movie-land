@@ -27,59 +27,23 @@
       </div>
     </div>
 
-    <section v-if="cast.length" class="detail-section">
-      <div class="cast-section-heading d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
-        <h2 class="section-title h4 mb-0">Cast</h2>
-        <div class="view-toggle" role="group" aria-label="Cast display mode">
-          <button type="button" class="view-toggle-btn" :class="{ active: !showCastAsList }"
-                  :aria-pressed="!showCastAsList" aria-label="Slider view" title="Slider view"
-                  @click="showCastAsList = false">
-            <i class="bi bi-collection-play-fill" aria-hidden="true"></i>
-          </button>
-          <button type="button" class="view-toggle-btn" :class="{ active: showCastAsList }"
-                  :aria-pressed="showCastAsList" aria-label="List view" title="List view"
-                  @click="showCastAsList = true">
-            <i class="bi bi-list-ul" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <slider v-if="!showCastAsList" id="cast-carousel">
-        <template #card>
-          <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row, index) in castChunks" :key="index">
-            <div class="row pe-3 ps-3">
-              <div class="col-md-3 p-1 d-flex" v-for="person in row" :key="person.id">
-                <div class="movie-card" @click="goTo('person', person.id)">
-                  <async-image kind="person" frame-class="card-img-frame" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
-                  <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
-                  <div class="p-2 text-center footer">{{ person.character }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-      </slider>
-
-      <div v-else>
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 cast-list-grid">
-          <div v-for="person in pagedCast" :key="person.id" class="col">
-            <div class="movie-card" @click="goTo('person', person.id)">
-              <async-image kind="person" frame-class="cast-card-image" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
-              <p class="description p-2 text-center mb-0 pb-0">{{ person.name }}</p>
-              <div class="p-2 text-center footer">{{ person.character }}</div>
-            </div>
-          </div>
-          <div v-for="slot in (castPageCount > 1 ? 12 - pagedCast.length : 0)" :key="`cast-placeholder-${slot}`" class="col cast-list-placeholder" aria-hidden="true">
-            <div class="movie-card"><async-image kind="person" frame-class="cast-card-image" /><p class="description p-2 mb-0"></p><div class="footer p-2"></div></div>
-          </div>
-        </div>
-        <pagination-controls :page="castPage" :page-count="castPageCount" :can-prev="castCanPrev" :can-next="castCanNext" @prev="castPrev" @next="castNext" />
-      </div>
-    </section>
+    <media-section v-if="cast.length" :items="cast" />
 
     <section v-if="recommendations.length" class="detail-section">
-      <h2 class="section-title h4 mb-4">Recommended Movies</h2>
-      <movie-slider id="recommendations-carousel" :movie-data="recommendationChunks" :show-footer="false"></movie-slider>
+      <section-heading eyebrow="More Like This" title="Recommended Movies">
+        <template #actions>
+          <div v-if="recTotal > 1" class="round-pagination">
+            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+            </button>
+            <span class="round-pagination-count" aria-live="polite">{{ recIndex }} / {{ recTotal }}</span>
+            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+            </button>
+          </div>
+        </template>
+      </section-heading>
+      <movie-slider id="recommendations-carousel" :movie-data="recommendationChunks" :show-footer="false" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
   </div>
 </template>
@@ -88,12 +52,11 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
-import Slider from '../components/Slider.vue'
 import MovieSlider from '../components/MovieSlider.vue'
+import MediaSection from '../components/MediaSection.vue'
+import SectionHeading from '../components/SectionHeading.vue'
 import { formatDate } from '@/utils/date'
-import { chunk } from '@/utils/collection'
-import { usePagination } from '@/composables/usePagination'
-import PaginationControls from '../components/PaginationControls.vue'
+import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
 import AsyncImage from '../components/AsyncImage.vue'
 
@@ -105,21 +68,14 @@ const cast = ref([])
 const crew = ref([])
 const recommendations = ref([])
 const loading = ref(true)
-const showCastAsList = ref(false)
 
-const {
-  page: castPage,
-  pageCount: castPageCount,
-  pageItems: pagedCast,
-  canPrev: castCanPrev,
-  canNext: castCanNext,
-  nextPage: castNext,
-  prevPage: castPrev,
-  resetPage: resetCastPage
-} = usePagination(cast, 12)
-
-const castChunks = computed(() => chunk(cast.value, 4))
 const recommendationChunks = computed(() => chunk(recommendations.value, 6))
+const recIndex = ref(1)
+const recTotal = computed(() => recommendationChunks.value.length)
+
+function onRecSlid(payload) {
+  recIndex.value = payload.index
+}
 const directors = computed(() => [...new Map(crew.value.filter(person => person.job === 'Director').map(person => [person.id, person])).values()])
 const writers = computed(() => [...new Map(crew.value.filter(person => ['Writer', 'Screenplay', 'Story'].includes(person.job)).map(person => [person.id, person])).values()])
 
@@ -129,7 +85,6 @@ function goTo(media, id) {
 
 async function loadPage() {
   loading.value = true
-  resetCastPage()
   try {
     const [d, c, r] = await Promise.all([
       api.getMovieDetails(route.query.id),
@@ -137,9 +92,9 @@ async function loadPage() {
       api.getRecommendationsMovies(route.query.id)
     ])
     movieData.value = d.data
-    cast.value = (c.data.cast || []).filter(p => p.profile_path)
+    cast.value = (c.data.cast || [])
     crew.value = c.data.crew || []
-    recommendations.value = (r.data.results || [])
+    recommendations.value = trimToChunks(r.data.results || [])
   } catch (e) {
     console.log(e)
   } finally {

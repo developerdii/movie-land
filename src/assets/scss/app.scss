@@ -80,29 +80,37 @@ body {
 .detail-content { margin-inline: 0; padding: 0; align-items: stretch; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .person-detail-content { background: transparent; }
 .detail-section { margin-top: clamp(2.5rem, 5vw, 4rem); }
-.cast-section-heading { width: 100%; padding-top: .55rem; border-top: 3px solid var(--ml-brand-accent); }
-.cast-section-heading .section-title { flex: 1; border-top: 0; padding-top: 0; }
-.movie-card { cursor: pointer; overflow: hidden; border-radius: 14px; box-shadow: 0 8px 22px rgba(25, 35, 48, .12); transition: transform .2s ease, box-shadow .2s ease; }
-.movie-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(25, 35, 48, .2); }
-
-/* Let the card clip poster corners once; keep the poster's bottom mask fade. */
-.movie-card.movie-card { border-radius: 1.2rem 1.2rem .6rem .6rem; }
-.movie-card.movie-card { width: 100%; min-width: 0; }
-.movie-card.movie-card > .card-img-frame { width: 100%; max-width: 100%; margin-inline: 0; border-radius: 0; }
-.movie-card.movie-card { box-shadow: none; }
-.movie-card.movie-card:hover { box-shadow: none; }
-.movie-card.movie-card { display: flex; flex-direction: column; height: 100%; }
-.movie-card.movie-card > .card-img-frame { aspect-ratio: 2 / 3; flex: 0 0 auto; }
-.movie-card.movie-card > .description { height: 5.5rem; min-height: 5.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.movie-card.movie-card > .footer { height: 3rem; min-height: 3rem; max-height: 3rem; display: flex; align-items: center; justify-content: center; overflow: hidden; line-height: 1.2; }
+.movie-card,
+.cast-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(23, 27, 37, .1);
+  border-radius: 1rem;
+  background: var(--ml-brand-dark);
+  color: #f7f7f8;
+  box-shadow: 0 8px 22px rgba(23, 27, 37, .12);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.movie-card { display: flex; width: 100%; height: 100%; flex-direction: column; cursor: pointer; }
+.movie-card:hover,
+.cast-card:hover { transform: translateY(-3px); border-color: rgba(233, 154, 22, .45); box-shadow: 0 13px 28px rgba(23, 27, 37, .18); }
+.movie-card:focus-visible,
+.cast-card:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; }
+.movie-card > .card-img-frame,
+.movie-card > .cast-card-image { width: 100%; max-width: 100%; aspect-ratio: 2 / 3; flex: 0 0 auto; border-radius: 0; }
+.movie-card > .description { display: -webkit-box; min-height: 4.25rem; height: 4.25rem; overflow: hidden; padding: .8rem .9rem !important; color: #f7f7f8; font-size: .94rem; font-weight: 650; line-height: 1.3; text-align: center !important; text-transform: none; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.movie-card > .footer { display: flex; min-height: 2.8rem; max-height: 2.8rem; align-items: center; justify-content: flex-start; overflow: hidden; margin-top: auto; padding: .6rem .9rem !important; border-top: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .035); color: rgba(247, 247, 248, .72); font-size: .78rem; font-weight: 600; line-height: 1.25; text-align: left !important; text-overflow: ellipsis; }
+.movie-card .media-image { -webkit-mask-image: none; mask-image: none; }
+.movie-card > .card-img-frame::after,
+.movie-card > .cast-card-image::after,
+.cast-section .cast-photo::after { position: absolute; z-index: 2; inset: 58% 0 0; background: linear-gradient(180deg, transparent, rgba(23, 27, 37, .56)); content: ''; pointer-events: none; }
+.movie-card .description:hover { color: #f7f7f8; transform: none; }
 .cast-list-grid { align-content: start; }
 .cast-list-placeholder { visibility: hidden; pointer-events: none; }
 .media-image-frame { position: relative; display: block; width: 100%; overflow: hidden; isolation: isolate; background: #202630; }
 .media-image-placeholder { position: absolute; inset: 0; z-index: 0; display: grid; place-items: center; background: linear-gradient(145deg, #343b46, #171b25); color: var(--ml-brand-accent); font-size: clamp(1.35rem, 2.4vw, 2.25rem); }
 .media-image { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .22s ease; }
 .media-image.is-loaded { opacity: 1; }
-.movie-card.movie-card > .card-img-frame,
-.movie-card.movie-card > .cast-card-image { width: 100%; max-width: 100%; margin-inline: 0; border-radius: 0; aspect-ratio: 2 / 3; flex: 0 0 auto; }
 .movie-card.movie-card > .cast-card-image { position: relative; }
 
 .pagination-switch { display: flex; width: fit-content; align-items: center; gap: 2px; margin-left: auto; padding: 3px; border: 1px solid #d9dde3; border-radius: 9px; background: #f4f5f7; }
@@ -112,27 +120,17 @@ body {
 .pagination-switch-count { min-width: 3.25rem; text-align: center; color: var(--ml-brand-dark); font-size: .9rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .pagination-switch-count span { color: #7b8492; font-weight: 400; }
 
+.round-pagination { display: flex; align-items: center; gap: 8px; }
+.round-pagination-btn { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid #d9dde3; border-radius: 999px; background: var(--ml-surface); color: var(--ml-ink); cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
+.round-pagination-btn:hover:not(:disabled) { border-color: var(--ml-brand-accent); color: var(--ml-brand-accent); }
+.round-pagination-btn:disabled { opacity: .35; cursor: default; }
+.round-pagination-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
+.round-pagination-count { min-width: 56px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ml-muted); font-variant-numeric: tabular-nums; }
+
 @media (max-width: 575.98px) {
   #app .router-view { padding: .85rem; margin-top: .75rem; }
   .detail-overview { font-size: .95rem; }
   .detail-description { padding-top: 1rem; }
-}
-
-/* Shared section title with the brand accent divider */
-.section-title {
-  border-top: 3px solid var(--ml-brand-accent);
-  padding-top: 0.55rem;
-  color: var(--ml-navy);
-  font-weight: 800;
-  letter-spacing: -0.4px;
-}
-
-.eyebrow {
-  color: var(--ml-gold);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
 .poster-placeholder {

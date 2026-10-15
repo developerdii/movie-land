@@ -8,6 +8,7 @@
 ## Styling
 - Bootstrap 5 utility classes + custom SCSS in `<style lang="scss">` blocks.
 - Global styles live in `src/assets/scss/app.scss` (imported in `main.js`).
+- Fonts: "Big Shoulders Display" (700/800) and "Manrope" (400–700) are loaded via `<link>` in `index.html`. Use "Big Shoulders Display" for display section titles (via `SectionHeading`) and "Manrope" for eyebrow labels; body/UI text stays on the system-ui stack.
 - Brand theme uses the two colors in `src/assets/movieland-logo.svg`: dark `#171B25` and accent gold `#E99A16` (the logo may use its lighter gold gradient shade). Use these tokens across headings, section dividers, buttons, links, ratings, and interactions; avoid unrelated purple or blue accents.
 - Keep list/slider toggles, upcoming headings, and recommendation headings within the brand palette; avoid gradient shadows behind section titles.
 - Use compact icon-only segmented controls for cast view modes; keep hover feedback neutral and understated, with the dark brand color reserved for the selected mode.

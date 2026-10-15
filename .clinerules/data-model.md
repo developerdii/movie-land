@@ -59,8 +59,8 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Person search results may carry `known_for: [...]`.
 
 ## Domain conventions
-- Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); the cast slider uses **4**.
+- Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
 - Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (trending) / 5 (search); tab counts use `total_results` (search) or list length (trending). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department` and `popularity`.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM Do'`, and `'MMM Do YY'`.
-- Lists are paginated client-side with `usePagination(items, pageSize)` (`@/composables/usePagination`) + `PaginationControls`; no `.slice()` limits anywhere.
+- Lists are paginated client-side by `MediaSection` (its own `page`/`pageSize` state + round pagination controls). `usePagination` + `PaginationControls` are legacy and currently unused.
 

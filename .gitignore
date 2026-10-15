@@ -6,6 +6,10 @@ node_modules
 /tests/e2e/screenshots/
 
 
+# Design reference mocks (never committed)
+/Cast.pdf
+/Cast-html/
+
 # local env files
 .env.local
 .env.*.local
