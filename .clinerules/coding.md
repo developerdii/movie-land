@@ -1,9 +1,9 @@
 # Coding Conventions
 
 ## Vue
-- Vue 3 Options API (`export default { ... }`). No Composition API yet.
-- Declare props with `type`/`default`; follow existing patterns (`Slider` / `MovieSlider`).
-- Navigation via `this.$router.push({ path, query: { id } })`.
+- Vue 3 Composition API with `<script setup>`.
+- Props via `defineProps`; shared logic in `src/utils/` (or `src/composables/` for reactive logic).
+- Navigation via `useRouter().push({ path, query: { id } })`.
 
 ## Styling
 - Bootstrap 5 utility classes + custom SCSS in `<style lang="scss">` blocks.

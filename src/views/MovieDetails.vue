@@ -105,130 +105,110 @@
   </div>
 </template>
 
-<script>
-import api from "@/api";
-import Rating from "@/components/Rating.vue";
-import dateFormatter from '../mixins/dateFormatter';
+<script setup>
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import api from '@/api'
+import Rating from '@/components/Rating.vue'
 import Slider from '../components/Slider.vue'
 import MovieSlider from '../components/MovieSlider.vue'
 import Enums from '../enums'
-import _ from "lodash";
+import { formatDate } from '@/utils/date'
+import { chunk } from '@/utils/collection'
 
-export default {
-  mixins: [dateFormatter],
-  components: {
-    Rating,
-    Slider,
-    MovieSlider
-  },
+const route = useRoute()
 
-  data() {
-    return {
-      movieData: {},
-      cast: [],
-      fullCastData: [],
-      recommendations: [],
-      loading: false,
-      selectedTab: Enums.SLIDER,
-      Enums,
-      page: 0,
-    }
-  },
-  watch: {
-    $route() {
-      Object.assign(this.$data, this.$options.data());
-      this.loadPage();
-    }
+const movieData = ref({})
+const cast = ref([])
+const fullCastData = ref([])
+const recommendations = ref([])
+const loading = ref(false)
+const selectedTab = ref(Enums.SLIDER)
+const page = ref(0)
 
-  },
-  computed: {
-    movieTitle() {
-      return `${this.movieData.title} (${this.getFormattedDate(this.movieData.release_date, 'YYYY')})`
-    },
+const movieTitle = computed(() =>
+  `${movieData.value.title} (${formatDate(movieData.value.release_date, 'YYYY')})`
+)
 
-    castViewSize() {
-      return this.selectedTab === Enums.SLIDER ? 4 : 6;
-    },
+const castViewSize = computed(() => (selectedTab.value === Enums.SLIDER ? 4 : 6))
 
-    disablePrevious() {
-      return this.page <= 0;
-    },
+const disablePrevious = computed(() => page.value <= 0)
 
-    disableNext() {
-      let pageSize = this.cast.length;
-      return this.page >= pageSize - 1;
-    }
-  },
+const disableNext = computed(() => page.value >= cast.value.length - 1)
 
-  mounted() {
-    this.loadPage();
-  },
-
-  methods: {
-    async loadPage() {
-      this.loading = true;
-      await this.getData();
-      await this.getCredits();
-      await this.getRecommendations();
-      this.loading = false;
-    },
-
-    async getData() {
-      try {
-        let response = await api.getMovieDetails(this.$route.query.id)
-        if (response.status === 200) {
-          this.movieData = response.data;
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    },
-
-    async getCredits() {
-      try {
-        let response = await api.getMovieCredits(this.$route.query.id)
-        if (response.status === 200) {
-          this.fullCastData = response.data.cast;
-          this.chunkCredits(this.fullCastData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    chunkCredits(data) {
-      this.cast = _.chunk(data.filter(person => person.profile_path), this.castViewSize);
-    },
-
-    async getRecommendations() {
-      try {
-        let response = await api.getRecommendationsMovies(this.$route.query.id)
-        if (response.status === 200) {
-          this.recommendations = _.chunk(response.data.results, 6);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    selectViewTab(id) {
-      this.selectedTab = id;
-      this.page = 0;
-      this.chunkCredits(this.fullCastData);
-    },
-
-    changePage(isNext) {
-      if (isNext) {
-        if (this.disableNext) return
-        this.page++
-      } else {
-        if (this.disablePrevious) return
-        this.page--;
-      }
-    }
+async function getData() {
+  try {
+    const response = await api.getMovieDetails(route.query.id)
+    if (response.status === 200) movieData.value = response.data
+  } catch (error) {
+    console.log(error)
   }
-
 }
+
+async function getCredits() {
+  try {
+    const response = await api.getMovieCredits(route.query.id)
+    if (response.status === 200) {
+      fullCastData.value = response.data.cast
+      chunkCredits()
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function chunkCredits() {
+  cast.value = chunk(fullCastData.value.filter(person => person.profile_path), castViewSize.value)
+}
+
+async function getRecommendations() {
+  try {
+    const response = await api.getRecommendationsMovies(route.query.id)
+    if (response.status === 200) recommendations.value = chunk(response.data.results, 6)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function loadPage() {
+  loading.value = true
+  await getData()
+  await getCredits()
+  await getRecommendations()
+  loading.value = false
+}
+
+function selectViewTab(id) {
+  selectedTab.value = id
+  page.value = 0
+  chunkCredits()
+}
+
+function changePage(isNext) {
+  if (isNext) {
+    if (disableNext.value) return
+    page.value++
+  } else {
+    if (disablePrevious.value) return
+    page.value--
+  }
+}
+
+watch(
+  () => route.query.id,
+  () => {
+    movieData.value = {}
+    cast.value = []
+    fullCastData.value = []
+    recommendations.value = []
+    page.value = 0
+    loadPage()
+  }
+)
+
+onMounted(() => {
+  loadPage()
+})
 </script>
 
 <style lang="scss">

@@ -20,7 +20,7 @@
         <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.title }}</h5>
-            <small>{{ getFormattedDate(item.release_date, 'YYYY') }}</small>
+            <small>{{ formatDate(item.release_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
             <div class="col-md-2 pe-0">
@@ -34,7 +34,7 @@
         <div v-if="item.media_type === 'tv' || defaultMediaType.type === 'tv'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.name }}</h5>
-            <small>{{ getFormattedDate(item.first_air_date, 'YYYY') }}</small>
+            <small>{{ formatDate(item.first_air_date, 'YYYY') }}</small>
           </div>
           <div class="row mt-1" style="width: 40rem">
             <div class="col-md-2 pe-0">
@@ -78,174 +78,122 @@
   </div>
 </template>
 
-<script>
-import api from "@/api";
-import _ from 'lodash'
-import dateFormatter from "@/mixins/dateFormatter";
+<script setup>
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/api'
+import { formatDate } from '@/utils/date'
+import { debounce } from '@/utils/collection'
 
-export default {
-  mixins: [dateFormatter],
-  data() {
-    return {
-      searchText: '',
-      searchList: [],
-      defaultMediaType: {
-        id: 1,
-        type: 'movie',
-        text: 'Movie'
-      },
-      mediaTypes: [
-        {
-          id: 1,
-          type: 'movie',
-          text: 'Movie'
-        },
-        {
-          id: 2,
-          type: 'tv',
-          text: 'TV'
-        },
-        {
-          id: 3,
-          type: 'person',
-          text: 'Person'
-        },
-      ],
-      trendingData: {
-        movie: [],
-        tv: [],
-        person: [],
-      },
-      isShownSearchList: false,
-      loading: false,
-      searchValue: {
-        movie: {
-          name: null,
-          data: null,
-        },
-        tv: {
-          name: null,
-          data: null,
-        },
-        person: {
-          name: null,
-          data: null,
-        },
-      }
-    }
-  },
+const router = useRouter()
 
-  watch: {
-    searchText(value) {
-      if (value === '') {
-        this.getTrendingData()
-      }
-    }
-  },
+const searchText = ref('')
+const searchList = ref([])
+const defaultMediaType = reactive({ id: 1, type: 'movie', text: 'Movie' })
+const mediaTypes = [
+  { id: 1, type: 'movie', text: 'Movie' },
+  { id: 2, type: 'tv', text: 'TV' },
+  { id: 3, type: 'person', text: 'Person' }
+]
+const trendingData = reactive({ movie: [], tv: [], person: [] })
+const isShownSearchList = ref(false)
+const loading = ref(false)
+const searchValue = reactive({
+  movie: { name: null, data: null },
+  tv: { name: null, data: null },
+  person: { name: null, data: null }
+})
 
-  mounted() {
-    if (document.addEventListener) {
-      document.addEventListener('click', this.hideList);
-    } else if (document.attachEvent) {
-      document.attachEvent('click', this.hideList);
-    }
-  },
-  methods: {
-    async getTrendingData() {
-      this.loading = true;
+function filterResults(results) {
+  return results.filter(item =>
+    defaultMediaType.id === 3 ? item.profile_path !== null : item.poster_path !== null
+  )
+}
 
-      if (this.trendingData[this.defaultMediaType.type].length > 0) {
-        this.searchList = this.trendingData[this.defaultMediaType.type];
-        this.loading = false;
-        this.isShownSearchList = true;
-        return;
-      }
+async function getTrendingData() {
+  loading.value = true
 
-      try {
-        let response = await api.getTrendingMovies(this.defaultMediaType.type, 'day')
-        if (response.request.status === 200) {
-          this.isShownSearchList = true;
-          this.loading = false;
-          this.searchList = response.data.results.filter(item => {
-            if (this.defaultMediaType.id === 3) {
-              return item.profile_path !== null
-            } else {
-              return item.poster_path !== null
-            }
-          }).slice(0, 15);
-          this.trendingData[this.defaultMediaType.type] = this.searchList;
-        }
-      } catch (error) {
-        this.loading = false;
-        this.isShownSearchList = false;
-        throw error.message
-      }
-    },
+  if (trendingData[defaultMediaType.type].length > 0) {
+    searchList.value = trendingData[defaultMediaType.type]
+    loading.value = false
+    isShownSearchList.value = true
+    return
+  }
 
-    selectMediaType(media) {
-      this.defaultMediaType = media;
-      this.isShownSearchList = false;
-      this.getList()
-    },
-
-    getList() {
-      if (this.searchText.length > 2) {
-        this.search();
-      } else {
-        this.getTrendingData();
-      }
-    },
-
-    debounceInput: _.debounce(function () {
-      this.search();
-    }, 350),
-
-    async search() {
-      if (this.searchText.length < 3) return;
-      if (this.searchValue[this.defaultMediaType.type].name === this.defaultMediaType.type + '-' + this.searchText) {
-        this.searchList = this.searchValue[this.defaultMediaType.type].data
-        this.isShownSearchList = true;
-        return
-      }
-      this.loading = true;
-      try {
-        let response = await api.getSearch(this.defaultMediaType.type, this.searchText)
-        if (response.request.status === 200) {
-          this.searchList = response.data.results.filter(item => {
-            if (this.defaultMediaType.id === 3) {
-              return item.profile_path !== null
-            } else {
-              return item.poster_path !== null
-            }
-          }).slice(0, 5);
-          this.searchValue[this.defaultMediaType.type].name = this.defaultMediaType.type + '-' + this.searchText;
-          this.searchValue[this.defaultMediaType.type].data = this.searchList;
-          this.isShownSearchList = true;
-          this.loading = false;
-          this.clicked = true;
-        }
-      } catch (error) {
-        this.loading = false;
-        this.isShownSearchList = false;
-        this.clicked = false;
-        throw error.message;
-      }
-    },
-
-    hideList(event) {
-      let listElement = document.getElementById('search-list')
-      let searchBox = document.querySelector('#search input')
-      let searchNavBar = document.querySelector('#search-nav-bar')
-      if (event.target !== searchBox && event.target !== listElement && event.srcElement.parentElement !== searchNavBar) {
-        this.isShownSearchList = false;
-      }
-    },
-
-    route(media, id) {
-      this.$router.push({ path: media, query: { id } })
-    }
+  try {
+    const response = await api.getTrendingMovies(defaultMediaType.type, 'day')
+    searchList.value = filterResults(response.data.results).slice(0, 15)
+    trendingData[defaultMediaType.type] = searchList.value
+    isShownSearchList.value = true
+    loading.value = false
+  } catch (error) {
+    loading.value = false
+    isShownSearchList.value = false
+    throw error.message
   }
 }
+
+function selectMediaType(media) {
+  Object.assign(defaultMediaType, media)
+  isShownSearchList.value = false
+  getList()
+}
+
+function getList() {
+  if (searchText.value.length > 2) search()
+  else getTrendingData()
+}
+
+async function search() {
+  if (searchText.value.length < 3) return
+
+  if (searchValue[defaultMediaType.type].name === `${defaultMediaType.type}-${searchText.value}`) {
+    searchList.value = searchValue[defaultMediaType.type].data
+    isShownSearchList.value = true
+    return
+  }
+
+  loading.value = true
+  try {
+    const response = await api.getSearch(defaultMediaType.type, searchText.value)
+    searchList.value = filterResults(response.data.results).slice(0, 5)
+    searchValue[defaultMediaType.type].name = `${defaultMediaType.type}-${searchText.value}`
+    searchValue[defaultMediaType.type].data = searchList.value
+    isShownSearchList.value = true
+    loading.value = false
+  } catch (error) {
+    loading.value = false
+    isShownSearchList.value = false
+    throw error.message
+  }
+}
+
+const debounceInput = debounce(search, 350)
+
+function hideList(event) {
+  const listElement = document.getElementById('search-list')
+  const searchBox = document.querySelector('#search input')
+  const searchNavBar = document.querySelector('#search-nav-bar')
+  if (event.target !== searchBox && event.target !== listElement && event.target.parentElement !== searchNavBar) {
+    isShownSearchList.value = false
+  }
+}
+
+function route(media, id) {
+  router.push({ path: media, query: { id } })
+}
+
+watch(searchText, value => {
+  if (value === '') getTrendingData()
+})
+
+onMounted(() => {
+  document.addEventListener('click', hideList)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', hideList)
+})
 </script>
 <style lang="scss">
 /* width */

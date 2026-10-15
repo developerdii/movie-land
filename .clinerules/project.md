@@ -3,7 +3,7 @@
 **MovieLand** — a Vue 3 SPA for browsing movies & TV via the TMDB API. The home page shows a hero carousel of popular movies plus an "upcoming" slider; a navbar search covers movies / TV / people; a movie detail page shows details, credits and recommendations.
 
 ## Tech stack
-Vue 3 (Options API) · Vite · Pinia · Vue Router 4 (hash history) · axios · Bootstrap 5 (npm) · Bootstrap Icons · Sass · moment · lodash · NProgress · ESLint (flat config, `eslint-plugin-vue`).
+Vue 3 (Composition API, `<script setup>`) · Vite · Pinia · Vue Router 4 (hash history) · axios · Bootstrap 5 (npm) · Bootstrap Icons · Sass · NProgress · ESLint (flat config, `eslint-plugin-vue`).
 
 ## Commands
 ```bash

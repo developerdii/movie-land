@@ -30,5 +30,5 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 - `getMovieCredits` returns `{ cast: [...] }` with `name`, `character`, `profile_path`.
 
 ## Domain conventions
-- Sliders chunk results into pages of **6** with `_.chunk(results, 6)`.
+- Sliders chunk results into pages of **6** with `chunk(results, 6)` (from `@/utils/collection`).
 - Search drops results with null `poster_path` (movie/tv) or `profile_path` (person); caps at 15 (trending) / 5 (search).

@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot name="title"></slot>
-    <div ref="carousel" :id="id" class="carousel slide" style="z-index: 0">
+    <div ref="carouselEl" :id="id" class="carousel slide" style="z-index: 0">
       <div class="carousel-inner">
         <slot name="card"></slot>
       </div>
@@ -19,23 +19,27 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Carousel } from 'bootstrap'
 
-export default {
-  props: {
-    id: {
-      type: String,
-      default: 'carouselExampleIndicators2'
-    }
-  },
-  mounted() {
-    this.carousel = new Carousel(this.$refs.carousel, { wrap: true })
-  },
-  beforeUnmount() {
-    this.carousel?.dispose()
+defineProps({
+  id: {
+    type: String,
+    default: 'carouselExampleIndicators2'
   }
-}
+})
+
+const carouselEl = ref(null)
+let carousel = null
+
+onMounted(() => {
+  carousel = new Carousel(carouselEl.value, { wrap: true })
+})
+
+onBeforeUnmount(() => {
+  carousel?.dispose()
+})
 </script>
 
 <style lang="scss">

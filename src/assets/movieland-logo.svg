@@ -18,6 +18,6 @@
     </g>
     <path d="M43 39.5a5 5 0 0 1 7.5-4.3l23 13.3a5 5 0 0 1 0 8.6l-23 13.3a5 5 0 0 1-7.5-4.3v-26.6Z" fill="url(#gold)"/>
   </g>
-  <text x="130" y="69" fill="#F6F4EF" font-family="Inter, Montserrat, Arial, sans-serif" font-size="48" font-weight="800" letter-spacing="-2.2">MOVIE<tspan fill="#F5B63E">LAND</tspan></text>
-  <text x="133" y="94" fill="#9BA3B3" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="3.8">DISCOVER YOUR NEXT FILM</text>
+  <text x="130" y="69" fill="#171B25" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="48" font-weight="800" letter-spacing="-2.2">MOVIE<tspan fill="#E99A16">LAND</tspan></text>
+  <text x="133" y="94" fill="#596273" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="1.5">DISCOVER YOUR NEXT FILM</text>
 </svg>

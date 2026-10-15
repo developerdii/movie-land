@@ -16,11 +16,11 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
   - `UpComing` — wraps `MovieSlider` with `movie/upcoming` data.
   - `Rating` — renders `vote_average` as `x.x / 10`.
 - **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails` (details + credits + recommendations; slider/list toggle via `Enums`).
-- **`src/mixins/dateFormatter.js`** — `getFormattedDate(date, format)` via moment; shared by `MovieSlider` and `MovieDetails`.
+- **`src/utils/`** — pure helpers: `date.js` (`formatDate`) and `collection.js` (`chunk`, `debounce`).
 - **`src/enums.js`** — frozen view-mode enum: `LIST = 1`, `SLIDER = 2`.
 
 ## Rules of thumb
 - All TMDB calls go through `src/api.js`; never inline axios/fetch in components.
-- Carousel components initialize their own `Carousel` instance in `mounted()` (don't rely on `data-bs-ride`).
-- Navigation uses `this.$router.push({ path, query: { id } })`; the detail page keeps the `?id=` convention.
-- Keep date formatting in the `dateFormatter` mixin.
+- Carousel components initialize their own `Carousel` instance in `onMounted()` (don't rely on `data-bs-ride`).
+- Navigation uses `useRouter().push({ path, query: { id } })`; the detail page keeps the `?id=` convention.
+- Keep date formatting in `src/utils/date.js`.

@@ -1,5 +1,5 @@
 <template>
-  <div id="carouselExampleIndicators" ref="carousel" class="carousel slide carousel-fade"
+  <div id="carouselExampleIndicators" ref="carouselEl" class="carousel slide carousel-fade"
        @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
     <div class="carousel-indicators">
       <button v-for="(movie,index) in popularMovies" :key="index" type="button"
@@ -47,41 +47,37 @@
     </button>
   </div>
 </template>
-<script>
-import api from "@/api";
-import Rating from "@/components/Rating.vue";
+<script setup>
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import api from '@/api'
+import Rating from '@/components/Rating.vue'
 import { Carousel } from 'bootstrap'
 
-export default {
-  data() {
-    return {
-      popularMovies: [],
-      isShownDescription: false,
-    }
-  },
-  components: {
-    Rating
-  },
-  methods: {
-    hoverCarousel() {
-      this.isShownDescription = true;
-      this.carousel?.pause();
-    },
-    unHoverCarousel() {
-      this.isShownDescription = false;
-      this.carousel?.cycle();
-    }
-  },
-  async mounted() {
-    const response = await api.getPopularMovies()
-    this.popularMovies = response.data.results.filter(movie => movie.backdrop_path !== null)
-    await this.$nextTick()
-    this.carousel = new Carousel(this.$refs.carousel, { interval: 5000, ride: 'carousel', wrap: true })
-  },
-  beforeUnmount() {
-    this.carousel?.dispose()
-  }
+const popularMovies = ref([])
+const isShownDescription = ref(false)
+const carouselEl = ref(null)
+let carousel = null
+
+function hoverCarousel() {
+  isShownDescription.value = true
+  carousel?.pause()
 }
+
+function unHoverCarousel() {
+  isShownDescription.value = false
+  carousel?.cycle()
+}
+
+onMounted(async () => {
+  const response = await api.getPopularMovies()
+  popularMovies.value = response.data.results.filter(movie => movie.backdrop_path !== null)
+  await nextTick()
+  carousel = new Carousel(carouselEl.value, { interval: 5000, ride: 'carousel', wrap: true })
+})
+
+onBeforeUnmount(() => {
+  carousel?.dispose()
+})
 </script>
 
 <style lang="scss">

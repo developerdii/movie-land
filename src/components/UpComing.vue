@@ -1,32 +1,19 @@
 <template>
-  <movie-slider v-if="upComingMovies.length" :movie-data="upComingMovies" :title="title" :show-footer="true">
-
-  </movie-slider>
+  <movie-slider v-if="upComingMovies.length" :movie-data="upComingMovies" :title="title" :show-footer="true"></movie-slider>
 </template>
 
-<script>
-import _ from 'lodash'
-import api from "@/api";
+<script setup>
+import { onMounted, ref } from 'vue'
+import api from '@/api'
 import MovieSlider from '../components/MovieSlider.vue'
+import { chunk } from '@/utils/collection'
 
-export default {
-  components: {MovieSlider},
-  data() {
-    return {
-      upComingMovies: [],
-      title: 'COMING SOON'
-    }
-  },
-  async mounted() {
-    await api.getUpComing().then(response => {
-          this.upComingMovies = _.chunk(response.data.results, 6)
-        }
-    )
-  },
-  methods: {
-    route(id) {
-      this.$router.push({ path: 'movie', query: { id } })
-    }
-  }
-}
+const upComingMovies = ref([])
+const title = 'COMING SOON'
+
+onMounted(async () => {
+  const response = await api.getUpComing()
+  upComingMovies.value = chunk(response.data.results, 6)
+})
 </script>
+
