@@ -7,28 +7,23 @@
              placeholder="Search..."/>
 
     </div>
-    <div v-if="isShownSearchList" id="search-list" class="list-group position-fixed me-2 mt-1 bg-light shadow-sm"
-         style="right: 0; overflow-y: auto; max-height: 92vh">
-      <nav id="search-nav-bar" class="nav nav-pills sticky-top bg-light shadow-sm flex-column flex-sm-row">
-        <a v-for="media in mediaTypes" :key="media.id" class="flex-sm-fill text-sm-center nav-link shadow m-1"
+    <div v-if="isShownSearchList" id="search-list" class="search-panel list-group position-fixed mt-2 bg-light shadow-sm">
+      <nav id="search-nav-bar" class="nav nav-pills sticky-top bg-light flex-column flex-sm-row search-tabs">
+        <a v-for="media in mediaTypes" :key="media.id" class="flex-sm-fill text-sm-center nav-link m-1"
            :class="defaultMediaType.id === media.id ? 'active' : ''" aria-current="page"
            @click="selectMediaType(media)">
           {{ media.text }}</a>
       </nav>
       <a href="javascript:void(0)" @click="route(item.media_type || defaultMediaType.type,item.id)" v-for="item in searchList" :key="item.id"
-         class="list-group-item list-group-item-action flex-column align-items-start">
+         class="list-group-item list-group-item-action flex-column align-items-start search-result">
         <div v-if="item.media_type === 'movie' || defaultMediaType.type === 'movie'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.title }}</h5>
             <small>{{ formatDate(item.release_date, 'YYYY') }}</small>
           </div>
-          <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pe-0">
-              <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.poster_path">
-            </div>
-            <div class="col-md-10 ps-0">
-              <small class="search-list-description"> {{ item.overview }}</small>
-            </div>
+          <div class="search-result-body">
+            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.poster_path" :alt="item.title">
+            <p class="search-list-description mb-0">{{ item.overview || 'No overview available.' }}</p>
           </div>
         </div>
         <div v-if="item.media_type === 'tv' || defaultMediaType.type === 'tv'">
@@ -36,26 +31,20 @@
             <h5 class="mb-1">{{ item.name }}</h5>
             <small>{{ formatDate(item.first_air_date, 'YYYY') }}</small>
           </div>
-          <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pe-0">
-              <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.poster_path">
-            </div>
-            <div class="col-md-10 ps-0">
-              <small class="search-list-description"> {{ item.overview }}</small>
-            </div>
+          <div class="search-result-body">
+            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.poster_path" :alt="item.name">
+            <p class="search-list-description mb-0">{{ item.overview || 'No overview available.' }}</p>
           </div>
         </div>
         <div v-if="item.media_type === 'person' || defaultMediaType.type === 'person'">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ item.name }}</h5>
-            <small>Popularity: <span class="text-info">{{ item.popularity }}</span></small>
+            <small>Popularity: <span class="fw-semibold" style="color: var(--ml-brand-accent)">{{ item.popularity }}</span></small>
           </div>
-          <div class="row mt-1" style="width: 40rem">
-            <div class="col-md-2 pe-0">
-              <img style="width: 70%;" :src="'https://image.tmdb.org/t/p/w500'+item.profile_path">
-            </div>
-            <div class="col-md-10 ps-0">
-              <p v-for="(movie,index) in item.known_for" :key="index" class="fw-light m-1">
+          <div class="search-result-body">
+            <img class="search-result-image" :src="'https://image.tmdb.org/t/p/w342'+item.profile_path" :alt="item.name">
+            <div class="search-result-copy">
+              <p v-for="(movie,index) in item.known_for" :key="index" class="known-for-item mb-1">
                 <template v-if="movie.title">
                   <a class="fw-light" href="javascript:void(0);" @click="route('movie', movie.id)">{{ movie.title + ' - ' }}</a>
                   <i class="bi bi-star-fill" style="color: orange"></i> {{ movie.vote_average }}
@@ -69,7 +58,7 @@
         <div class="w-100 text-center">
           <h5 class="p-10 m-10">{{ 'Nothing Found' }}</h5>
         </div>
-        <div class="row mt-1" style="width: 40rem">
+        <div class="row mt-1 search-result-body">
           <div class="col-md-10 ps-0">
           </div>
         </div>
@@ -196,34 +185,28 @@ onBeforeUnmount(() => {
 })
 </script>
 <style lang="scss">
-/* width */
-#search-list::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* Track */
-#search-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Handle */
-#search-list::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-#search-list::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
+#search-list { z-index: 1040; top: 4.5rem; right: max(1rem, calc((100vw - 1320px) / 2)); width: min(760px, calc(100vw - 2rem)); max-height: min(76vh, 760px); overflow-y: auto; border: 1px solid #e4e8ef; border-radius: 14px; }
+.search-tabs { z-index: 2; padding: .45rem; border-bottom: 1px solid #e7e9ef; }
+.search-tabs .nav-link { color: #344254; font-weight: 700; border-radius: 9px; }
+#search-list .nav-pills .nav-link.active { background: var(--ml-gold); color: #171b25; }
+.search-result { padding: .9rem 1rem; color: var(--ml-navy); }
+.search-result h5 { font-size: 1.05rem; font-weight: 700; margin: 0; }
+.search-result > div > .d-flex { align-items: baseline; gap: 1rem; }
+.search-result > div > .d-flex small { flex: 0 0 auto; color: #737d8a; }
+.search-result-body { display: flex; align-items: flex-start; gap: .9rem; width: 100%; margin-top: .65rem; }
+.search-result-image { display: block; width: 68px; height: 100px; object-fit: cover; border-radius: 7px; flex: 0 0 68px; background: #e9edf2; }
+.search-list-description { flex: 1; min-width: 0; color: #596273; line-height: 1.5; font-size: .9rem; font-weight: 400; }
+.search-result-copy { min-width: 0; flex: 1; font-size: .9rem; }
+.known-for-item { color: #596273; }
+.known-for-item a { color: var(--ml-brand-dark); text-decoration: none; }
+.known-for-item a:hover { text-decoration: underline; }
+#search-list::-webkit-scrollbar { width: 9px; }
+#search-list::-webkit-scrollbar-thumb { background: #c5cad2; border-radius: 8px; border: 2px solid #f8f9fb; }
 #search input {
   //border-radius: 2rem;
   box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px 0 inset;
 }
 
-.search-list-description {
-  overflow: hidden;
-  display: -webkit-box;
-  /*-webkit-line-clamp: 5;*/
-  -webkit-box-orient: vertical;
-}
+.search-list-description { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+@media (max-width: 575.98px) { #search-list { top: 4.1rem; right: .5rem; width: calc(100vw - 1rem); max-height: 78vh; } .search-result { padding: .8rem; } .search-result-image { width: 58px; height: 86px; flex-basis: 58px; } .search-list-description, .search-result-copy { font-size: .82rem; } }
 </style>

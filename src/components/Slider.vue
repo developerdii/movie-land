@@ -78,20 +78,22 @@ $movie-card-radius: 1.2rem;
   flex-direction: column;
 
   img {
-    border-radius: calc(#{$movie-card-radius} - 0.2rem) calc(#{$movie-card-radius} - 0.3rem) 0 0;
-    -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, black), color-stop(0.35, black), color-stop(0.5, black), color-stop(0.65, black), color-stop(0.85, rgba(0, 0, 0, 0.6)), color-stop(1, transparent));
+    border-radius: $movie-card-radius $movie-card-radius 0 0;
+    display: block;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, .78) 78%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, .78) 78%, transparent 100%);
   }
 
   .description {
     transition: transform 1.5s ease;
     min-height: 5.5rem;
-    color: lightcyan;
+    color: #fff;
     text-transform: uppercase;
   }
 
   .description:hover {
     transform: scale(1.1);
-    color: #0c63e4;
+    color: var(--ml-brand-accent);
   }
 
   .footer {
@@ -109,11 +111,14 @@ $movie-card-radius: 1.2rem;
 }
 
 .container-title {
-  background: linear-gradient(180deg, rgba(247, 247, 247, 1) 0%, rgba(247, 247, 247, 0) 100%);
-  padding: 0.2rem 0.5rem;
+  background: transparent;
+  padding: 0.55rem 0.5rem 0;
   clear: both;
-  color: #2c3e50;
-  border-top: 0.2rem solid #351C75;
+  color: var(--ml-brand-dark);
+  border-top: 3px solid var(--ml-brand-accent);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
 }
 
 .carousel-control-prev {

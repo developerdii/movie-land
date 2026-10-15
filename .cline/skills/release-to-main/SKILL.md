@@ -5,29 +5,23 @@ description: Build and ship a release to production. Use when the user asks to d
 
 # Release to Production
 
-Production today is the `gh-pages` branch served by GitHub Pages. Follow this checklist whenever a release / deploy is requested.
+Production is the `main` branch. A push to `main` triggers `.github/workflows/deploy.yml` and deploys to GitHub Pages. Follow this checklist whenever a release / deploy is requested.
 
 ## 1. Validate
 ```bash
 npm run build       # production build must succeed
 ```
 
-## 2. Publish to gh-pages (current flow)
-- Build output is in `dist/`. Publish its contents to the root of the `gh-pages` branch (commit them there, or `git subtree push --prefix dist origin gh-pages`).
-- Confirm the site updates at https://developerdii.github.io/movie-land/.
+## 2. Commit and publish the working branch
+- Keep all application work on `develop`.
+- Commit the reviewed release changes on `develop` with a Conventional Commit message.
+- Push `develop` to `origin` and ensure lint/build CI passes.
 
-## 3. After the Actions deploy lands (migration)
-- Once `.github/workflows/deploy.yml` exists and the source moves to `develop` → `main`, switch this skill to the merge flow:
-  ```bash
-  git checkout develop
-  git fetch origin
-  git checkout main
-  git merge --ff-only develop
-  git push origin main
-  git checkout develop
-  ```
-- `main` will be production — pushing it triggers the Pages deploy.
+## 3. Merge to production
+- Fetch the latest remote refs and confirm the working tree is clean.
+- Fast-forward `main` to `develop`; stop and resolve divergence instead of creating a merge commit.
+- Push `main` to `origin` to trigger the GitHub Pages deploy, then return to `develop`.
 
 ## 4. Verify & report
-- Confirm the deployed site works (home carousel + search + a movie detail page).
+- Confirm the GitHub Actions deployment completes and the site updates at https://developerdii.github.io/movie-land/.
 - Report the released commit hash and what changed.

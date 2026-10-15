@@ -20,16 +20,17 @@ function parseDate(value) {
 }
 
 // Formats a date the same way the legacy moment-based helper did.
-// Supported formats: 'YYYY' and 'MMM Do YY'.
+// Supported formats: 'YYYY', 'MMM Do', and 'MMM Do YY'.
 export function formatDate(date, format) {
   if (!date) return ''
   const d = parseDate(date)
   if (Number.isNaN(d.getTime())) return ''
 
   if (format === 'YYYY') return String(d.getFullYear())
-  if (format === 'MMM Do YY') {
+  if (format === 'MMM Do' || format === 'MMM Do YY') {
     const month = MONTHS[d.getMonth()]
     const day = ordinal(d.getDate())
+    if (format === 'MMM Do') return `${month} ${day}`
     const year = String(d.getFullYear()).slice(-2)
     return `${month} ${day} ${year}`
   }

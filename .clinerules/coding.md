@@ -8,11 +8,17 @@
 ## Styling
 - Bootstrap 5 utility classes + custom SCSS in `<style lang="scss">` blocks.
 - Global styles live in `src/assets/scss/app.scss` (imported in `main.js`).
+- Brand theme uses the two colors in `src/assets/movieland-logo.svg`: dark `#171B25` and accent gold `#E99A16` (the logo may use its lighter gold gradient shade). Use these tokens across headings, section dividers, buttons, links, ratings, and interactions; avoid unrelated purple or blue accents.
+- Keep list/slider toggles, upcoming headings, and recommendation headings within the brand palette; avoid gradient shadows behind section titles.
+- Use compact icon-only segmented controls for cast view modes; keep hover feedback neutral and understated, with the dark brand color reserved for the selected mode.
 - Icons are Bootstrap Icons (`bi bi-*`).
 - Reuse `.movie-card`, `.container-title` and existing carousel styles before adding new ones.
+- Detail route pages share `.detail-page`, `.detail-heading`, `.detail-content`, `.detail-poster`, `.detail-overview`, and `.detail-section` styles from `src/assets/scss/app.scss`; keep film and TV metadata in the heading row and avoid nested fact cards.
+- Keep search panel sizing and result styles in `SearchBar.vue`; use flex result rows, readable regular-weight summaries, and responsive widths.
 
 ## Dates, images, IDs
-- Dates: `getFormattedDate(date, format)` from `@/mixins/dateFormatter` (moment). Use `'YYYY'` for years, `'MMM Do YY'` for release dates.
+- Dates: `formatDate(date, format)` from `@/utils/date`. Use `'YYYY'` for a standalone year and `'MMM Do YY'` for a single compact release date.
+- Languages: use `getLanguageName(code)` from `@/utils/language`; omit English from detail metadata and show other language names instead of ISO codes.
 - Images: full URL `'https://image.tmdb.org/t/p/w500' + poster_path` (or `/original/` for backdrops).
 - IDs: TMDB numeric ids; detail navigation uses `?id=`.
 

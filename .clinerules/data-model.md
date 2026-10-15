@@ -59,6 +59,6 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 ## Domain conventions
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); the cast slider uses **4**.
 - Search drops results with null `poster_path` (movie/tv) or `profile_path` (person); caps at 15 (trending) / 5 (search).
-- Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'` and `'MMM Do YY'`.
+- Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM Do'`, and `'MMM Do YY'`.
 - Lists are paginated client-side with `usePagination(items, pageSize)` (`@/composables/usePagination`) + `PaginationControls`; no `.slice()` limits anywhere.
 

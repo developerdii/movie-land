@@ -1,6 +1,6 @@
 <template>
   <p>
-    <i class="bi bi-star-fill" style="color: orange"></i> {{ value.toFixed(1) + ' / 10' }}
+    <i class="bi bi-star-fill" style="color: var(--ml-brand-accent)"></i> {{ value.toFixed(1) + ' / 10' }}
   </p>
 </template>
 
