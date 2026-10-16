@@ -13,7 +13,7 @@
         </div>
       </template>
     </section-heading>
-    <movie-slider id="upcoming-carousel" :movie-data="upComingMovies" :show-footer="true" :show-position="false" :show-rating="false" :show-arrows="false" @slid="onSlid"></movie-slider>
+    <movie-slider id="upcoming-carousel" variant="comingSoon" :movie-data="upComingMovies" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
   </div>
 </template>
 

@@ -103,46 +103,6 @@ body {
 .detail-content { margin-inline: 0; padding: 0; align-items: stretch; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .person-detail-content { background: transparent; }
 .detail-section { margin-top: clamp(2.5rem, 5vw, 4rem); }
-.movie-card,
-.cast-card {
-  min-width: 0;
-  overflow: hidden;
-  border-radius: 20px;
-  background: var(--ml-brand-dark);
-  color: var(--ml-surface);
-  box-shadow: 0 1px 2px rgba(var(--ml-brand-dark-rgb), .06), 0 8px 24px rgba(var(--ml-brand-dark-rgb), .08);
-  text-decoration: none;
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.movie-card { position: relative; display: flex; width: 100%; flex-direction: column; cursor: pointer; }
-.movie-card:hover,
-.movie-card:focus-visible,
-.cast-card:hover,
-.cast-card:focus-visible { transform: translateY(-6px); box-shadow: 0 0 0 2px var(--ml-brand-accent), 0 14px 30px rgba(var(--ml-brand-dark-rgb), .24); }
-.movie-card > .card-img-frame,
-.movie-card > .cast-card-image { width: 100%; aspect-ratio: 2 / 3; flex: 0 0 auto; border-radius: 0; }
-.movie-card > .card-img-frame::before,
-.cast-card .cast-photo::before { content: ""; position: absolute; z-index: 2; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(var(--ml-brand-dark-rgb), .08); pointer-events: none; }
-.movie-card > .description { display: -webkit-box; min-height: 2.6rem; overflow: hidden; margin: 0; color: var(--ml-surface); font-family: Manrope, "Helvetica Neue", sans-serif; font-weight: 700; font-size: 15px; line-height: 1.35; text-align: left; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.movie-card > .footer { margin: 0; overflow: hidden; color: rgba(var(--ml-surface-rgb), .72); font-size: .78rem; font-weight: 600; line-height: 1.25; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-.movie-card .media-image { -webkit-mask-image: none; mask-image: none; }
-.movie-card .media-image,
-.cast-card .media-image { transition: opacity .22s ease, transform .35s ease; }
-.movie-card:hover .media-image,
-.movie-card:focus-visible .media-image,
-.cast-card:hover .media-image,
-.cast-card:focus-visible .media-image { transform: scale(1.04); }
-
-.movie-card .card-rating,
-.cast-card .card-rating { position: absolute; top: 10px; left: 10px; z-index: 3; height: 26px; padding: 0 9px; border-radius: 8px; background: rgba(var(--ml-brand-dark-rgb), .88); display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--ml-surface); }
-.movie-card .card-rating i,
-.cast-card .card-rating i { color: var(--ml-brand-accent); font-size: 12px; }
-.card-info { position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; gap: .3rem; padding: .75rem .9rem; }
-.movie-card .card-info::before,
-.cast-card--poster .card-info::before { content: ""; position: absolute; inset: -40px; background: var(--poster) center bottom / cover; filter: blur(28px) saturate(1.4); z-index: -2; }
-.movie-card .card-info::after,
-.cast-card--poster .card-info::after { content: ""; position: absolute; inset: 0; background: rgba(var(--ml-brand-dark-rgb), .72); z-index: -1; }
-.cast-section .cast-card:not(.cast-card--poster) .cast-photo::after { position: absolute; z-index: 2; inset: 0; background: linear-gradient(180deg, rgba(var(--ml-brand-dark-rgb), 0) 55%, rgba(var(--ml-brand-dark-rgb), .8) 85%, rgba(var(--ml-brand-dark-rgb), .97) 100%); content: ''; pointer-events: none; }
 .movie-card-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; padding-top: 8px; }
 @media (max-width: 767.98px) {
   .movie-card-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -153,7 +113,6 @@ body {
 .media-image-placeholder { position: absolute; inset: 0; z-index: 0; display: grid; place-items: center; background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark)); color: var(--ml-brand-accent); font-size: clamp(1.35rem, 2.4vw, 2.25rem); }
 .media-image { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .22s ease; }
 .media-image.is-loaded { opacity: 1; }
-.movie-card.movie-card > .cast-card-image { position: relative; }
 
 .pagination-switch { display: flex; width: fit-content; align-items: center; gap: 2px; margin-left: auto; padding: 3px; border: 1px solid #d9dde3; border-radius: 9px; background: #f4f5f7; }
 .pagination-switch-btn { display: grid; width: 38px; height: 32px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--ml-brand-dark); transition: background-color .15s ease, color .15s ease; }

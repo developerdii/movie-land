@@ -65,7 +65,7 @@
           </div>
         </template>
       </section-heading>
-      <movie-slider id="recommendations-carousel" type="tv" :movie-data="recommendationChunks" :footer-format="'YYYY'" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
+      <movie-slider id="recommendations-carousel" type="tv" variant="movie" :movie-data="recommendationChunks" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
   </div>
 </template>

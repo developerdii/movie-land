@@ -1,4 +1,5 @@
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function ordinal(day) {
   if (day >= 11 && day <= 13) return `${day}th`
@@ -34,6 +35,28 @@ export function formatDate(date, format) {
     const year = String(d.getFullYear()).slice(-2)
     return `${month} ${day} ${year}`
   }
+  if (format === 'ddd, MMM D, YYYY') {
+    return `${WEEKDAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+  }
   return d.toDateString()
+}
+
+export function formatMonth(date) {
+  const d = parseDate(date)
+  return Number.isNaN(d.getTime()) ? '' : MONTHS[d.getMonth()]
+}
+
+export function formatDay(date) {
+  const d = parseDate(date)
+  return Number.isNaN(d.getTime()) ? '' : String(d.getDate())
+}
+
+export function daysUntil(date) {
+  const d = parseDate(date)
+  if (Number.isNaN(d.getTime())) return null
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const target = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  return Math.round((target - today) / 86400000)
 }
 

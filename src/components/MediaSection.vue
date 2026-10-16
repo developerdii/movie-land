@@ -26,19 +26,13 @@
 
     <ul v-if="view === 'grid'" class="cast-grid">
       <li v-for="item in pagedItems" :key="item.id" class="cast-grid-item">
-        <a class="cast-card" :class="{ 'cast-card--poster': !isPerson }" :style="posterStyle(item)" :href="`#/${kind}?id=${item.id}`" @click.prevent="open(item)">
-          <async-image v-if="imagePath(item)" :kind="kind" frame-class="cast-photo" :src="imageUrl(item)" :alt="titleOf(item)" />
-          <div v-else class="cast-photo cast-initials" aria-hidden="true">{{ initials(titleOf(item)) }}</div>
-          <span v-if="!isPerson && item.vote_average" class="card-rating" aria-hidden="true">
-            <i class="bi bi-star-fill"></i>{{ item.vote_average.toFixed(1) }}
-          </span>
-          <div class="card-info">
-            <div class="cast-meta">
-              <span class="cast-name">{{ titleOf(item) }}</span>
-            </div>
-            <span class="cast-role"><span v-if="isPerson" class="cast-as">as </span>{{ subtitleOf(item) }}</span>
-          </div>
-        </a>
+        <poster-card
+          :variant="isPerson ? 'person' : 'movie'"
+          :item="item"
+          :media-type="kind"
+          :show-type="!isPerson"
+          @navigate="open"
+        />
       </li>
     </ul>
 
@@ -58,7 +52,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import AsyncImage from './AsyncImage.vue'
+import PosterCard from './PosterCard.vue'
 import SectionHeading from './SectionHeading.vue'
 
 const props = defineProps({
@@ -110,12 +104,6 @@ function imageUrl(item, size = 'w500') {
   return path ? 'https://image.tmdb.org/t/p/' + size + path : ''
 }
 
-function posterStyle(item) {
-  const path = imagePath(item)
-  if (!path) return {}
-  return { '--poster': `url('https://image.tmdb.org/t/p/w500${path}')` }
-}
-
 function open(item) {
   router.push({ path: '/' + props.kind, query: { id: item.id } })
 }
@@ -154,37 +142,6 @@ function initials(name) {
 }
 
 .cast-grid-item { min-width: 0; }
-.cast-card { position: relative; display: flex; width: 100%; flex-direction: column; justify-content: flex-end; aspect-ratio: 3 / 4; cursor: pointer; }
-.cast-card--poster { aspect-ratio: auto; justify-content: flex-start; }
-
-.cast-section .cast-photo {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  width: auto;
-  height: auto;
-  aspect-ratio: auto;
-  border: 0;
-  border-radius: 0;
-  background: var(--ml-brand-dark);
-  overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-}
-.cast-card--poster .cast-photo { position: relative; z-index: 0; inset: auto; width: 100%; height: auto; aspect-ratio: 2 / 3; flex: 0 0 auto; }
-
-.cast-section .cast-photo .media-image-placeholder {
-  background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark));
-  color: var(--ml-brand-accent);
-  font-size: 1.25rem;
-}
-
-.cast-initials { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; color: rgba(var(--ml-surface-rgb), .45); letter-spacing: .02em; }
-
-.cast-meta { position: relative; z-index: 2; display: block; }
-.cast-card--poster .cast-meta { min-height: 2.6rem; }
-.cast-name { display: -webkit-box; overflow: hidden; text-align: left; color: var(--ml-surface); font-family: Manrope, "Helvetica Neue", sans-serif; font-weight: 700; font-size: 15px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.cast-role { position: relative; z-index: 2; overflow: hidden; text-align: left; color: rgba(var(--ml-surface-rgb), .72); font-size: .78rem; font-weight: 600; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
-.cast-as { color: rgba(var(--ml-surface-rgb), .5); }
 
 .cast-list {
   list-style: none; margin: 0; padding: 0;
