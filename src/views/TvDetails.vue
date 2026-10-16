@@ -16,30 +16,38 @@
               <span class="detail-rating-value">{{ tv.vote_average.toFixed(1) }}</span>
               <span class="detail-rating-scale">/ 10</span>
             </span>
-            <span v-if="tv.number_of_seasons" class="detail-meta-item"><i class="bi bi-collection" aria-hidden="true"></i>{{ tv.number_of_seasons }} {{ tv.number_of_seasons === 1 ? 'season' : 'seasons' }}</span>
             <span v-if="tv.episode_run_time && tv.episode_run_time.length" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(tv.episode_run_time[0]) }}</span>
-            <span v-if="tv.first_air_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(tv.first_air_date, 'MMM Do YY') }}</span>
-            <span v-if="getLanguageName(tv.original_language)" class="detail-meta-item">{{ getLanguageName(tv.original_language) }}</span>
+            <span v-if="airDates" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ airDates }}</span>
+            <span v-if="seasonsEpisodes" class="detail-meta-item"><i class="bi bi-collection" aria-hidden="true"></i>{{ seasonsEpisodes }}</span>
+            <span v-if="getLanguageName(tv.original_language)" class="detail-meta-item"><i class="bi bi-globe2" aria-hidden="true"></i>{{ getLanguageName(tv.original_language) }}</span>
           </div>
         </header>
 
-        <dl v-if="directors.length || writers.length" class="detail-facts">
-          <div v-if="directors.length" class="detail-fact">
-            <dt>Director</dt>
+        <dl v-if="creators.length || writers.length" class="detail-facts">
+          <div v-if="mergedCreatorWriter" class="detail-fact">
+            <dt>Creator &amp; Writer</dt>
             <dd>
-              <template v-for="(person, index) in directors" :key="person.id">
-                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
-              </template>
+              <a class="detail-person" :href="`/person?id=${mergedCreatorWriter.id}`" @click.prevent="goTo('person', mergedCreatorWriter.id)">{{ mergedCreatorWriter.name }}</a>
             </dd>
           </div>
-          <div v-if="writers.length" class="detail-fact">
-            <dt>Writers</dt>
-            <dd>
-              <template v-for="(person, index) in writers" :key="person.id">
-                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
-              </template>
-            </dd>
-          </div>
+          <template v-else>
+            <div v-if="creators.length" class="detail-fact">
+              <dt>Created by</dt>
+              <dd>
+                <template v-for="(person, index) in creators" :key="person.id">
+                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < creators.length - 1" class="detail-fact-sep">,</span>
+                </template>
+              </dd>
+            </div>
+            <div v-if="writers.length" class="detail-fact">
+              <dt>{{ writerLabel }}</dt>
+              <dd>
+                <template v-for="(person, index) in writers" :key="person.id">
+                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
+                </template>
+              </dd>
+            </div>
+          </template>
         </dl>
 
         <div class="detail-overview-block">
@@ -55,11 +63,11 @@
       <section-heading eyebrow="More Like This" title="Recommended TV Shows">
         <template #actions>
           <div v-if="recTotal > 1" class="round-pagination">
-            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
+            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" :aria-disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
             </button>
             <span class="round-pagination-count" aria-live="polite">{{ recIndex }} / {{ recTotal }}</span>
-            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
+            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" :aria-disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
             </button>
           </div>
@@ -78,7 +86,6 @@ import MediaSection from '../components/MediaSection.vue'
 import SectionHeading from '../components/SectionHeading.vue'
 import MovieSlider from '../components/MovieSlider.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
-import { formatDate } from '@/utils/date'
 import { getLanguageName } from '@/utils/language'
 import AsyncImage from '../components/AsyncImage.vue'
 
@@ -113,8 +120,31 @@ function crewByJobs(jobNames) {
     .map((entry) => entry.person)
 }
 
-const directors = computed(() => crewByJobs(['Director']))
+const creators = computed(() => (tv.value.created_by || []).filter(c => c.name))
 const writers = computed(() => crewByJobs(['Writer', 'Screenplay', 'Story']))
+const mergedCreatorWriter = computed(() => {
+  if (creators.value.length === 1 && writers.value.length === 1 && creators.value[0].id === writers.value[0].id) {
+    return creators.value[0]
+  }
+  return null
+})
+const writerLabel = computed(() => (writers.value.length === 1 ? 'Writer' : 'Writers'))
+const airDates = computed(() => {
+  const first = tv.value.first_air_date ? tv.value.first_air_date.slice(0, 4) : ''
+  if (!first) return ''
+  const last = tv.value.last_air_date ? tv.value.last_air_date.slice(0, 4) : ''
+  const ended = tv.value.status === 'Ended' || tv.value.status === 'Canceled'
+  if (ended && last) return first === last ? first : `${first} – ${last}`
+  return `${first} – present`
+})
+const seasonsEpisodes = computed(() => {
+  const seasons = tv.value.number_of_seasons
+  const episodes = tv.value.number_of_episodes
+  if (!seasons && !episodes) return ''
+  const s = seasons ? `${seasons} ${seasons === 1 ? 'season' : 'seasons'}` : ''
+  const e = episodes ? `${episodes} ${episodes === 1 ? 'episode' : 'episodes'}` : ''
+  return [s, e].filter(Boolean).join(' · ')
+})
 
 function formatRuntime(minutes) {
   if (!minutes) return ''

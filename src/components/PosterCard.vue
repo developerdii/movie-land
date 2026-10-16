@@ -209,8 +209,8 @@ function onClick() {
   justify-content: center;
   font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
   font-weight: 800;
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  color: rgba(var(--ml-surface-rgb), .45);
+  font-size: 40px;
+  color: rgba(var(--ml-muted-rgb), .4);
   background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark));
 }
 

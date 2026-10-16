@@ -2,19 +2,38 @@
   <div v-if="!loading" class="container-xxl detail-page">
     <div class="row g-4 detail-content person-detail-content">
       <div class="col-5 col-sm-4 col-lg-3">
-        <async-image kind="person" frame-class="detail-poster" :src="person.profile_path ? 'https://image.tmdb.org/t/p/w500' + person.profile_path : ''" :alt="person.name" />
+        <async-image v-if="person.profile_path" kind="person" frame-class="detail-poster" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name" />
+        <div v-else class="detail-poster person-detail-initials" aria-hidden="true">{{ personInitials }}</div>
       </div>
       <div class="col-12 col-sm-8 col-lg-9">
-        <h1 class="h2 fw-bold mb-2">{{ person.name }}</h1>
-        <div class="detail-meta-row d-flex flex-wrap align-items-center gap-2 gap-lg-3">
-          <span v-if="person.known_for_department" class="detail-meta-item"><i class="bi bi-briefcase"></i>{{ person.known_for_department }}</span>
-          <span v-if="person.birthday" class="detail-meta-item"><i class="bi bi-calendar3"></i>{{ formatDate(person.birthday, 'MMM Do YY') }}</span>
-          <span v-if="person.popularity" class="detail-meta-item"><i class="bi bi-graph-up"></i>Popularity {{ person.popularity.toFixed(0) }}</span>
+        <div class="detail-hero-header">
+          <div v-if="person.known_for_department" class="person-eyebrow">
+            <span class="person-eyebrow-dash" aria-hidden="true"></span>
+            <span class="section-heading-eyebrow">{{ person.known_for_department }}</span>
+          </div>
+          <h1 class="detail-title">{{ person.name }}</h1>
+          <dl class="detail-facts">
+            <div v-if="bornValue" class="detail-fact">
+              <dt>{{ bornLabel }}</dt>
+              <dd class="detail-fact-stack">
+                <span>{{ bornValue }}</span>
+                <span v-if="person.place_of_birth" class="detail-fact-sub">{{ person.place_of_birth }}</span>
+              </dd>
+            </div>
+            <div v-if="person.known_for_department" class="detail-fact">
+              <dt>Known for</dt>
+              <dd>{{ person.known_for_department }}</dd>
+            </div>
+            <div v-if="creditCount" class="detail-fact">
+              <dt>Credits</dt>
+              <dd>{{ creditCount }}</dd>
+            </div>
+          </dl>
         </div>
         <div v-if="person.biography" class="person-biography-wrap">
           <p ref="bioElement" class="detail-overview person-biography" :class="{ 'is-collapsed': !bioExpanded }">{{ person.biography }}</p>
           <button v-if="bioNeedsToggle" type="button" class="read-more-link" :aria-expanded="bioExpanded" @click="bioExpanded = !bioExpanded">
-            {{ bioExpanded ? 'Read less' : 'Read more' }}
+            {{ bioExpanded ? 'Show less' : 'Read more' }}
           </button>
         </div>
       </div>
@@ -27,7 +46,7 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/utils/date'
@@ -44,6 +63,52 @@ const bioElement = ref(null)
 const bioExpanded = ref(false)
 const bioNeedsToggle = ref(false)
 let bioResizeObserver
+
+const personInitials = computed(() => {
+  return (person.value.name || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+})
+
+function ageOn(birth, death) {
+  const [by, bm, bd] = birth.split('-').map(Number)
+  const end = death ? death.split('-').map(Number) : null
+  const now = new Date()
+  const ey = end ? end[0] : now.getFullYear()
+  const em = end ? end[1] : now.getMonth() + 1
+  const ed = end ? end[2] : now.getDate()
+  let age = ey - by
+  if (em < bm || (em === bm && ed < bd)) age--
+  return age
+}
+
+const bornLabel = computed(() => (person.value.deathday ? 'Died' : 'Born'))
+const bornValue = computed(() => {
+  if (!person.value.birthday) return ''
+  if (person.value.deathday) {
+    const age = ageOn(person.value.birthday, person.value.deathday)
+    return `${formatDate(person.value.deathday, 'MMM D, YYYY')} · age ${age}`
+  }
+  const age = ageOn(person.value.birthday, null)
+  return `${formatDate(person.value.birthday, 'MMM D, YYYY')} · age ${age}`
+})
+const creditCount = computed(() => movieCredits.value.length + tvCredits.value.length)
+
+function sortByDate(items, kind) {
+  const field = kind === 'tv' ? 'first_air_date' : 'release_date'
+  return [...items].sort((a, b) => {
+    const da = a[field] || ''
+    const db = b[field] || ''
+    if (!da && !db) return 0
+    if (!da) return 1
+    if (!db) return -1
+    return db.localeCompare(da)
+  })
+}
 
 async function updateBioOverflow() {
   await nextTick()
@@ -67,8 +132,8 @@ async function load() {
       api.getPersonTvCredits(id)
     ])
     person.value = d.data
-    movieCredits.value = (m.data.cast || [])
-    tvCredits.value = (t.data.cast || [])
+    movieCredits.value = sortByDate(m.data.cast || [], 'movie')
+    tvCredits.value = sortByDate(t.data.cast || [], 'tv')
     await updateBioOverflow()
   } catch (e) {
     console.log(e)

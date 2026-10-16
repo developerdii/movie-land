@@ -13,11 +13,11 @@
           </button>
         </div>
         <div v-if="pageCount > 1" class="round-pagination">
-          <button type="button" class="round-pagination-btn" :disabled="!canPrev" aria-label="Previous" @click="prevPage">
+          <button type="button" class="round-pagination-btn" :disabled="!canPrev" :aria-disabled="!canPrev" aria-label="Previous" @click="prevPage">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
           </button>
           <span class="round-pagination-count" aria-live="polite">{{ pageLabel }}</span>
-          <button type="button" class="round-pagination-btn" :disabled="!canNext" aria-label="Next" @click="nextPage">
+          <button type="button" class="round-pagination-btn" :disabled="!canNext" :aria-disabled="!canNext" aria-label="Next" @click="nextPage">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
           </button>
         </div>
@@ -30,7 +30,6 @@
           :variant="isPerson ? 'person' : 'movie'"
           :item="item"
           :media-type="kind"
-          :show-type="!isPerson"
           @navigate="open"
         />
       </li>

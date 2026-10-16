@@ -17,28 +17,36 @@
               <span class="detail-rating-scale">/ 10</span>
             </span>
             <span v-if="movieData.runtime" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(movieData.runtime) }}</span>
-            <span v-if="movieData.release_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(movieData.release_date, 'MMM Do YY') }}</span>
-            <span v-if="getLanguageName(movieData.original_language)" class="detail-meta-item">{{ getLanguageName(movieData.original_language) }}</span>
+            <span v-if="movieData.release_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(movieData.release_date, 'MMM D, YYYY') }}</span>
+            <span v-if="getLanguageName(movieData.original_language)" class="detail-meta-item"><i class="bi bi-globe2" aria-hidden="true"></i>{{ getLanguageName(movieData.original_language) }}</span>
           </div>
         </header>
 
         <dl v-if="directors.length || writers.length" class="detail-facts">
-          <div v-if="directors.length" class="detail-fact">
-            <dt>Director</dt>
+          <div v-if="mergedDirectorWriter" class="detail-fact">
+            <dt>Director &amp; Writer</dt>
             <dd>
-              <template v-for="(person, index) in directors" :key="person.id">
-                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
-              </template>
+              <a class="detail-person" :href="`/person?id=${mergedDirectorWriter.id}`" @click.prevent="goTo('person', mergedDirectorWriter.id)">{{ mergedDirectorWriter.name }}</a>
             </dd>
           </div>
-          <div v-if="writers.length" class="detail-fact">
-            <dt>Writers</dt>
-            <dd>
-              <template v-for="(person, index) in writers" :key="person.id">
-                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
-              </template>
-            </dd>
-          </div>
+          <template v-else>
+            <div v-if="directors.length" class="detail-fact">
+              <dt>Director</dt>
+              <dd>
+                <template v-for="(person, index) in directors" :key="person.id">
+                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
+                </template>
+              </dd>
+            </div>
+            <div v-if="writers.length" class="detail-fact">
+              <dt>{{ writerLabel }}</dt>
+              <dd>
+                <template v-for="(person, index) in writers" :key="person.id">
+                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
+                </template>
+              </dd>
+            </div>
+          </template>
         </dl>
 
         <div class="detail-overview-block">
@@ -54,11 +62,11 @@
       <section-heading eyebrow="More Like This" title="Recommended Movies">
         <template #actions>
           <div v-if="recTotal > 1" class="round-pagination">
-            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
+            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" :aria-disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
             </button>
             <span class="round-pagination-count" aria-live="polite">{{ recIndex }} / {{ recTotal }}</span>
-            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
+            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" :aria-disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
             </button>
           </div>
@@ -99,6 +107,13 @@ function onRecSlid(payload) {
 }
 const directors = computed(() => [...new Map(crew.value.filter(person => person.job === 'Director').map(person => [person.id, person])).values()])
 const writers = computed(() => [...new Map(crew.value.filter(person => ['Writer', 'Screenplay', 'Story'].includes(person.job)).map(person => [person.id, person])).values()])
+const mergedDirectorWriter = computed(() => {
+  if (directors.value.length === 1 && writers.value.length === 1 && directors.value[0].id === writers.value[0].id) {
+    return directors.value[0]
+  }
+  return null
+})
+const writerLabel = computed(() => (writers.value.length === 1 ? 'Writer' : 'Writers'))
 
 function formatRuntime(minutes) {
   if (!minutes) return ''

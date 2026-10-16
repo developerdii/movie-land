@@ -25,7 +25,7 @@ defineProps({
   justify-content: space-between;
   gap: 24px;
   padding-bottom: .75rem;
-  border-bottom: 3px solid var(--ml-brand-accent);
+  border-bottom: 2px solid var(--ml-brand-accent);
   margin-bottom: 1.5rem;
 }
 
@@ -45,7 +45,7 @@ defineProps({
   margin: 0;
   font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
   font-weight: 800;
-  font-size: 64px;
+  font-size: 52px;
   line-height: 0.9;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -55,6 +55,6 @@ defineProps({
 .section-heading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
 @media (max-width: 639.98px) {
-  .section-heading-title { font-size: 44px; }
+  .section-heading-title { font-size: 38px; }
 }
 </style>

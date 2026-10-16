@@ -32,7 +32,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getPersonTvCredits(personId)` | `GET /person/{id}/tv_credits` | `PersonDetails` |
 | `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
 | `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
-| `getTvAggregateCredits(tvId)` | `GET /tv/{id}/aggregate_credits` | `TvDetails` (directors/writers) |
+| `getTvAggregateCredits(tvId)` | `GET /tv/{id}/aggregate_credits` | `TvDetails` (writers) |
 | `getTvRecommendations(tvId)` | `GET /tv/{id}/recommendations` | `TvDetails` |
 
 ## Discover (filtered movie queries)
@@ -54,14 +54,14 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
   - tv: `id`, `name`, `poster_path`, `first_air_date`, `overview`, `vote_average`, `number_of_seasons`, `episode_run_time`.
   - person: `id`, `name`, `profile_path`, `popularity`, `known_for_department`.
 - `getMovieDetails` adds `genres: [{id, name}]`, `tagline`, `runtime`, `original_language`.
-- `getTvDetails` adds `genres`, `tagline`, `number_of_seasons`, `episode_run_time`, `first_air_date`.
-- `getPersonDetails` adds `biography`, `birthday`, `known_for_department`, `popularity`.
+- `getTvDetails` adds `genres`, `tagline`, `number_of_seasons`, `number_of_episodes`, `episode_run_time`, `first_air_date`, `last_air_date`, `status`, `created_by`.
+- `getPersonDetails` adds `biography`, `birthday`, `deathday`, `place_of_birth`, `known_for_department`, `popularity`.
 - Credits return `{ cast: [...] }` with `name`, `character`, `profile_path`.
 - Person search results may carry `known_for: [...]`.
 
 ## Domain conventions
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
 - Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (trending) / 5 (search); tab counts use `total_results` (search) or list length (trending). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department` and `popularity`.
-- Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM Do'`, and `'MMM Do YY'`.
+- Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM D, YYYY'`, and `'ddd, MMM D, YYYY'`.
 - Lists are paginated client-side by `MediaSection` (its own `page`/`pageSize` state + round pagination controls). `usePagination` + `PaginationControls` are legacy and currently unused.
 
