@@ -14,7 +14,7 @@
 - Use compact icon-only segmented controls for cast view modes; keep hover feedback neutral and understated, with the dark brand color reserved for the selected mode.
 - Icons are Bootstrap Icons (`bi bi-*`).
 - Reuse `.movie-card`, `.container-title` and existing carousel styles before adding new ones.
-- Poster cards (`.movie-card`, `.cast-card`) and the hero share one panel style: dark `#141418` surface, `#222228` border, `20px` radius, gold accents — full-bleed artwork with a scrim mask, the title overlaid on the image, and a dark metadata panel below.
+- Poster cards (`.movie-card`, `.cast-card`) share one panel style: dark `#141418` surface, `20px` radius, gold accents, and a light shadow (no border). Film cards show the poster clean on top with the title + date/year in a dark strip below; actor cards keep a full-bleed photo with a bottom scrim and the name overlaid.
 - Three poster card types share that panel style, differing only in the bottom-panel metadata: **upcoming** (title + release date), **actor** (name + role), and **film/TV** (title + release year). Recommendations ("Recommended Movies" / "Recommended TV Shows") use the film/TV type.
 - Detail route pages share `.detail-page`, `.detail-hero`, `.detail-poster`, `.detail-overview`, and `.detail-section` styles from `src/assets/scss/app.scss`; film and TV details use a two-column `.detail-hero` (poster + display title, genre/rating metadata, and Director/Writers fact cards).
 - Keep the search dropdown (light surface, tabs, result rows, footer) and its styles in `SearchBar.vue`; scope its rules with the `#search` id and keep accents on the brand gold token.

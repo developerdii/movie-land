@@ -2,17 +2,17 @@
   <slider :id="id" :show-indicators="showIndicators" :show-position="showPosition" :show-arrows="showArrows" @slid="$emit('slid', $event)">
     <template #card>
       <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row, index) in movieData" :key="index">
-        <div class="row pt-2 pe-3 ps-3">
-          <div class="col-md-2 p-1 d-flex" v-for="(movie, movieIndex) in row" :key="movieIndex" @click="route(movie.id)">
-            <div class="movie-card">
-              <async-image :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" :alt="titleOf(movie)" frame-class="card-img-frame" image-class="card-img-top" />
-              <span v-if="showRating && movie.vote_average" class="card-rating" aria-hidden="true">
-                <i class="bi bi-star-fill"></i>{{ movie.vote_average.toFixed(1) }}
-              </span>
-              <p class="description p-2 mb-0 pb-0">{{ titleOf(movie) }}</p>
-              <div v-if="showFooter" class="p-2 text-center footer">{{ formatDate(dateOf(movie), footerFormat) }}</div>
+        <div class="movie-card-row">
+          <a class="movie-card" v-for="(movie, movieIndex) in row" :key="movieIndex" :style="posterStyle(movie)" :href="`#/${type}?id=${movie.id}`" @click.prevent="route(movie.id)">
+            <async-image :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" :alt="titleOf(movie)" frame-class="card-img-frame" image-class="card-img-top" />
+            <span v-if="showRating && movie.vote_average" class="card-rating" aria-hidden="true">
+              <i class="bi bi-star-fill"></i>{{ movie.vote_average.toFixed(1) }}
+            </span>
+            <div class="card-info">
+              <p class="description">{{ titleOf(movie) }}</p>
+              <div v-if="showFooter" class="footer">{{ formatDate(dateOf(movie), footerFormat) }}</div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </template>
@@ -51,5 +51,10 @@ function dateOf(item) {
 
 function route(id) {
   router.push({ path: props.type, query: { id } })
+}
+
+function posterStyle(movie) {
+  if (!movie.poster_path) return {}
+  return { '--poster': `url('https://image.tmdb.org/t/p/w500${movie.poster_path}')` }
 }
 </script>
