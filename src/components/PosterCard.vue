@@ -13,7 +13,7 @@
         :src="imageUrl"
         :alt="title"
         :kind="variant === 'person' ? 'person' : 'movie'"
-        :aspect-ratio="variant === 'person' ? 'auto' : '2 / 3'"
+        aspect-ratio="auto"
         frame-class="poster-card__frame"
       />
       <div v-else class="poster-card__initials" aria-hidden="true">{{ initials }}</div>
@@ -166,10 +166,13 @@ function onClick() {
   width: 100%;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 20px;
+  isolation: isolate;
+  border-radius: 16px;
+  outline: 1px solid rgba(128, 128, 128, .18);
+  outline-offset: -1px;
   background: var(--ml-brand-dark);
   color: var(--ml-surface);
-  box-shadow: 0 1px 2px rgba(var(--ml-brand-dark-rgb), .06), 0 8px 24px rgba(var(--ml-brand-dark-rgb), .08);
+  box-shadow: 0 2px 4px rgba(var(--ml-brand-dark-rgb), .04), 0 10px 24px rgba(var(--ml-brand-dark-rgb), .08);
   text-decoration: none;
   cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease;
@@ -177,22 +180,20 @@ function onClick() {
 .poster-card:hover,
 .poster-card:focus-visible {
   transform: translateY(-6px);
+  outline-color: transparent;
   box-shadow: 0 0 0 2px var(--ml-brand-accent), 0 14px 30px rgba(var(--ml-brand-dark-rgb), .24);
 }
-
 .poster-card__media {
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  flex: 0 0 auto;
 }
 .poster-card:not(.poster-card--person) .poster-card__media {
   aspect-ratio: 2 / 3;
-  flex: 0 0 auto;
 }
 .poster-card--person .poster-card__media {
-  position: absolute;
-  inset: 0;
-  aspect-ratio: auto;
+  aspect-ratio: 3 / 4;
 }
 
 .poster-card__frame {
@@ -213,16 +214,6 @@ function onClick() {
   background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark));
 }
 
-.poster-card__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(var(--ml-brand-dark-rgb), .08);
-  pointer-events: none;
-  z-index: 2;
-}
-
 .poster-card__frame .media-image {
   transition: opacity .22s ease, transform .35s ease;
 }
@@ -238,7 +229,7 @@ function onClick() {
   z-index: 3;
   min-width: 40px;
   padding: 6px 9px 7px;
-  border-radius: 10px;
+  border-radius: 6px;
   background: var(--ml-brand-dark);
   display: flex;
   flex-direction: column;
@@ -282,7 +273,7 @@ function onClick() {
   z-index: 3;
   height: 26px;
   padding: 0 9px;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--ml-brand-dark);
   display: inline-flex;
   align-items: center;
@@ -335,8 +326,9 @@ function onClick() {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: .375rem;
+  gap: 6px;
   padding: 14px 16px 16px;
+  min-height: 96px;
 }
 .poster-card--comingSoon .card-info::before,
 .poster-card--movie .card-info::before {
@@ -369,7 +361,6 @@ function onClick() {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  min-height: 2.5em;
 }
 .poster-card__sub {
   font-family: Manrope, "Helvetica Neue", sans-serif;
@@ -382,29 +373,27 @@ function onClick() {
   text-overflow: ellipsis;
 }
 
-.poster-card--person {
-  aspect-ratio: 3 / 4;
-  justify-content: flex-end;
-}
 .poster-card--person .poster-card__media::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(var(--ml-brand-dark-rgb), 0) 60%, rgba(var(--ml-brand-dark-rgb), .85) 100%);
+  background: linear-gradient(to top, rgba(var(--ml-brand-dark-rgb), .9) 0%, rgba(var(--ml-brand-dark-rgb), .6) 25%, transparent 50%);
   pointer-events: none;
 }
 .poster-card__person {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: .25rem;
-  padding: 12px 16px;
+  gap: 4px;
+  padding: 0 16px 16px;
 }
 .poster-card__person .poster-card__title {
   display: block;
-  min-height: 0;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -419,6 +408,6 @@ function onClick() {
   text-overflow: ellipsis;
 }
 .poster-card__as {
-  color: rgba(var(--ml-surface-rgb), .65);
+  color: rgba(var(--ml-surface-rgb), .6);
 }
 </style>
