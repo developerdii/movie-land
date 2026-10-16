@@ -1,15 +1,37 @@
 <template>
   <div class="container-xxl detail-page browse-page">
+    <div class="browse-top">
+      <div class="browse-seg" role="group" aria-label="Media type">
+        <button
+          v-for="tab in TYPE_TABS"
+          :key="tab.value"
+          type="button"
+          class="browse-seg-btn"
+          :class="{ active: tab.value === type }"
+          :aria-pressed="tab.value === type"
+          :disabled="loading"
+        @click="applyChange({ type: tab.value })"
+        >{{ tab.label }}</button>
+      </div>
+
+      <!-- Search is its own TMDB endpoint, so it sits beside the tabs and not in the filter bar. -->
+      <browse-search :q="state.q" :type="type" @change="applyChange" />
+    </div>
+
     <browse-filters
-      :type="type"
+      v-if="type !== 'person'"
       :state="state"
       :genres="genreOptions"
       :years="years"
+      :languages="languages"
+      :countries="countries"
+      :loading="loading"
       @change="applyChange"
     />
 
+    <!-- While loading, MediaSection shows skeleton cards, including on the first load when there are no items yet. -->
     <media-section
-      v-if="items.length"
+      v-if="items.length || loading"
       :key="type"
       :items="items"
       :kind="type"
@@ -21,7 +43,6 @@
       :loading="loading"
       @update:page="goToPage"
     />
-    <p v-else-if="loading" class="browse-status" role="status">Loading…</p>
     <div v-else class="browse-status" role="status">
       <i class="bi bi-film" aria-hidden="true"></i>
       <span>{{ failed ? 'Could not load results. Try again.' : 'No results for these filters.' }}</span>
@@ -34,6 +55,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import BrowseFilters from '@/components/BrowseFilters.vue'
+import BrowseSearch from '@/components/BrowseSearch.vue'
 import MediaSection from '@/components/MediaSection.vue'
 import {
   MAX_PAGES,
@@ -42,18 +64,23 @@ import {
   toBrowseQuery,
   yearOptions
 } from '@/utils/browse'
+import { getCountryList, getLanguageList } from '@/utils/configuration'
 import { getGenreList } from '@/utils/genres'
 
 const route = useRoute()
 const router = useRouter()
 
-const PAGE_TITLES = { movie: 'Movies', tv: 'TV Shows', person: 'People' }
+const TYPE_TABS = [
+  { value: 'movie', label: 'Movies' },
+  { value: 'tv', label: 'TV Shows' },
+  { value: 'person', label: 'People' }
+]
 const years = yearOptions()
 
 // The URL is the state: everything below is derived from route.params and route.query.
 const type = computed(() => route.params.type)
 const state = computed(() => parseBrowseQuery(route.query))
-const pageTitle = computed(() => PAGE_TITLES[type.value])
+const pageTitle = computed(() => TYPE_TABS.find((tab) => tab.value === type.value).label)
 const eyebrow = computed(() => (state.value.q ? 'Search · ' + state.value.q : 'Browse'))
 
 const items = ref([])
@@ -63,6 +90,12 @@ const failed = ref(false)
 
 const genres = ref([])
 const genreOptions = computed(() => [...genres.value].sort((a, b) => a.name.localeCompare(b.name)))
+
+// Language and country lists are static, so they load once per session; empty lists just leave "Any" selected.
+const languages = ref([])
+const countries = ref([])
+getLanguageList().then((list) => { languages.value = list }).catch(() => {})
+getCountryList().then((list) => { countries.value = list }).catch(() => {})
 
 watch(type, async (next) => {
   items.value = []
@@ -118,7 +151,10 @@ function applyChange({ type: nextType, ...filters }) {
     return
   }
   // Any filter change starts again from the first page.
-  router.push({ path: '/browse/' + type.value, query: toBrowseQuery({ ...state.value, ...filters, page: 1 }) })
+  const next = { path: '/browse/' + type.value, query: toBrowseQuery({ ...state.value, ...filters, page: 1 }) }
+  // Search-field updates replace the current entry, so Back does not step through every pause while typing.
+  if (Object.keys(filters).length === 1 && 'q' in filters) router.replace(next)
+  else router.push(next)
 }
 
 function goToPage(page) {
@@ -129,6 +165,33 @@ function goToPage(page) {
 <style lang="scss">
 .browse-page { padding-top: 2rem; padding-bottom: 3rem; }
 .browse-page .detail-section { margin-top: 2rem; }
+
+/* Top row: media type tabs and the search field. Switching type is not a filter. */
+.browse-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.browse-seg { display: flex; width: fit-content; max-width: 100%; gap: 4px; padding: 4px; background: #f4f5f7; border: 1px solid #d9dde3; border-radius: 999px; }
+.browse-seg-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4a5568;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.browse-seg-btn:hover:not(.active) { color: var(--ml-brand-dark); }
+.browse-seg-btn.active { background: var(--ml-brand-accent); color: var(--ml-brand-dark); }
+.browse-seg-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
+.browse-seg-btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* 20 results per TMDB page: 2, 4 or 5 columns always fill the last row. */
 .browse-page .cast-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

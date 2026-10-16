@@ -19,13 +19,40 @@ export const SORT_OPTIONS = [
   { value: 'vote_average', label: 'Rating' }
 ]
 
+// Minimum rating choices (TMDB vote_average.gte).
+export const RATING_OPTIONS = [
+  { value: '5', label: '5+' },
+  { value: '6', label: '6+' },
+  { value: '7', label: '7+' },
+  { value: '8', label: '8+' }
+]
+
+// Maximum rating choices (TMDB vote_average.lte).
+export const MAX_RATING_OPTIONS = [
+  { value: '4', label: 'Up to 4' },
+  { value: '5', label: 'Up to 5' },
+  { value: '6', label: 'Up to 6' },
+  { value: '7', label: 'Up to 7' },
+  { value: '8', label: 'Up to 8' }
+]
+
+// Runtime buckets in minutes (TMDB with_runtime.gte / with_runtime.lte).
+export const RUNTIME_OPTIONS = [
+  { value: 'short', label: 'Under 90 min', params: { 'with_runtime.lte': 89 } },
+  { value: 'medium', label: '90–120 min', params: { 'with_runtime.gte': 90, 'with_runtime.lte': 120 } },
+  { value: 'long', label: 'Over 120 min', params: { 'with_runtime.gte': 121 } }
+]
+
 // TMDB list endpoints return 20 results per page and stop at page 500.
 export const MAX_PAGES = 500
 
-// Sorting by rating is noise unless the title has a minimum number of votes.
+// Sorting or filtering by rating is noise unless the title has a minimum number of votes.
 const MIN_VOTE_COUNT = 100
 
 const SORT_PATTERN = /^(popularity|release_date|vote_average)\.(asc|desc)$/
+const RATING_VALUES = RATING_OPTIONS.map((option) => option.value)
+const MAX_RATING_VALUES = MAX_RATING_OPTIONS.map((option) => option.value)
+const RUNTIME_VALUES = RUNTIME_OPTIONS.map((option) => option.value)
 
 function first(value) {
   return Array.isArray(value) ? value[0] : value
@@ -34,12 +61,22 @@ function first(value) {
 export function parseBrowseQuery(query = {}) {
   const genre = first(query.genre) || ''
   const year = first(query.year) || ''
+  const language = first(query.language) || ''
+  const country = first(query.country) || ''
+  const rating = first(query.rating) || ''
+  const maxRating = first(query.maxRating) || ''
+  const runtime = first(query.runtime) || ''
   const sort = first(query.sort) || ''
   const page = parseInt(first(query.page), 10)
   return {
     q: (first(query.q) || '').trim(),
     genre: /^\d+$/.test(genre) ? genre : '',
     year: /^\d{4}$/.test(year) ? year : '',
+    language: /^[a-z]{2}$/.test(language) ? language : '',
+    country: /^[A-Z]{2}$/.test(country) ? country : '',
+    rating: RATING_VALUES.includes(rating) ? rating : '',
+    maxRating: MAX_RATING_VALUES.includes(maxRating) ? maxRating : '',
+    runtime: RUNTIME_VALUES.includes(runtime) ? runtime : '',
     sort: SORT_PATTERN.test(sort) ? sort : DEFAULT_SORT,
     page: page >= 1 && page <= MAX_PAGES ? page : 1
   }
@@ -51,9 +88,19 @@ export function toBrowseQuery(state) {
   if (state.q) query.q = state.q
   if (state.genre) query.genre = state.genre
   if (state.year) query.year = state.year
+  if (state.language) query.language = state.language
+  if (state.country) query.country = state.country
+  if (state.rating) query.rating = state.rating
+  if (state.maxRating) query.maxRating = state.maxRating
+  if (state.runtime) query.runtime = state.runtime
   if (state.sort !== DEFAULT_SORT) query.sort = state.sort
   if (state.page > 1) query.page = String(state.page)
   return query
+}
+
+// True when a filter in the collapsible second row is set (language, min rating, runtime).
+export function hasMoreFilters(state) {
+  return Boolean(state.language || state.rating || state.maxRating || state.runtime)
 }
 
 export function sortField(sort) {
@@ -77,7 +124,12 @@ export function buildDiscoverParams(state, type) {
   }
   if (state.genre) params.with_genres = state.genre
   if (state.year) params[type === 'tv' ? 'first_air_date_year' : 'primary_release_year'] = state.year
-  if (field === 'vote_average') params['vote_count.gte'] = MIN_VOTE_COUNT
+  if (state.language) params.with_original_language = state.language
+  if (state.country) params.with_origin_country = state.country
+  if (state.rating) params['vote_average.gte'] = state.rating
+  if (state.maxRating) params['vote_average.lte'] = state.maxRating
+  if (state.runtime) Object.assign(params, RUNTIME_OPTIONS.find((option) => option.value === state.runtime).params)
+  if (field === 'vote_average' || state.rating || state.maxRating) params['vote_count.gte'] = MIN_VOTE_COUNT
   return params
 }
 

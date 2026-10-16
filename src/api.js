@@ -42,6 +42,14 @@ export default {
     return api.get('/genre/tv/list')
   },
 
+  getLanguages() {
+    return api.get('/configuration/languages')
+  },
+
+  getCountries() {
+    return api.get('/configuration/countries')
+  },
+
   getTrendingMovies(mediaType, timeWindow) {
     return api.get(`/trending/${mediaType}/${timeWindow}`)
   },

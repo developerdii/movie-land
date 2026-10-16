@@ -1,5 +1,5 @@
 <template>
-  <section class="detail-section cast-section" :class="{ 'is-loading': loading }" :aria-busy="loading">
+  <section class="detail-section cast-section" :aria-busy="loading">
     <section-heading :eyebrow="eyebrow" :title="title">
       <template #actions>
         <div class="cast-seg" role="group" :aria-label="title + ' display mode'">
@@ -13,37 +13,69 @@
           </button>
         </div>
         <div v-if="pageCount > 1" class="round-pagination">
-          <button type="button" class="round-pagination-btn" :disabled="!canPrev" :aria-disabled="!canPrev" aria-label="Previous" @click="prevPage">
+          <button type="button" class="round-pagination-btn" :disabled="!canPrev || loading" :aria-disabled="!canPrev || loading" aria-label="Previous" @click="prevPage">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
           </button>
-          <span class="round-pagination-count" aria-live="polite">{{ pageLabel }}</span>
-          <button type="button" class="round-pagination-btn" :disabled="!canNext" :aria-disabled="!canNext" aria-label="Next" @click="nextPage">
+          <div class="round-pagination-jump">
+            <input
+              type="number"
+              inputmode="numeric"
+              class="round-pagination-input"
+              :value="pageIndex + 1"
+              :min="1"
+              :max="pageCount"
+              :disabled="loading"
+              :aria-label="'Current page, 1 to ' + pageCount"
+              @change="jumpTo"
+              @keydown.enter.prevent="$event.target.blur()"
+            >
+            <span class="round-pagination-total" aria-live="polite">/ {{ pageCount }}</span>
+          </div>
+          <button type="button" class="round-pagination-btn" :disabled="!canNext || loading" :aria-disabled="!canNext || loading" aria-label="Next" @click="nextPage">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
           </button>
         </div>
       </template>
     </section-heading>
 
+    <span v-if="loading" class="visually-hidden" role="status">Loading results</span>
+
     <ul v-if="view === 'grid'" class="cast-grid">
-      <li v-for="item in pagedItems" :key="item.id" class="cast-grid-item">
-        <poster-card
-          :variant="isPerson ? 'person' : 'movie'"
-          :item="item"
-          :media-type="kind"
-          @navigate="open"
-        />
-      </li>
+      <template v-if="showSkeleton">
+        <li v-for="n in SERVER_PAGE_SIZE" :key="'skeleton-' + n" class="cast-grid-item" aria-hidden="true">
+          <poster-card-skeleton />
+        </li>
+      </template>
+      <template v-else>
+        <li v-for="item in pagedItems" :key="item.id" class="cast-grid-item">
+          <poster-card
+            :variant="isPerson ? 'person' : 'movie'"
+            :item="item"
+            :media-type="kind"
+            @navigate="open"
+          />
+        </li>
+      </template>
     </ul>
 
     <ul v-else class="cast-list">
-      <li v-for="item in pagedItems" :key="item.id" class="cast-row" @click="open(item)">
-        <span class="cast-avatar" :class="{ 'cast-avatar--poster': !isPerson }" aria-hidden="true">
-          <img v-if="imagePath(item)" :src="imageUrl(item, isPerson ? 'w185' : 'w92')" :alt="titleOf(item)" />
-          <span v-else>{{ initials(titleOf(item)) }}</span>
-        </span>
-        <span class="cast-row-name">{{ titleOf(item) }}</span>
-        <span class="cast-row-role">{{ subtitleOf(item) }}</span>
-      </li>
+      <template v-if="showSkeleton">
+        <li v-for="n in SERVER_PAGE_SIZE" :key="'skeleton-' + n" class="cast-row cast-row--skeleton" aria-hidden="true">
+          <span class="cast-avatar cast-avatar--skeleton skeleton-shimmer"></span>
+          <span class="cast-row-skeleton-bar cast-row-skeleton-bar--name skeleton-shimmer"></span>
+          <span class="cast-row-skeleton-bar cast-row-skeleton-bar--role skeleton-shimmer"></span>
+        </li>
+      </template>
+      <template v-else>
+        <li v-for="item in pagedItems" :key="item.id" class="cast-row" @click="open(item)">
+          <span class="cast-avatar" :class="{ 'cast-avatar--poster': !isPerson }" aria-hidden="true">
+            <img v-if="imagePath(item)" :src="imageUrl(item, isPerson ? 'w185' : 'w92')" :alt="titleOf(item)" />
+            <span v-else>{{ initials(titleOf(item)) }}</span>
+          </span>
+          <span class="cast-row-name">{{ titleOf(item) }}</span>
+          <span class="cast-row-role">{{ subtitleOf(item) }}</span>
+        </li>
+      </template>
     </ul>
   </section>
 </template>
@@ -52,6 +84,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import PosterCard from './PosterCard.vue'
+import PosterCardSkeleton from './PosterCardSkeleton.vue'
 import SectionHeading from './SectionHeading.vue'
 
 const props = defineProps({
@@ -68,6 +101,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:page'])
+
+// TMDB returns 20 results per page, so a server-paged load shows 20 placeholders.
+const SERVER_PAGE_SIZE = 20
+const showSkeleton = computed(() => props.loading && props.serverPaged)
 
 const router = useRouter()
 const view = ref('grid')
@@ -95,6 +132,17 @@ const pageLabel = computed(() => (pageIndex.value + 1) + ' / ' + pageCount.value
 function goToPage(index) {
   if (props.serverPaged) emit('update:page', index + 1)
   else localPage.value = index
+}
+
+// Typed page numbers are clamped to 1..pageCount; anything unreadable goes back to the current page.
+function jumpTo(event) {
+  const input = event.target
+  const requested = Math.round(Number(input.value))
+  const target = Number.isFinite(requested) && input.value !== ''
+    ? Math.min(Math.max(requested, 1), pageCount.value)
+    : pageIndex.value + 1
+  input.value = String(target)
+  if (target - 1 !== pageIndex.value) goToPage(target - 1)
 }
 
 function nextPage() {
@@ -165,8 +213,48 @@ function initials(name) {
 
 .cast-grid-item { min-width: 0; }
 
-.cast-section.is-loading .cast-grid,
-.cast-section.is-loading .cast-list { opacity: .45; transition: opacity .2s ease; }
+/* List-view skeleton rows. The shimmer comes from .skeleton-shimmer. */
+.cast-row--skeleton { cursor: default; }
+.cast-row--skeleton:hover { background: none; }
+.cast-row .cast-avatar.cast-avatar--skeleton { border: 0; background: none; }
+.cast-row-skeleton-bar { display: block; height: 12px; border-radius: 6px; }
+.cast-row-skeleton-bar--name { flex: 1 1 auto; max-width: 260px; height: 14px; }
+.cast-row-skeleton-bar--role { flex: none; width: 90px; }
+
+.round-pagination-jump {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 48px;
+  padding: 0 14px 0 8px;
+  border: 1px solid #d9dde3;
+  border-radius: 999px;
+  background: var(--ml-surface);
+  color: var(--ml-muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.round-pagination-jump:focus-within { border-color: var(--ml-brand-accent); }
+.round-pagination-input {
+  width: 52px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ml-ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.round-pagination-input::-webkit-outer-spin-button,
+.round-pagination-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.round-pagination-input:hover { background: #f4f5f7; }
+.round-pagination-input:focus { outline: none; background: #f4f5f7; }
+.round-pagination-total { min-width: 2.5rem; }
 
 .cast-list {
   list-style: none; margin: 0; padding: 0;

@@ -21,6 +21,8 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider` |
 | `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags), `PopularMoviesSlider` (hero genre) |
 | `getTvGenres()` | `GET /genre/tv/list` | `SearchBar` (genre tags) |
+| `getLanguages()` | `GET /configuration/languages` | `BrowseView` (language filter) |
+| `getCountries()` | `GET /configuration/countries` | `BrowseView` (country filter) |
 | `getTrendingMovies(mediaType, timeWindow)` | `GET /trending/{media_type}/{time_window}` | `SearchBar` (default list) |
 | `getSearch(mediaType, searchText, page)` | `GET /search/{media_type}?query={text}&page={n}` | `SearchBar`, `BrowseView` (when a search text is set) |
 | `getDiscover(mediaType, params)` | `GET /discover/{media_type}` (movie or tv) | `BrowseView` |
@@ -63,10 +65,11 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 
 ## Browse (filtered lists)
 `/browse/:type` (`movie`, `tv`, `person`) is a full-page, server-paged list. The URL is its only state:
-- Query params: `q` (search text), `genre` (one genre id), `year`, `sort` (default `popularity.desc`; also `release_date.*` and `vote_average.*`), `page` (1-based). Only non-default values are written, so the default view is `/browse/{type}`.
-- Movies and TV use `getDiscover`. `sort` maps per type: `release_date` → `primary_release_date` (movie) or `first_air_date` (TV). `year` maps to `primary_release_year` (movie) or `first_air_date_year` (TV). Rating sort adds `vote_count.gte=100` so unrated titles don't float to the top.
-- People use `getPopularPeople` (`/person/popular`). It has no sort, filter or direction parameters, so people only get the default popularity order and the search text. The filter panel shows no genre, year or sort for people.
+- Query params: `q` (search text), `genre` (one genre id), `year`, `language` (ISO 639-1, e.g. `fr`), `country` (ISO 3166-1, e.g. `FR`), `rating` (minimum, `5`–`8`), `maxRating` (maximum, `4`–`8`), `runtime` (`short` | `medium` | `long`), `sort` (default `popularity.desc`; also `release_date.*` and `vote_average.*`), `page` (1-based). Only non-default values are written, so the default view is `/browse/{type}`.
+- Movies and TV use `getDiscover`. `sort` maps per type: `release_date` → `primary_release_date` (movie) or `first_air_date` (TV). `year` maps to `primary_release_year` (movie) or `first_air_date_year` (TV). `language` → `with_original_language`, `country` → `with_origin_country`, `rating` → `vote_average.gte`, `maxRating` → `vote_average.lte`, `runtime` → `with_runtime.gte` / `with_runtime.lte` (short: lte 89; medium: 90–120; long: gte 121). Rating sort and either rating filter add `vote_count.gte=100`, so unrated titles don't float to the top or pass the filter.
+- People use `getPopularPeople` (`/person/popular`). TMDB has no sort, filter or direction parameters for people, so the search field is the only filter on that page. A department filter could only work client-side on the 20 people already loaded, so it is not offered.
 - A search text uses `getSearch` (`/search/{type}`), which ignores genre, year and sort. While `q` is set the filter controls are disabled.
+- The search field writes `q` with `router.replace` (the history entry is replaced while typing), while every other filter pushes a new entry.
 - TMDB returns 20 results per page and stops at page 500. The view caps `total_pages` at 500. Movie and TV rows without a `poster_path` are kept and show the initials placeholder, so every page stays full. (Dropping them left `popularity.asc` pages with 5 or 11 cards.)
 - Entry points: a genre tag on a movie or TV detail page opens `/browse/{movie|tv}?genre={id}`. The search footer's "Browse all" opens `/browse/{active tab}` with `q` when the search box has text, and shows popular results otherwise.
 
