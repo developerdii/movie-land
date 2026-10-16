@@ -67,7 +67,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Movies and TV use `getDiscover`. `sort` maps per type: `release_date` → `primary_release_date` (movie) or `first_air_date` (TV). `year` maps to `primary_release_year` (movie) or `first_air_date_year` (TV). Rating sort adds `vote_count.gte=100` so unrated titles don't float to the top.
 - People use `getPopularPeople` (`/person/popular`). It has no sort, filter or direction parameters, so people only get the default popularity order and the search text. The filter panel shows no genre, year or sort for people.
 - A search text uses `getSearch` (`/search/{type}`), which ignores genre, year and sort. While `q` is set the filter controls are disabled.
-- TMDB returns 20 results per page and stops at page 500. The view caps `total_pages` at 500. Movie and TV rows without a `poster_path` are dropped, as in search.
+- TMDB returns 20 results per page and stops at page 500. The view caps `total_pages` at 500. Movie and TV rows without a `poster_path` are kept and show the initials placeholder, so every page stays full. (Dropping them left `popularity.asc` pages with 5 or 11 cards.)
 - Entry points: a genre tag on a movie or TV detail page opens `/browse/{movie|tv}?genre={id}`. The search footer's "Browse all" opens `/browse/{active tab}` with `q` when the search box has text, and shows popular results otherwise.
 
 ## Domain conventions

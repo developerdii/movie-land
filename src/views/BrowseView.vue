@@ -38,7 +38,6 @@ import MediaSection from '@/components/MediaSection.vue'
 import {
   MAX_PAGES,
   buildDiscoverParams,
-  hasArtwork,
   parseBrowseQuery,
   toBrowseQuery,
   yearOptions
@@ -92,7 +91,8 @@ async function load() {
   try {
     const { data } = await request(current, mediaType)
     if (id !== requestId) return
-    items.value = (data.results || []).filter((item) => hasArtwork(item, mediaType))
+    // Keep items without a poster: PosterCard shows an initials placeholder, so each TMDB page stays full.
+    items.value = data.results || []
     totalPages.value = Math.min(data.total_pages || 0, MAX_PAGES)
     const lastPage = Math.max(totalPages.value, 1)
     if (current.page > lastPage) {

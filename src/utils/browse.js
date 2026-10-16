@@ -81,11 +81,6 @@ export function buildDiscoverParams(state, type) {
   return params
 }
 
-// Movie and TV rows without a poster break the grid, so they are dropped (same rule as search).
-export function hasArtwork(item, type) {
-  return type === 'person' || Boolean(item.poster_path)
-}
-
 export function yearOptions(from = 1950, to = new Date().getFullYear() + 1) {
   const years = []
   for (let year = to; year >= from; year--) years.push(year)
