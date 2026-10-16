@@ -1,5 +1,5 @@
 <template>
-  <section class="detail-section cast-section">
+  <section class="detail-section cast-section" :class="{ 'is-loading': loading }" :aria-busy="loading">
     <section-heading :eyebrow="eyebrow" :title="title">
       <template #actions>
         <div class="cast-seg" role="group" :aria-label="title + ' display mode'">
@@ -58,38 +58,61 @@ const props = defineProps({
   items: { type: Array, default: () => [] },
   kind: { type: String, default: 'person' },
   eyebrow: { type: String, default: 'Starring' },
-  title: { type: String, default: 'Cast' }
+  title: { type: String, default: 'Cast' },
+  // Server-paged mode (browse page): `items` is one TMDB page and paging is
+  // driven by `page` (1-based) and `totalPages`, via the update:page event.
+  serverPaged: { type: Boolean, default: false },
+  page: { type: Number, default: 1 },
+  totalPages: { type: Number, default: 1 },
+  loading: { type: Boolean, default: false }
 })
+
+const emit = defineEmits(['update:page'])
 
 const router = useRouter()
 const view = ref('grid')
 
 const isPerson = computed(() => props.kind === 'person')
 
-const page = ref(0)
+// Client-side paging (cast and filmography) keeps its own index.
+const localPage = ref(0)
 const pageSize = computed(() => (view.value === 'grid' ? 6 : 12))
-const pageCount = computed(() => Math.max(1, Math.ceil(props.items.length / pageSize.value)))
-const pagedItems = computed(() => props.items.slice(page.value * pageSize.value, (page.value + 1) * pageSize.value))
-const canPrev = computed(() => page.value > 0)
-const canNext = computed(() => page.value < pageCount.value - 1)
-const pageLabel = computed(() => (page.value + 1) + ' / ' + pageCount.value)
+const pageIndex = computed(() => (props.serverPaged ? props.page - 1 : localPage.value))
+const pageCount = computed(() => (
+  props.serverPaged
+    ? Math.max(1, props.totalPages)
+    : Math.max(1, Math.ceil(props.items.length / pageSize.value))
+))
+const pagedItems = computed(() => (
+  props.serverPaged
+    ? props.items
+    : props.items.slice(localPage.value * pageSize.value, (localPage.value + 1) * pageSize.value)
+))
+const canPrev = computed(() => pageIndex.value > 0)
+const canNext = computed(() => pageIndex.value < pageCount.value - 1)
+const pageLabel = computed(() => (pageIndex.value + 1) + ' / ' + pageCount.value)
+
+function goToPage(index) {
+  if (props.serverPaged) emit('update:page', index + 1)
+  else localPage.value = index
+}
 
 function nextPage() {
-  if (canNext.value) page.value++
+  if (canNext.value) goToPage(pageIndex.value + 1)
 }
 
 function prevPage() {
-  if (canPrev.value) page.value--
+  if (canPrev.value) goToPage(pageIndex.value - 1)
 }
 
-watch(view, () => { page.value = 0 })
+watch(view, () => { localPage.value = 0 })
 
 function titleOf(item) {
   return props.kind === 'movie' ? item.title : item.name
 }
 
 function subtitleOf(item) {
-  if (props.kind === 'person') return item.character || ''
+  if (props.kind === 'person') return item.character || item.known_for_department || ''
   const date = props.kind === 'tv' ? item.first_air_date : item.release_date
   return date ? date.slice(0, 4) : ''
 }
@@ -141,6 +164,9 @@ function initials(name) {
 }
 
 .cast-grid-item { min-width: 0; }
+
+.cast-section.is-loading .cast-grid,
+.cast-section.is-loading .cast-list { opacity: .45; transition: opacity .2s ease; }
 
 .cast-list {
   list-style: none; margin: 0; padding: 0;

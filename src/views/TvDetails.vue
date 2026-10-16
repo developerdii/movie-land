@@ -7,7 +7,7 @@
       <div class="detail-hero-content">
         <header class="detail-hero-header">
           <div v-if="tv.genres && tv.genres.length" class="detail-tags">
-            <span v-for="g in tv.genres" :key="g.id" class="detail-tag">{{ g.name }}</span>
+            <router-link v-for="g in tv.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/tv', query: { genre: g.id } }">{{ g.name }}</router-link>
           </div>
           <h1 class="detail-title">{{ tv.name }}</h1>
           <div class="detail-meta-row">

@@ -46,8 +46,13 @@ export default {
     return api.get(`/trending/${mediaType}/${timeWindow}`)
   },
 
-  getSearch(mediaType, searchText) {
-    return api.get(`/search/${mediaType}`, { params: { query: searchText } })
+  getSearch(mediaType, searchText, page = 1) {
+    return api.get(`/search/${mediaType}`, { params: { query: searchText, page } })
+  },
+
+  // Browse: filtered, sorted lists. mediaType is 'movie' or 'tv'.
+  getDiscover(mediaType, params) {
+    return api.get(`/discover/${mediaType}`, { params })
   },
 
   getUpComing(fromDate) {
@@ -83,6 +88,10 @@ export default {
 
   getPersonTvCredits(personId) {
     return api.get(`/person/${personId}/tv_credits`)
+  },
+
+  getPopularPeople(page = 1) {
+    return api.get('/person/popular', { params: { page } })
   },
 
   // TV

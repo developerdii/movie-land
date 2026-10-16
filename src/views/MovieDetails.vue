@@ -7,7 +7,7 @@
       <div class="detail-hero-content">
         <header class="detail-hero-header">
           <div v-if="movieData.genres && movieData.genres.length" class="detail-tags">
-            <span v-for="g in movieData.genres" :key="g.id" class="detail-tag">{{ g.name }}</span>
+            <router-link v-for="g in movieData.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/movie', query: { genre: g.id } }">{{ g.name }}</router-link>
           </div>
           <h1 class="detail-title">{{ movieData.title }}</h1>
           <div class="detail-meta-row">

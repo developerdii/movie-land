@@ -45,7 +45,10 @@
 
     <div v-else class="poster-card__person">
       <span class="poster-card__title">{{ title }}</span>
-      <span class="poster-card__role"><span class="poster-card__as">as </span>{{ roleName }}</span>
+      <span class="poster-card__role">
+        <template v-if="roleName"><span class="poster-card__as">as </span>{{ roleName }}</template>
+        <template v-else>{{ item.known_for_department }}</template>
+      </span>
     </div>
   </a>
 </template>

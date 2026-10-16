@@ -101,20 +101,25 @@
           <span class="ml-search-hint"><span class="ml-search-key">Enter</span><span>to open</span></span>
           <span class="ml-search-hint"><span class="ml-search-key">Esc</span><span>to close</span></span>
         </span>
+        <a class="ml-search-browse" :href="browseHref" @click.prevent="browseAll">
+          <span>Browse all</span>
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/utils/date'
 import { debounce } from '@/utils/collection'
 import AsyncImage from './AsyncImage.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const tabs = [
   { type: 'movie', label: 'Movie' },
@@ -337,6 +342,24 @@ function clearQuery() {
 
 function openItem(item) {
   router.push({ path: '/' + item.type, query: { id: item.id } })
+  closePanel()
+}
+
+// On the browse page the search box mirrors the URL's search text, so it never shows a query the results don't use.
+watch(() => route.fullPath, () => {
+  if (route.name === 'Browse') query.value = typeof route.query.q === 'string' ? route.query.q : ''
+})
+
+// Browse all keeps the search text (if any) and the active tab, e.g. #/browse/tv?q=dark.
+function browseQuery() {
+  const q = query.value.trim()
+  return q ? { q } : {}
+}
+
+const browseHref = computed(() => router.resolve({ path: '/browse/' + activeType.value, query: browseQuery() }).href)
+
+function browseAll() {
+  router.push({ path: '/browse/' + activeType.value, query: browseQuery() })
   closePanel()
 }
 
@@ -750,6 +773,28 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   align-items: center;
   gap: 6px;
 }
+
+#search .ml-search-browse {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mls-text);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+#search .ml-search-browse i {
+  color: var(--ml-brand-accent);
+  transition: transform .15s ease;
+}
+
+#search .ml-search-browse:hover { color: var(--ml-brand-accent); }
+#search .ml-search-browse:hover i { transform: translateX(3px); }
+#search .ml-search-browse:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; border-radius: 6px; }
 
 #search .ml-search-key {
   padding: 2px 6px;

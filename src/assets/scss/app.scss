@@ -64,6 +64,7 @@ body {
 .detail-tag { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 1px solid var(--ml-line); border-radius: 999px; color: var(--ml-muted); font-size: 13px; font-weight: 700; transition: background .15s ease, border-color .15s ease, color .15s ease; }
 .detail-tag:hover { background: rgba(233, 154, 22, .12); border-color: var(--ml-brand-accent); color: var(--ml-brand-accent); }
 .detail-tag:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; border-radius: 6px; }
+a.detail-tag { text-decoration: none; }
 
 .detail-title { margin: 0; font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 800; font-size: 76px; line-height: .92; letter-spacing: .005em; text-transform: uppercase; text-wrap: balance; color: var(--ml-ink); }
 
