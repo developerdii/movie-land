@@ -15,10 +15,10 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
   - `SectionHeading` — shared section heading (eyebrow label + display title with a gold accent divider below); uses the "Big Shoulders Display" (title) and "Manrope" (eyebrow) fonts; supports an `actions` slot for heading controls.
   - `MediaSection` — reusable grid/list section (eyebrow + title heading, grid/list view toggle, round pagination); the `kind` prop (`person` | `movie` | `tv`) drives card fields and the detail route; used by Cast (film/TV details) and Filmography (person details).
   - `MovieSlider` — renders `Slider` with chunked rows of 6 items; the `type` prop (`movie` | `tv`) drives title/date fields and the detail route.
-  - `PopularMoviesSlider` — hero carousel from `movie/popular`; auto-cycles and pauses on hover.
+  - `PopularMoviesSlider` — hero slider from `movie/popular`; auto-advances every 5s (pauses on hover, resets on manual nav) with prev/next controls, a progress bar and "up next" thumbnails; shows the backdrop, poster, title, rating, year, genre, overview and action buttons.
   - `UpComing` — wraps `MovieSlider` with upcoming movies from the discover endpoint (see `data-model.md`).
   - `Rating` — renders `vote_average` as `x.x / 10`.
-- **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`. Detail pages share `.detail-page` and `.detail-content`; film and TV metadata stays in the heading row, and profile photos are not reused as backdrops.
+- **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`. Detail pages share `.detail-page`; film and TV details use a shared `.detail-hero` (poster + display title + genre/rating metadata + Director/Writers fact cards), and profile photos are not reused as backdrops.
 - **`src/utils/`** — pure helpers: `date.js` (`formatDate`), `language.js` (`getLanguageName`), and `collection.js` (`chunk`, `debounce`).
 - **`src/composables/usePagination.js`** — `usePagination(items, pageSize)` for client-side list pagination (legacy; `MediaSection` now pages internally).
 - **`src/components/PaginationControls.vue`** — prev/next + "page X / Y" pagination controls (legacy; superseded by the shared `round-pagination`).

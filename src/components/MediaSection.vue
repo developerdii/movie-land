@@ -25,9 +25,12 @@
     </section-heading>
 
     <ul v-if="view === 'grid'" class="cast-grid">
-      <li v-for="item in pagedItems" :key="item.id" class="cast-card" @click="open(item)">
-        <async-image v-if="imagePath(item)" :kind="kind" frame-class="cast-photo" :aspect-ratio="aspectRatio" :src="imageUrl(item)" :alt="titleOf(item)" />
-        <div v-else class="cast-photo cast-initials" :class="{ 'cast-photo--poster': !isPerson }" aria-hidden="true">{{ initials(titleOf(item)) }}</div>
+      <li v-for="item in pagedItems" :key="item.id" class="cast-card" :class="{ 'cast-card--poster': !isPerson }" @click="open(item)">
+        <async-image v-if="imagePath(item)" :kind="kind" frame-class="cast-photo" :src="imageUrl(item)" :alt="titleOf(item)" />
+        <div v-else class="cast-photo cast-initials" aria-hidden="true">{{ initials(titleOf(item)) }}</div>
+        <span v-if="!isPerson && item.vote_average" class="card-rating" aria-hidden="true">
+          <i class="bi bi-star-fill"></i>{{ item.vote_average.toFixed(1) }}
+        </span>
         <div class="cast-meta">
           <span class="cast-name">{{ titleOf(item) }}</span>
         </div>
@@ -65,7 +68,6 @@ const router = useRouter()
 const view = ref('grid')
 
 const isPerson = computed(() => props.kind === 'person')
-const aspectRatio = computed(() => (isPerson.value ? '3 / 4' : '2 / 3'))
 
 const page = ref(0)
 const pageSize = computed(() => (view.value === 'grid' ? 6 : 12))
@@ -141,31 +143,34 @@ function initials(name) {
   gap: 32px 20px;
 }
 
-.cast-card { display: flex; flex-direction: column; cursor: pointer; }
+.cast-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 3 / 4; cursor: pointer; }
+.cast-card--poster { aspect-ratio: 2 / 3; }
 
 .cast-section .cast-photo {
-  position: relative;
-  aspect-ratio: 3 / 4;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
   border: 0;
   border-radius: 0;
-  background: var(--ml-brand-dark);
+  background: #141418;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
 
-.cast-section .cast-photo.cast-photo--poster { aspect-ratio: 2 / 3; }
-
 .cast-section .cast-photo .media-image-placeholder {
-  background: linear-gradient(145deg, #343b46, #171b25);
+  background: linear-gradient(145deg, #2c2c33, #141418);
   color: var(--ml-brand-accent);
   font-size: 1.25rem;
 }
 
 .cast-initials { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; color: rgba(247,247,248,.45); letter-spacing: .02em; }
 
-.cast-meta { display: flex; min-height: 4.25rem; height: 4.25rem; align-items: center; justify-content: center; padding: .8rem .9rem; background: var(--ml-brand-dark); }
-.cast-name { display: -webkit-box; overflow: hidden; text-align: center; color: #f7f7f8; font-size: .94rem; font-weight: 650; line-height: 1.3; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.cast-role { display: -webkit-box; min-height: 2.8rem; max-height: 2.8rem; overflow: hidden; text-align: center; padding: .6rem .9rem; border-top: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.035); color: rgba(247,247,248,.72); font-size: .78rem; font-weight: 600; line-height: 1.25; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cast-meta { position: relative; z-index: 2; display: block; padding: .7rem 1rem .3rem; }
+.cast-name { display: -webkit-box; overflow: hidden; text-align: left; color: #fff; font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1.05; letter-spacing: .02em; text-transform: uppercase; text-shadow: 0 2px 6px rgba(0, 0, 0, .55); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cast-role { position: relative; z-index: 2; display: -webkit-box; min-height: 2.8rem; max-height: 2.8rem; overflow: hidden; text-align: left; padding: .6rem .9rem; border-top: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.05); color: rgba(247,247,248,.72); font-size: .78rem; font-weight: 600; line-height: 1.25; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .cast-as { color: rgba(247,247,248,.5); }
 
 .cast-list {

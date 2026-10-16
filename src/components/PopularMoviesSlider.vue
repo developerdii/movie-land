@@ -1,155 +1,549 @@
 <template>
-  <div id="carouselExampleIndicators" ref="carouselEl" class="carousel slide carousel-fade"
-       @mouseenter="hoverCarousel" @mouseleave="unHoverCarousel">
-    <div class="carousel-indicators">
-      <button v-for="(movie,index) in popularMovies" :key="index" type="button"
-              data-bs-target="#carouselExampleIndicators" :data-bs-slide-to="index" :class="index === 0 ? 'active' : ''"
-              :aria-label="'Slide '+(index+1)"></button>
-    </div>
-    <div class="carousel-inner">
-      <div class="carousel-item" :class="index === 0 ? 'active' : ''"
-           v-for="(movie,index) in popularMovies" :key="index">
-        <async-image :src="'https://image.tmdb.org/t/p/original/'+movie.backdrop_path" class="d-block" frame-class="popular-movie-img" image-class="popular-movie-img-content" :aspect-ratio="'auto'" :alt="movie.title" />
-        <div class="caption">
-          <div class="popular-movie-card">
-            <async-image class="poster-thumb" :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : ''" image-class="poster-thumb-image" :alt="`${movie.title} poster`" />
-            <div class="popular-movie-copy">
-              <span class="hero-kicker">Popular right now</span>
-              <h2 class="hover-title mb-2">{{ movie.title }}</h2>
-              <rating :value="movie.vote_average"></rating>
-              <router-link class="btn btn-gold mt-3" :to="{ path: 'movie', query: { id: movie.id } }">
-                <i class="bi bi-play-fill me-1"></i>View Details
+  <section v-if="popularMovies.length" class="hero-stage" aria-label="Popular movies" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
+    <async-image
+      :src="backdropUrl"
+      :alt="activeMovie.title"
+      :aspect-ratio="'auto'"
+      frame-class="hero-backdrop"
+      image-class="hero-backdrop-img"
+    />
+    <div class="hero-scrim" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <transition name="hero-fade" mode="out-in">
+        <div :key="activeIndex" class="hero-main">
+          <async-image
+            :src="posterUrl"
+            :alt="`${activeMovie.title} poster`"
+            frame-class="hero-poster"
+            image-class="hero-poster-img"
+          />
+          <div class="hero-copy">
+            <span class="hero-eyebrow">
+              <span class="hero-eyebrow-bar" aria-hidden="true"></span>Popular right now
+            </span>
+            <h1 class="hero-title">{{ activeMovie.title }}</h1>
+            <div class="hero-meta">
+              <span class="hero-meta-rating">
+                <i class="bi bi-star-fill" aria-hidden="true"></i>{{ rating }}<span class="hero-meta-scale">/ 10</span>
+              </span>
+              <span v-if="year" class="hero-meta-dot" aria-hidden="true"></span>
+              <span v-if="year">{{ year }}</span>
+              <span v-if="genre" class="hero-meta-dot" aria-hidden="true"></span>
+              <span v-if="genre">{{ genre }}</span>
+            </div>
+            <p class="hero-overview">{{ activeMovie.overview }}</p>
+            <div class="hero-actions">
+              <router-link class="hero-btn hero-btn-primary" :to="{ path: '/movie', query: { id: activeMovie.id } }">
+                <i class="bi bi-play-fill" aria-hidden="true"></i>View details
               </router-link>
-              <transition name="description">
-                <p v-if="isShownDescription && movie.overview" class="hero-overview mt-3 mb-0">{{ movie.overview }}</p>
-              </transition>
+              <!-- Watchlist: feature not implemented yet, keep for later
+              <button type="button" class="hero-btn hero-btn-ghost">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>Watchlist
+              </button>
+              -->
             </div>
           </div>
         </div>
+      </transition>
+    </div>
+
+    <div class="hero-upnext">
+      <div class="hero-nav">
+        <button type="button" class="hero-nav-btn" :disabled="atStart" aria-label="Previous film" @click="prev">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="hero-nav-btn" :disabled="atEnd" aria-label="Next film" @click="next">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+      <span class="hero-upnext-label">Up next</span>
+      <div class="hero-progress">
+        <span class="hero-progress-current">{{ current }}</span>
+        <div
+          class="hero-progress-track"
+          role="progressbar"
+          aria-label="Slide progress"
+          :aria-valuemin="1"
+          :aria-valuemax="total"
+          :aria-valuenow="activeIndex + 1"
+        >
+          <div class="hero-progress-fill" :style="{ width: progress }"></div>
+        </div>
+        <span class="hero-progress-total">{{ totalLabel }}</span>
+      </div>
+      <div class="hero-upnext-grid">
+        <button v-for="item in upNext" :key="item.index" type="button" class="hero-thumb" @click="goTo(item.index)">
+          <async-image
+            :src="item.backdrop ? 'https://image.tmdb.org/t/p/w500' + item.backdrop : ''"
+            :alt="item.title"
+            :aspect-ratio="'16 / 9'"
+            frame-class="hero-thumb-media"
+          />
+          <span class="hero-thumb-text">
+            <span class="hero-thumb-num">{{ item.num }}</span>
+            <span class="hero-thumb-title">{{ item.title }}</span>
+          </span>
+        </button>
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-            data-bs-slide="prev">
-      <span class="carousel-control-prev-icon p-3" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-            data-bs-slide="next">
-      <span class="carousel-control-next-icon p-3" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
+  </section>
+  <section v-else class="hero-stage hero-skeleton" aria-hidden="true"></section>
 </template>
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '@/api'
-import Rating from '@/components/Rating.vue'
 import AsyncImage from '@/components/AsyncImage.vue'
-import { Carousel } from 'bootstrap'
+import { formatDate } from '@/utils/date'
 
 const popularMovies = ref([])
-const isShownDescription = ref(false)
-const carouselEl = ref(null)
-let carousel = null
+const genres = ref([])
+const activeIndex = ref(0)
 
-function hoverCarousel() {
-  isShownDescription.value = true
-  carousel?.pause()
+const total = computed(() => popularMovies.value.length)
+const activeMovie = computed(() => popularMovies.value[activeIndex.value] || null)
+
+const pad = (n) => String(n).padStart(2, '0')
+
+const current = computed(() => pad(activeIndex.value + 1))
+const totalLabel = computed(() => pad(total.value))
+const progress = computed(() => {
+  if (!total.value) return '0%'
+  return ((activeIndex.value + 1) / total.value * 100).toFixed(1) + '%'
+})
+const atStart = computed(() => activeIndex.value === 0)
+const atEnd = computed(() => total.value <= 1 || activeIndex.value >= total.value - 1)
+
+const rating = computed(() => (activeMovie.value?.vote_average ?? 0).toFixed(1))
+const year = computed(() => formatDate(activeMovie.value?.release_date, 'YYYY'))
+const genre = computed(() => {
+  if (!activeMovie.value?.genre_ids?.length) return ''
+  const map = new Map(genres.value.map((g) => [g.id, g.name]))
+  return activeMovie.value.genre_ids.map((id) => map.get(id)).filter(Boolean).slice(0, 1).join('')
+})
+
+const backdropUrl = computed(() => {
+  const path = activeMovie.value?.backdrop_path
+  return path ? 'https://image.tmdb.org/t/p/original' + path : ''
+})
+const posterUrl = computed(() => {
+  const path = activeMovie.value?.poster_path
+  return path ? 'https://image.tmdb.org/t/p/w500' + path : ''
+})
+
+const upNext = computed(() => {
+  const n = total.value
+  if (n <= 1) return []
+  const count = Math.min(3, n - 1)
+  return Array.from({ length: count }, (_, o) => (activeIndex.value + o + 1) % n).map((j) => {
+    const movie = popularMovies.value[j]
+    return { index: j, num: pad(j + 1), title: movie.title, backdrop: movie.backdrop_path }
+  })
+})
+
+const AUTOPLAY_DELAY = 5000
+let autoplayTimer = null
+
+function stopAutoplay() {
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer)
+    autoplayTimer = null
+  }
 }
 
-function unHoverCarousel() {
-  isShownDescription.value = false
-  carousel?.cycle()
+function startAutoplay() {
+  stopAutoplay()
+  autoplayTimer = setInterval(() => {
+    if (total.value <= 1) return
+    activeIndex.value = (activeIndex.value + 1) % total.value
+  }, AUTOPLAY_DELAY)
+}
+
+function goTo(index) {
+  activeIndex.value = index
+  startAutoplay()
+}
+function prev() {
+  if (!atStart.value) {
+    activeIndex.value -= 1
+    startAutoplay()
+  }
+}
+function next() {
+  if (!atEnd.value) {
+    activeIndex.value += 1
+    startAutoplay()
+  }
 }
 
 onMounted(async () => {
-  const response = await api.getPopularMovies()
-  popularMovies.value = response.data.results.filter(movie => movie.backdrop_path !== null)
-  await nextTick()
-  carousel = new Carousel(carouselEl.value, { interval: 5000, ride: 'carousel', wrap: true })
+  const [moviesResponse, genresResponse] = await Promise.all([
+    api.getPopularMovies(),
+    api.getMovieGenres()
+  ])
+  popularMovies.value = moviesResponse.data.results
+    .filter((movie) => movie.backdrop_path !== null)
+    .slice(0, 20)
+  genres.value = genresResponse.data.genres || []
+  startAutoplay()
 })
 
 onBeforeUnmount(() => {
-  carousel?.dispose()
+  stopAutoplay()
 })
 </script>
 
 <style lang="scss">
-#carouselExampleIndicators {
-  z-index: 0;
-}
-
-.popular-movie-img {
+.hero-stage {
   position: relative;
-  aspect-ratio: auto !important;
-  object-position: 100% 0;
-  width: 100%;
-  height: clamp(360px, 43vw, 570px);
-  object-fit: cover
-}
-
-.popular-movie-img-content { object-position: 100% 0; }
-
-.popular-movie-card {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: clamp(1.25rem, 4vw, 3.5rem);
-  text-align: left;
-  width: min(900px, 86%);
-  margin-left: 9%;
-}
-
-.poster-thumb.media-image-frame {
-  display: block;
-  width: clamp(145px, 18vw, 230px);
-  aspect-ratio: 2 / 3;
-  border-radius: 10px;
-  flex-shrink: 0;
+  flex-direction: column;
+  align-items: stretch;
+  height: clamp(560px, 66vw, 660px);
   overflow: hidden;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
-  transition: transform .3s ease;
-}
-.poster-thumb-image { border-radius: 10px; box-shadow: 0 14px 34px rgba(0, 0, 0, .5); transition: transform .3s ease; }
-
-.hover-title {
-  font-size: clamp(1.7rem, 3.2vw, 3rem);
-  font-weight: 800;
-  color: #fff;
-  margin: 0;
+  border: 1px solid #222228;
+  border-radius: 20px;
+  background: #141418;
+  color: #f4f2ee;
+  font-family: Manrope, "Helvetica Neue", sans-serif;
+  box-shadow: 0 18px 44px rgba(17, 25, 39, .18);
 }
 
-.caption {
+.hero-backdrop.media-image-frame {
   position: absolute;
+  z-index: 0;
   inset: 0;
+  background: #141418;
+}
+
+.hero-backdrop-img { object-position: center; }
+
+.hero-scrim {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(20, 20, 24, .98) 0%, rgba(20, 20, 24, .92) 40%, rgba(20, 20, 24, .55) 62%, rgba(20, 20, 24, 0) 82%),
+    linear-gradient(0deg, rgba(14, 14, 16, .55) 0%, rgba(14, 14, 16, 0) 45%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  padding: 2rem 0;
-  color: #fff;
-  background: linear-gradient(90deg, rgba(3, 8, 15, .88), rgba(3, 8, 15, .46) 58%, rgba(0, 0, 0, .08)), linear-gradient(0deg, rgba(3, 3, 8, .72), transparent 75%);
-  transition: background .25s ease;
-
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 48px);
+  box-sizing: border-box;
 }
 
-#carouselExampleIndicators { overflow: hidden; border-radius: 16px; box-shadow: 0 18px 44px rgba(17, 25, 39, .18); }
-#carouselExampleIndicators .carousel-item::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(3,8,15,.42), transparent 70%); }
-#carouselExampleIndicators .caption { z-index: 1; }
-.poster-thumb { max-height: 320px; object-fit: cover; }
-.hero-kicker { display: block; color: #ffc45a; font-size: .78rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; margin-bottom: .55rem; }
-.hero-overview { max-width: 54ch; color: rgba(255,255,255,.88); line-height: 1.6; font-size: .98rem; }
-.description-enter-active, .description-leave-active { transition: opacity .2s ease, transform .2s ease; }
-.description-enter-from, .description-leave-to { opacity: 0; transform: translateY(-5px); }
-#carouselExampleIndicators:hover .poster-thumb { transform: translateY(-3px); }
+.hero-main {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
+  min-width: 0;
+  width: 100%;
+  max-width: 1040px;
+}
+
+.hero-poster.media-image-frame {
+  flex: none;
+  width: clamp(150px, 18vw, 230px);
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, .5);
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ml-brand-accent);
+  white-space: nowrap;
+}
+
+.hero-eyebrow-bar {
+  flex: none;
+  width: 24px;
+  height: 2px;
+  background: var(--ml-brand-accent);
+}
+
+.hero-title {
+  margin: 0;
+  font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-size: clamp(44px, 6.5vw, 88px);
+  line-height: .9;
+  letter-spacing: .005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: #f4f2ee;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  font-size: 15px;
+  color: #c9c9d1;
+}
+
+.hero-meta-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #f4f2ee;
+}
+
+.hero-meta-rating i { color: var(--ml-brand-accent); }
+
+.hero-meta-scale { font-weight: 500; color: #8c8c96; }
+
+.hero-meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #4a4a52;
+}
+
+.hero-overview {
+  margin: 0;
+  max-width: 440px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #a3a3ad;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter .15s ease, background-color .15s ease;
+}
+
+.hero-btn-primary {
+  border: 0;
+  background: var(--ml-brand-accent);
+  color: #141210;
+}
+.hero-btn-primary:hover { color: #141210; filter: brightness(1.08); }
+
+.hero-btn-ghost {
+  padding: 0 22px;
+  border: 1px solid #3a3a42;
+  background: transparent;
+  color: #f4f2ee;
+}
+.hero-btn-ghost:hover { background: rgba(255, 255, 255, .08); color: #f4f2ee; }
+
+.hero-btn:focus-visible,
+.hero-nav-btn:focus-visible,
+.hero-thumb:focus-visible {
+  outline: 2px solid var(--ml-brand-accent);
+  outline-offset: 3px;
+}
+
+.hero-nav {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-nav-btn {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #2a2a30;
+  border-radius: 999px;
+  background: #17171b;
+  color: #f4f2ee;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.hero-nav-btn:hover:not(:disabled) { background: #26262c; }
+.hero-nav-btn:disabled { opacity: .35; cursor: default; }
+
+.hero-progress {
+  flex: 1 1 220px;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-progress-current {
+  font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  color: #f4f2ee;
+}
+
+.hero-progress-track {
+  flex: 1 1 auto;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #2a2a30;
+}
+
+.hero-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ml-brand-accent);
+  transition: width .3s ease;
+}
+
+.hero-progress-total {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #8c8c96;
+}
+
+.hero-upnext {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+  padding: 14px clamp(20px, 4vw, 48px);
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  background: linear-gradient(0deg, rgba(14, 14, 16, .92), rgba(14, 14, 16, .5));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.hero-upnext-label {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #8c8c96;
+}
+
+.hero-upnext-grid {
+  flex: 1 1 560px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.hero-thumb {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #2a2a30;
+  border-radius: 12px;
+  background: #141418;
+  color: #f4f2ee;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.hero-thumb:hover { border-color: #4a4a52; }
+
+.hero-thumb-media.media-image-frame {
+  flex: none;
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+}
+
+.hero-thumb-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hero-thumb-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8c8c96;
+}
+
+.hero-thumb-title {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-fade-enter-active,
+.hero-fade-leave-active { transition: opacity .3s ease; }
+.hero-fade-enter-from,
+.hero-fade-leave-to { opacity: 0; }
+
+.hero-skeleton { animation: hero-pulse 1.2s ease-in-out infinite; }
+@keyframes hero-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .72; }
+}
+
 @media (max-width: 767.98px) {
-  .popular-movie-img { height: 360px; }
-  .caption { padding: .75rem 0; }
-  .popular-movie-card { width: 90%; margin-left: 6%; gap: .8rem; }
-  .poster-thumb.media-image-frame { width: clamp(90px, 27vw, 150px); max-height: 230px; }
-  .hover-title { font-size: clamp(1.15rem, 5vw, 1.7rem); }
-  .hero-kicker { font-size: .62rem; margin-bottom: .25rem; }
-  .popular-movie-copy .btn { padding: .4rem .8rem; font-size: .82rem; }
-  .hero-overview { font-size: .8rem; line-height: 1.4; }
+  .hero-stage { height: 640px; }
+  .hero-content { padding: 20px; }
+  .hero-main { gap: 16px; }
+  .hero-poster.media-image-frame { width: clamp(90px, 24vw, 140px); }
+  .hero-title { font-size: clamp(32px, 9vw, 48px); }
+  .hero-overview { font-size: 14px; line-height: 1.5; }
+  .hero-btn { height: 44px; padding: 0 18px; font-size: 14px; }
+  .hero-btn-ghost { padding: 0 16px; }
+  .hero-upnext { gap: 12px 14px; padding: 12px 16px; }
+  .hero-nav-btn { width: 42px; height: 42px; }
+  .hero-progress { flex: 1 1 100%; min-width: 0; }
+  .hero-upnext-grid { flex: 1 1 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hero-thumb { height: 56px; gap: 8px; padding: 6px; }
+  .hero-thumb-media.media-image-frame { width: 44px; }
+  .hero-thumb-num { font-size: 10px; }
+  .hero-thumb-title { font-size: 12px; }
 }
 </style>

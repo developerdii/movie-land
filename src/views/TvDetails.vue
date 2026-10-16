@@ -1,27 +1,48 @@
 <template>
   <div v-if="!loading" class="container-xxl detail-page">
-    <div class="detail-heading">
-      <h1 class="h2 fw-bold mb-2">{{ tv.name }}</h1>
-      <div class="detail-meta-row d-flex flex-wrap align-items-center gap-2 gap-lg-3 text-muted">
-        <span v-if="tv.number_of_seasons" class="detail-meta-item"><i class="bi bi-collection"></i>{{ tv.number_of_seasons }} seasons</span>
-        <span v-if="tv.episode_run_time && tv.episode_run_time.length" class="detail-meta-item"><i class="bi bi-clock"></i>{{ tv.episode_run_time[0] }} min</span>
-        <span v-if="tv.first_air_date" class="detail-meta-item"><i class="bi bi-calendar3"></i>{{ formatDate(tv.first_air_date, 'MMM Do YY') }}</span>
-        <span v-if="getLanguageName(tv.original_language)" class="detail-meta-item">{{ getLanguageName(tv.original_language) }}</span>
-        <span class="d-flex flex-wrap gap-1"><span v-for="g in tv.genres" :key="g.id" class="badge text-bg-light border">{{ g.name }}</span></span>
-      </div>
-    </div>
-
-    <div class="row g-4 detail-content">
-      <div class="col-5 col-sm-4 col-lg-3">
+    <div class="detail-hero">
+      <div class="detail-hero-poster">
         <async-image frame-class="detail-poster" :src="tv.poster_path ? 'https://image.tmdb.org/t/p/w500' + tv.poster_path : ''" :alt="tv.name" />
       </div>
-      <div class="col-12 col-sm-8 col-lg-9 detail-copy">
-        <div v-if="tv.vote_average" class="detail-rating"><i class="bi bi-star-fill"></i><span>{{ tv.vote_average.toFixed(1) }} <small>/ 10</small></span></div>
-        <div class="detail-description">
-          <div v-if="directors.length || writers.length" class="detail-credits">
-            <div v-if="directors.length"><span class="detail-credit-label">Director</span><span class="detail-credit-links"><a v-for="(person, index) in directors" :key="person.id" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}<span v-if="index < directors.length - 1">, </span></a></span></div>
-            <div v-if="writers.length"><span class="detail-credit-label">Writer</span><span class="detail-credit-links"><a v-for="(person, index) in writers" :key="person.id" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}<span v-if="index < writers.length - 1">, </span></a></span></div>
+      <div class="detail-hero-content">
+        <header class="detail-hero-header">
+          <div v-if="tv.genres && tv.genres.length" class="detail-tags">
+            <span v-for="g in tv.genres" :key="g.id" class="detail-tag">{{ g.name }}</span>
           </div>
+          <h1 class="detail-title">{{ tv.name }}</h1>
+          <div class="detail-meta-row">
+            <span v-if="tv.vote_average" class="detail-rating-badge">
+              <i class="bi bi-star-fill" aria-hidden="true"></i>
+              <span class="detail-rating-value">{{ tv.vote_average.toFixed(1) }}</span>
+              <span class="detail-rating-scale">/ 10</span>
+            </span>
+            <span v-if="tv.number_of_seasons" class="detail-meta-item"><i class="bi bi-collection" aria-hidden="true"></i>{{ tv.number_of_seasons }} {{ tv.number_of_seasons === 1 ? 'season' : 'seasons' }}</span>
+            <span v-if="tv.episode_run_time && tv.episode_run_time.length" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(tv.episode_run_time[0]) }}</span>
+            <span v-if="tv.first_air_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(tv.first_air_date, 'MMM Do YY') }}</span>
+            <span v-if="getLanguageName(tv.original_language)" class="detail-meta-item">{{ getLanguageName(tv.original_language) }}</span>
+          </div>
+        </header>
+
+        <dl v-if="directors.length || writers.length" class="detail-facts">
+          <div v-if="directors.length" class="detail-fact">
+            <dt>Director</dt>
+            <dd>
+              <template v-for="(person, index) in directors" :key="person.id">
+                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
+              </template>
+            </dd>
+          </div>
+          <div v-if="writers.length" class="detail-fact">
+            <dt>Writers</dt>
+            <dd>
+              <template v-for="(person, index) in writers" :key="person.id">
+                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
+              </template>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="detail-overview-block">
           <p v-if="tv.tagline" class="detail-tagline">{{ tv.tagline }}</p>
           <p class="detail-overview">{{ tv.overview }}</p>
         </div>
@@ -44,7 +65,7 @@
           </div>
         </template>
       </section-heading>
-      <movie-slider id="recommendations-carousel" type="tv" :movie-data="recommendationChunks" :show-footer="false" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
+      <movie-slider id="recommendations-carousel" type="tv" :movie-data="recommendationChunks" :footer-format="'YYYY'" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
   </div>
 </template>
@@ -78,8 +99,31 @@ function onRecSlid(payload) {
   recIndex.value = payload.index
 }
 
-const directors = computed(() => [...new Map(crew.value.filter(person => person.job === 'Director').map(person => [person.id, person])).values()])
-const writers = computed(() => [...new Map(crew.value.filter(person => ['Writer', 'Screenplay', 'Story'].includes(person.job)).map(person => [person.id, person])).values()])
+function crewByJobs(jobNames) {
+  const map = new Map()
+  for (const person of crew.value) {
+    const matches = (person.jobs || []).filter((job) => jobNames.includes(job.job))
+    if (!matches.length) continue
+    const count = Math.max(...matches.map((job) => job.episode_count || 0))
+    map.set(person.id, { person, count })
+  }
+  return [...map.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6)
+    .map((entry) => entry.person)
+}
+
+const directors = computed(() => crewByJobs(['Director']))
+const writers = computed(() => crewByJobs(['Writer', 'Screenplay', 'Story']))
+
+function formatRuntime(minutes) {
+  if (!minutes) return ''
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h && m) return `${h}h ${m}m`
+  if (h) return `${h}h`
+  return `${m}m`
+}
 
 function goTo(media, id) {
   router.push({ path: media, query: { id } })
@@ -89,14 +133,15 @@ async function load() {
   loading.value = true
   const id = route.query.id
   try {
-    const [d, c, r] = await Promise.all([
+    const [d, c, ag, r] = await Promise.all([
       api.getTvDetails(id),
       api.getTvCredits(id),
+      api.getTvAggregateCredits(id),
       api.getTvRecommendations(id)
     ])
     tv.value = d.data
     cast.value = (c.data.cast || [])
-    crew.value = c.data.crew || []
+    crew.value = ag.data.crew || []
     recommendations.value = trimToChunks(r.data.results || [])
   } catch (e) {
     console.log(e)

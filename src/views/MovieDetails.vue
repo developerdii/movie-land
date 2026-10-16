@@ -1,26 +1,47 @@
 <template>
   <div v-if="!loading" class="container-xxl detail-page">
-    <div class="detail-heading">
-      <h1 class="h2 fw-bold mb-2">{{ movieData.title }}</h1>
-      <div class="detail-meta-row d-flex flex-wrap align-items-center gap-2 gap-lg-3 text-muted">
-        <span v-if="movieData.runtime" class="detail-meta-item"><i class="bi bi-clock"></i>{{ movieData.runtime }} min</span>
-        <span v-if="movieData.release_date" class="detail-meta-item"><i class="bi bi-calendar3"></i>{{ formatDate(movieData.release_date, 'MMM Do YY') }}</span>
-        <span v-if="getLanguageName(movieData.original_language)" class="detail-meta-item">{{ getLanguageName(movieData.original_language) }}</span>
-        <span class="d-flex flex-wrap gap-1"><span v-for="g in movieData.genres" :key="g.id" class="badge text-bg-light border">{{ g.name }}</span></span>
-      </div>
-    </div>
-
-    <div class="row g-4 detail-content">
-      <div class="col-5 col-sm-4 col-lg-3">
+    <div class="detail-hero">
+      <div class="detail-hero-poster">
         <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
       </div>
-      <div class="col-12 col-sm-8 col-lg-9 detail-copy">
-        <div v-if="movieData.vote_average" class="detail-rating"><i class="bi bi-star-fill"></i><span>{{ movieData.vote_average.toFixed(1) }} <small>/ 10</small></span></div>
-        <div class="detail-description">
-          <div v-if="directors.length || writers.length" class="detail-credits">
-            <div v-if="directors.length"><span class="detail-credit-label">Director</span><span class="detail-credit-links"><a v-for="(person, index) in directors" :key="person.id" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}<span v-if="index < directors.length - 1">, </span></a></span></div>
-            <div v-if="writers.length"><span class="detail-credit-label">Writer</span><span class="detail-credit-links"><a v-for="(person, index) in writers" :key="person.id" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}<span v-if="index < writers.length - 1">, </span></a></span></div>
+      <div class="detail-hero-content">
+        <header class="detail-hero-header">
+          <div v-if="movieData.genres && movieData.genres.length" class="detail-tags">
+            <span v-for="g in movieData.genres" :key="g.id" class="detail-tag">{{ g.name }}</span>
           </div>
+          <h1 class="detail-title">{{ movieData.title }}</h1>
+          <div class="detail-meta-row">
+            <span v-if="movieData.vote_average" class="detail-rating-badge">
+              <i class="bi bi-star-fill" aria-hidden="true"></i>
+              <span class="detail-rating-value">{{ movieData.vote_average.toFixed(1) }}</span>
+              <span class="detail-rating-scale">/ 10</span>
+            </span>
+            <span v-if="movieData.runtime" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(movieData.runtime) }}</span>
+            <span v-if="movieData.release_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(movieData.release_date, 'MMM Do YY') }}</span>
+            <span v-if="getLanguageName(movieData.original_language)" class="detail-meta-item">{{ getLanguageName(movieData.original_language) }}</span>
+          </div>
+        </header>
+
+        <dl v-if="directors.length || writers.length" class="detail-facts">
+          <div v-if="directors.length" class="detail-fact">
+            <dt>Director</dt>
+            <dd>
+              <template v-for="(person, index) in directors" :key="person.id">
+                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
+              </template>
+            </dd>
+          </div>
+          <div v-if="writers.length" class="detail-fact">
+            <dt>Writers</dt>
+            <dd>
+              <template v-for="(person, index) in writers" :key="person.id">
+                <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
+              </template>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="detail-overview-block">
           <p v-if="movieData.tagline" class="detail-tagline">{{ movieData.tagline }}</p>
           <p class="detail-overview">{{ movieData.overview }}</p>
         </div>
@@ -43,7 +64,7 @@
           </div>
         </template>
       </section-heading>
-      <movie-slider id="recommendations-carousel" :movie-data="recommendationChunks" :show-footer="false" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
+      <movie-slider id="recommendations-carousel" :movie-data="recommendationChunks" :footer-format="'YYYY'" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
   </div>
 </template>
@@ -78,6 +99,15 @@ function onRecSlid(payload) {
 }
 const directors = computed(() => [...new Map(crew.value.filter(person => person.job === 'Director').map(person => [person.id, person])).values()])
 const writers = computed(() => [...new Map(crew.value.filter(person => ['Writer', 'Screenplay', 'Story'].includes(person.job)).map(person => [person.id, person])).values()])
+
+function formatRuntime(minutes) {
+  if (!minutes) return ''
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h && m) return `${h}h ${m}m`
+  if (h) return `${h}h`
+  return `${m}m`
+}
 
 function goTo(media, id) {
   router.push({ path: media, query: { id } })

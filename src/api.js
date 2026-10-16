@@ -94,6 +94,10 @@ export default {
     return api.get(`/tv/${tvId}/credits`)
   },
 
+  getTvAggregateCredits(tvId) {
+    return api.get(`/tv/${tvId}/aggregate_credits`)
+  },
+
   getTvRecommendations(tvId) {
     return api.get(`/tv/${tvId}/recommendations`)
   }

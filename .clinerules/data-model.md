@@ -19,7 +19,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | Method | Endpoint | Used by |
 | --- | --- | --- |
 | `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider` |
-| `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags) |
+| `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags), `PopularMoviesSlider` (hero genre) |
 | `getTvGenres()` | `GET /genre/tv/list` | `SearchBar` (genre tags) |
 | `getTrendingMovies(mediaType, timeWindow)` | `GET /trending/{media_type}/{time_window}` | `SearchBar` (default list) |
 | `getSearch(mediaType, searchText)` | `GET /search/{media_type}?query={text}` | `SearchBar` |
@@ -32,6 +32,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getPersonTvCredits(personId)` | `GET /person/{id}/tv_credits` | `PersonDetails` |
 | `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
 | `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
+| `getTvAggregateCredits(tvId)` | `GET /tv/{id}/aggregate_credits` | `TvDetails` (directors/writers) |
 | `getTvRecommendations(tvId)` | `GET /tv/{id}/recommendations` | `TvDetails` |
 
 ## Discover (filtered movie queries)
