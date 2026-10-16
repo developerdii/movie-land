@@ -4,7 +4,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 
 ## Auth
 - `src/api.js` sets `Authorization: Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}` (a TMDB **API Read Access Token**, a v4 JWT).
-- Provide the token in `.env.local` (local dev). For CI/deploy, the read-only public token is embedded directly in `.github/workflows/deploy.yml`. See `.env.example`.
+- Provide the token in `.env.local` (local dev). For the deploy workflow, the read-only public token is embedded directly in `.github/workflows/deploy.yml` (no repo secret). See `.env.example`.
 
 ## Base URLs
 - API: `https://api.themoviedb.org/3/` (v3 — read-only data).

@@ -20,7 +20,7 @@ components → api.js (axios instance) → TMDB API (https://api.themoviedb.org/
   - `UpComing` — wraps `MovieSlider` with upcoming movies from the discover endpoint (see `data-model.md`).
   - `Rating` — renders `vote_average` as `x.x / 10`.
 - **`src/views/`** — route pages: `Home` (`PopularMoviesSlider` + `UpComing`), `MovieDetails`, `TvDetails`, `PersonDetails`. Detail pages share `.detail-page`, the `.detail-title` page-title style and the `.detail-poster` edge treatment. Film details show Director/Writers fact cards; TV details show Created-by/Writers cards plus air dates and season/episode counts; the person page shows Born/Known-for/Credits fact cards, a clamped biography with "Read more", and release-sorted filmography. Profile photos are not reused as backdrops.
-- **`src/utils/`** — pure helpers: `date.js` (`formatDate`), `language.js` (`getLanguageName`), and `collection.js` (`chunk`, `debounce`).
+- **`src/utils/`** — pure helpers: `date.js` (`formatDate`, `formatMonth`, `formatDay`, `daysUntil`), `language.js` (`getLanguageName`), `collection.js` (`chunk`, `trimToChunks`, `debounce`), and `genres.js` (`getGenreMap`, used by `PosterCard`).
 - **`src/composables/usePagination.js`** — `usePagination(items, pageSize)` for client-side list pagination (legacy; `MediaSection` now pages internally).
 - **`src/components/PaginationControls.vue`** — prev/next + "page X / Y" pagination controls (legacy; superseded by the shared `round-pagination`).
 

@@ -15,12 +15,11 @@ This repo uses a `develop` → `main` flow. `main` is production — pushing to 
 - Before finishing a task, run `npm run lint` and `npm run build`; both must pass.
 
 ## CI pipeline
-- `.github/workflows/ci.yml` runs on every push to `develop` and every PR targeting `main` / `develop` (lint + build).
-- `.github/workflows/deploy.yml` runs on push to `main` (build with the `VITE_TMDB_ACCESS_TOKEN` secret + deploy to Pages).
+- `.github/workflows/ci.yml` runs on every push to `develop` and every PR targeting `main` / `develop` (lint + build). It does not set `VITE_TMDB_ACCESS_TOKEN`.
+- `.github/workflows/deploy.yml` runs on push to `main` (build + deploy to Pages). It sets `VITE_TMDB_ACCESS_TOKEN` directly in its `env` block (the read-only public token; see `data-model.md` → Auth). No repo secret is needed for it.
 
 ## Required GitHub settings (one-time)
 - Repo → Settings → Pages → Source = **GitHub Actions** (replaces the old `gh-pages` branch deploy).
-- Add the `VITE_TMDB_ACCESS_TOKEN` secret (read-only TMDB token).
 - Set the default branch to `main` (or `develop`).
 - (Optional) Enable branch protection on `main` requiring the `CI` status check.
 
