@@ -11,19 +11,19 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 - Images: `https://image.tmdb.org/t/p/{size}{path}` — `w500` for posters/profiles, `original` for backdrops. Other sizes: `w92`, `w185`, `w342`, `w780`.
 
 ## API versioning
-- **v3** (`/3/`) — read-only data (movies, TV, people, search, trending, discover). Current standard; this is all MovieLand uses.
+- **v3** (`/3/`) — read-only data (movies, TV, people, search, discover). Current standard; this is all MovieLand uses.
 - **v4** (`/4/`) — account/user data (favorites, watchlist, ratings, lists); requires user auth (session/access token). Not used by MovieLand.
 - **v2** — deprecated/removed years ago; there is no v2.
 
 ## Endpoints (via `src/api.js`)
 | Method | Endpoint | Used by |
 | --- | --- | --- |
-| `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider` |
+| `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider`, `SearchBar` (default list) |
 | `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags), `PopularMoviesSlider` (hero genre) |
 | `getTvGenres()` | `GET /genre/tv/list` | `SearchBar` (genre tags) |
 | `getLanguages()` | `GET /configuration/languages` | `BrowseView` (language filter) |
 | `getCountries()` | `GET /configuration/countries` | `BrowseView` (country filter) |
-| `getTrendingMovies(mediaType, timeWindow)` | `GET /trending/{media_type}/{time_window}` | `SearchBar` (default list) |
+| `getPopularTv()` | `GET /tv/popular` | `SearchBar` (default list) |
 | `getSearch(mediaType, searchText, page)` | `GET /search/{media_type}?query={text}&page={n}` | `SearchBar`, `BrowseView` (when a search text is set) |
 | `getDiscover(mediaType, params)` | `GET /discover/{media_type}` (movie or tv) | `BrowseView` |
 | `getUpComing(fromDate)` | `GET /discover/movie` (see Discover below) | `UpComing` |
@@ -33,7 +33,7 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 | `getPersonDetails(personId)` | `GET /person/{id}` | `PersonDetails` |
 | `getPersonMovieCredits(personId)` | `GET /person/{id}/movie_credits` | `PersonDetails` |
 | `getPersonTvCredits(personId)` | `GET /person/{id}/tv_credits` | `PersonDetails` |
-| `getPopularPeople(page)` | `GET /person/popular` | `BrowseView` (people, no search text) |
+| `getPopularPeople(page)` | `GET /person/popular` | `BrowseView` (people, no search text), `SearchBar` (default list) |
 | `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
 | `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
 | `getTvAggregateCredits(tvId)` | `GET /tv/{id}/aggregate_credits` | `TvDetails` (writers) |
@@ -60,8 +60,15 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - `getMovieDetails` adds `genres: [{id, name}]`, `tagline`, `runtime`, `original_language`.
 - `getTvDetails` adds `genres`, `tagline`, `number_of_seasons`, `number_of_episodes`, `episode_run_time`, `first_air_date`, `last_air_date`, `status`, `created_by`.
 - `getPersonDetails` adds `biography`, `birthday`, `deathday`, `place_of_birth`, `known_for_department`, `popularity`.
-- Credits return `{ cast: [...] }` with `name`, `character`, `profile_path`.
+- Credits return `{ cast: [...], crew: [...] }`. Person pages merge cast and crew by title id, so a film is listed once even when the person acted and also worked behind the camera. The filmography and the "Credits" count (unique movies plus unique TV shows) both use the merged list. Christopher Nolan (id 525) has 33 cast and 78 crew movie credits, and his crew films are now included. Filmography rules (`visibleRoles` and `BADGE_PRIORITY` in PersonDetails). A film that has the person's main role (`known_for_department`) shows no roles at all, so a director's own films get no badge, and neither does a writer's written films. On every other film, the roles the person had there are shown. The grid card gets one badge, the first by priority: Directing, then Writing, then Acting. Directing comes from crew job Director, Writing from Writer, Screenplay, Story or Teleplay, Acting from cast. `PosterCard` shows the badge as a light pill, top right, the same style as the ACTING pill in the list view. Each entry also carries `allRoles` (Acting, Directing, Writing, whichever apply), which the list view shows as pills.
 - Person search results may carry `known_for: [...]`.
+
+## Images (detail pages)
+- `getMovieImages(id)` and `getTvImages(id)` call `/movie/{id}/images` and `/tv/{id}/images` with `include_image_language=en,null`, so only English and language-less artwork comes back. They return `backdrops`, `posters` and `logos`. They load after the page renders and never block it. Movies have no stills in the API; TV episode stills (`/tv/{id}/season/{n}/episode/{e}/images`) are not used yet.
+- `getPersonImages(id)` calls `/person/{id}/images` and returns `profiles`.
+- `getPersonTaggedImages(id, page)` calls `/person/{id}/tagged_images`, which is paged. The viewer walks up to 5 pages (`MAX_TAGGED_PAGES`) on first open. Each item's `media` gives the caption.
+- Sizes: backdrop in the viewer `w1280`, strip thumbnails `w500`, viewer thumbnails `w300`, posters and profiles `w780`, logos `w500`.
+- The viewer lists photos sorted by TMDB score, then vote count.
 
 ## Browse (filtered lists)
 `/browse/:type` (`movie`, `tv`, `person`) is a full-page, server-paged list. The URL is its only state:
@@ -75,7 +82,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 
 ## Domain conventions
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
-- Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (trending) / 5 (search); tab counts use `total_results` (search) or list length (trending). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department` and `popularity`.
+- Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (default popular lists) / 5 (search); tab counts use `total_results` (search) or list length (default list). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department`; in the default list they show their rank instead of `popularity`.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM D, YYYY'`, and `'ddd, MMM D, YYYY'`.
 - Lists are paginated client-side by `MediaSection` (its own `page`/`pageSize` state + round pagination controls). `usePagination` + `PaginationControls` are legacy and currently unused.
 

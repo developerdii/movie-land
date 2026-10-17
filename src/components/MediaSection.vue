@@ -24,6 +24,7 @@
               :value="pageIndex + 1"
               :min="1"
               :max="pageCount"
+              :style="{ width: 'calc(' + String(pageCount).length + 'ch + 6px)' }"
               :disabled="loading"
               :aria-label="'Current page, 1 to ' + pageCount"
               @change="jumpTo"
@@ -52,6 +53,7 @@
             :variant="isPerson ? 'person' : 'movie'"
             :item="item"
             :media-type="kind"
+            :roles="item.roles || []"
             @navigate="open"
           />
         </li>
@@ -73,6 +75,9 @@
             <span v-else>{{ initials(titleOf(item)) }}</span>
           </span>
           <span class="cast-row-name">{{ titleOf(item) }}</span>
+          <span v-if="item.allRoles && item.allRoles.length" class="cast-row-roles">
+            <span v-for="role in item.allRoles" :key="role" class="cast-row-pill">{{ role }}</span>
+          </span>
           <span class="cast-row-role">{{ subtitleOf(item) }}</span>
         </li>
       </template>
@@ -224,9 +229,11 @@ function initials(name) {
 .round-pagination-jump {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   height: 48px;
-  padding: 0 14px 0 8px;
+  min-width: 112px;
+  padding: 0 18px;
   border: 1px solid #d9dde3;
   border-radius: 999px;
   background: var(--ml-surface);
@@ -237,7 +244,8 @@ function initials(name) {
 }
 .round-pagination-jump:focus-within { border-color: var(--ml-brand-accent); }
 .round-pagination-input {
-  width: 52px;
+  flex: none;
+  width: 3ch;
   height: 36px;
   padding: 0;
   border: 0;
@@ -254,7 +262,7 @@ function initials(name) {
 .round-pagination-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .round-pagination-input:hover { background: #f4f5f7; }
 .round-pagination-input:focus { outline: none; background: #f4f5f7; }
-.round-pagination-total { min-width: 2.5rem; }
+.round-pagination-total { white-space: nowrap; }
 
 .cast-list {
   list-style: none; margin: 0; padding: 0;
@@ -287,6 +295,23 @@ function initials(name) {
 
 .cast-row-name { flex: 1 1 auto; min-width: 0; font-size: 16px; font-weight: 700; color: var(--ml-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cast-row-role { font-size: 14px; color: var(--ml-muted); text-align: right; }
+
+/* Every role a person had on a title, in the list view. All roles share the ACTING pill style. */
+.cast-row-roles { display: flex; flex: none; gap: 6px; }
+.cast-row-pill {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  background: #f1f3f6;
+  color: #4a5568;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
 @media (max-width: 639.98px) {
   .cast-list { grid-template-columns: 1fr; }

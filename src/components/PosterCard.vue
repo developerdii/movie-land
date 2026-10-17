@@ -36,6 +36,10 @@
       <span v-else-if="isVoice" class="poster-card__voice" aria-hidden="true">
         <i class="bi bi-mic-fill"></i>VOICE
       </span>
+
+      <div v-if="roles.length" class="poster-card__roles" aria-hidden="true">
+        <span v-for="role in roles" :key="role" class="poster-card__role-pill">{{ role }}</span>
+      </div>
     </div>
 
     <div v-if="variant !== 'person'" class="card-info">
@@ -63,7 +67,9 @@ const props = defineProps({
   variant: { type: String, required: true },
   item: { type: Object, required: true },
   mediaType: { type: String, default: 'movie' },
-  showType: { type: Boolean, default: false }
+  showType: { type: Boolean, default: false },
+  // Roles the person had on this title (e.g. Acting, Directing, Writing), shown as badges.
+  roles: { type: Array, default: () => [] }
 })
 
 const emit = defineEmits(['navigate'])
@@ -171,9 +177,8 @@ function onClick() {
   overflow: hidden;
   isolation: isolate;
   border-radius: 16px;
-  outline: 1px solid rgba(128, 128, 128, .18);
-  outline-offset: -1px;
-  background: var(--ml-brand-dark);
+  /* Transparent on purpose: a dark background under a white poster leaves a dark fringe on its edges. */
+  background: transparent;
   color: var(--ml-surface);
   box-shadow: 0 2px 4px rgba(var(--ml-brand-dark-rgb), .04), 0 10px 24px rgba(var(--ml-brand-dark-rgb), .08);
   text-decoration: none;
@@ -183,7 +188,6 @@ function onClick() {
 .poster-card:hover,
 .poster-card:focus-visible {
   transform: translateY(-6px);
-  outline-color: transparent;
   box-shadow: 0 0 0 2px var(--ml-brand-accent), 0 14px 30px rgba(var(--ml-brand-dark-rgb), .24);
 }
 .poster-card__media {
@@ -322,6 +326,34 @@ function onClick() {
   color: var(--ml-surface);
 }
 .poster-card__voice i { color: var(--ml-brand-accent); }
+
+/* Role badges, top right like the MOVIE/TV type badge. */
+.poster-card__roles {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: calc(100% - 20px);
+}
+/* Same light style as the ACTING pill in the list view. */
+.poster-card__role-pill {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #f1f3f6;
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #4a5568;
+}
 .card-info {
   position: relative;
   overflow: hidden;

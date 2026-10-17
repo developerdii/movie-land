@@ -36,8 +36,6 @@
   overflow: hidden;
   border-radius: 16px;
   background: var(--ml-surface);
-  outline: 1px solid rgba(128, 128, 128, .18);
-  outline-offset: -1px;
   box-shadow: 0 2px 4px rgba(var(--ml-brand-dark-rgb), .04), 0 10px 24px rgba(var(--ml-brand-dark-rgb), .08);
 }
 

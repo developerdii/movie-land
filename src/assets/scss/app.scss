@@ -53,7 +53,7 @@ body {
 }
 
 .detail-page { max-width: 1440px; margin-inline: auto; }
-.detail-poster { width: 100%; max-height: 620px; aspect-ratio: 2 / 3; border-radius: 16px; overflow: hidden; isolation: isolate; outline: 1px solid rgba(128, 128, 128, .18); outline-offset: -1px; box-shadow: 0 24px 48px rgba(23, 27, 37, .12); }
+.detail-poster { width: 100%; max-height: 620px; aspect-ratio: 2 / 3; border-radius: 16px; overflow: hidden; isolation: isolate; box-shadow: 0 24px 48px rgba(23, 27, 37, .12); }
 
 .detail-hero { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 56px; }
 .detail-hero-poster { flex: 0 1 320px; min-width: 240px; display: flex; flex-direction: column; gap: 16px; }
@@ -65,6 +65,11 @@ body {
 .detail-tag:hover { background: rgba(233, 154, 22, .12); border-color: var(--ml-brand-accent); color: var(--ml-brand-accent); }
 .detail-tag:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; border-radius: 6px; }
 a.detail-tag { text-decoration: none; }
+
+/* Photo entry points: the header poster opens the viewer. */
+.detail-poster-btn { display: block; width: 100%; padding: 0; border: 0; border-radius: 16px; background: none; cursor: zoom-in; }
+.detail-poster-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; }
+
 
 .detail-title { margin: 0; font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 800; font-size: 76px; line-height: .92; letter-spacing: .005em; text-transform: uppercase; text-wrap: balance; color: var(--ml-ink); }
 
@@ -93,10 +98,13 @@ a.detail-tag { text-decoration: none; }
 .detail-tagline { margin: 0; font-size: 18px; font-style: italic; font-weight: 500; color: var(--ml-brand-accent); }
 .detail-overview { margin: 0; color: var(--ml-muted); line-height: 1.7; font-size: 16px; font-weight: 400; }
 
-.person-biography-wrap { max-width: 60rem; margin-top: 1.5rem; }
-.person-biography { margin: 0; max-width: 68ch; }
+/* The biography spans the header column, so the paragraph, the fact cards and Read more share the same right edge. */
+.person-biography-wrap { margin-top: 1.5rem; }
+/* The person header uses the full column; the facts cards are not capped at the movie width. */
+.person-detail-content .detail-facts { max-width: none; }
+.person-biography { margin: 0; }
 .person-biography.is-collapsed { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
-.read-more-link { display: block; width: fit-content; margin: .45rem 0 0 auto; padding: 0; border: 0; background: none; color: var(--ml-brand-dark); font: inherit; font-size: .95rem; font-weight: 650; text-decoration: underline; text-decoration-color: var(--ml-brand-accent); text-underline-offset: 3px; cursor: pointer; }
+.read-more-link { display: block; width: fit-content; margin: .5rem 0 0 auto; padding: 0; border: 0; background: none; color: var(--ml-brand-dark); font: inherit; font-size: .95rem; font-weight: 650; text-decoration: underline; text-decoration-color: var(--ml-brand-accent); text-underline-offset: 3px; cursor: pointer; }
 .read-more-link:hover { color: var(--ml-brand-accent); }
 .read-more-link:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 3px; border-radius: 2px; }
 .person-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -116,7 +124,7 @@ a.detail-tag { text-decoration: none; }
 }
 .cast-list-grid { align-content: start; }
 .cast-list-placeholder { visibility: hidden; pointer-events: none; }
-.media-image-frame { position: relative; display: block; width: 100%; overflow: hidden; isolation: isolate; background: var(--ml-brand-dark); }
+.media-image-frame { position: relative; display: block; width: 100%; overflow: hidden; isolation: isolate; background: transparent; }
 .media-image-placeholder { position: absolute; inset: 0; z-index: 0; display: grid; place-items: center; background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark)); color: var(--ml-brand-accent); font-size: clamp(1.35rem, 2.4vw, 2.25rem); }
 .media-image { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .22s ease; }
 .media-image.is-loaded { opacity: 1; }

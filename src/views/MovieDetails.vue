@@ -2,7 +2,9 @@
   <div v-if="!loading" class="container-xxl detail-page">
     <div class="detail-hero">
       <div class="detail-hero-poster">
-        <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
+        <button type="button" class="detail-poster-btn" aria-label="View posters" @click="openPosters">
+          <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
+        </button>
       </div>
       <div class="detail-hero-content">
         <header class="detail-hero-header">
@@ -56,6 +58,8 @@
       </div>
     </div>
 
+    <media-strip v-if="imagesLoading || images.backdrops.length" :items="images.backdrops" :loading="imagesLoading" @open="openViewer('backdrops', $event)" />
+
     <media-section v-if="cast.length" :items="cast" />
 
     <section v-if="recommendations.length" class="detail-section">
@@ -74,11 +78,21 @@
       </section-heading>
       <movie-slider id="recommendations-carousel" variant="movie" :movie-data="recommendationChunks" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
+
+    <media-viewer
+      v-if="viewer.open"
+      :groups="viewerGroups"
+      :start-group="viewer.group"
+      :start-index="viewer.index"
+      :background="backdropUrl"
+      label="Movie photos"
+      @close="viewer.open = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import MovieSlider from '../components/MovieSlider.vue'
@@ -88,11 +102,58 @@ import { formatDate } from '@/utils/date'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
 import AsyncImage from '../components/AsyncImage.vue'
+import MediaStrip from '../components/MediaStrip.vue'
+import MediaViewer from '../components/MediaViewer.vue'
+import { imageUrl, sortImages, toViewerItems } from '@/utils/images'
 
 const route = useRoute()
 const router = useRouter()
 
 const movieData = ref({})
+const images = ref({ backdrops: [], posters: [], logos: [] })
+const imagesLoading = ref(false)
+const viewer = reactive({ open: false, group: 'backdrops', index: 0 })
+
+const backdropUrl = computed(() => imageUrl(movieData.value.backdrop_path, 'w1280'))
+// The clicked poster always appears: it opens on the same file in TMDB's list, or stands alone if TMDB has none.
+const posterItems = computed(() => {
+  if (images.value.posters.length) return images.value.posters
+  return movieData.value.poster_path ? [{ path: movieData.value.poster_path, caption: '' }] : []
+})
+
+function openPosters() {
+  const index = posterItems.value.findIndex((poster) => poster.path === movieData.value.poster_path)
+  openViewer('posters', Math.max(index, 0))
+}
+
+const viewerGroups = computed(() => [
+  { key: 'backdrops', label: 'Backdrops', size: 'w1280', items: images.value.backdrops },
+  { key: 'posters', label: 'Posters', size: 'w780', items: posterItems.value },
+  { key: 'logos', label: 'Logos', size: 'w500', items: images.value.logos }
+])
+
+function openViewer(group, index = 0) {
+  viewer.group = group
+  viewer.index = index
+  viewer.open = true
+}
+
+// Photos are not needed to render the page, so they load in the background and never block it.
+async function loadImages(id) {
+  imagesLoading.value = true
+  try {
+    const { data } = await api.getMovieImages(id)
+    images.value = {
+      backdrops: toViewerItems(sortImages(data.backdrops)),
+      posters: toViewerItems(sortImages(data.posters)),
+      logos: toViewerItems(sortImages(data.logos))
+    }
+  } catch (e) {
+    images.value = { backdrops: [], posters: [], logos: [] }
+  } finally {
+    imagesLoading.value = false
+  }
+}
 const cast = ref([])
 const crew = ref([])
 const recommendations = ref([])
@@ -130,6 +191,7 @@ function goTo(media, id) {
 
 async function loadPage() {
   loading.value = true
+  images.value = { backdrops: [], posters: [], logos: [] }
   try {
     const [d, c, r] = await Promise.all([
       api.getMovieDetails(route.query.id),
@@ -140,6 +202,7 @@ async function loadPage() {
     cast.value = (c.data.cast || [])
     crew.value = c.data.crew || []
     recommendations.value = trimToChunks(r.data.results || [])
+    loadImages(route.query.id)
   } catch (e) {
     console.log(e)
   } finally {

@@ -79,7 +79,8 @@
           />
           <span class="ml-search-item-body">
             <span class="ml-search-item-title">{{ item.pre }}<mark v-if="item.match">{{ item.match }}</mark>{{ item.post }}</span>
-            <span v-if="item.badge || item.meta" class="ml-search-item-meta">
+            <span v-if="item.badge || item.meta || item.rank" class="ml-search-item-meta">
+              <span v-if="item.rank" class="ml-search-rank">#{{ item.rank }}</span>
               <span v-if="item.badge" class="ml-search-badge">{{ item.badge }}</span>
               <span v-if="item.meta" class="ml-search-meta-text">{{ item.meta }}</span>
             </span>
@@ -136,7 +137,7 @@ const activeIndex = ref(0)
 
 const results = ref([])
 const counts = reactive({ movie: 0, tv: 0, person: 0 })
-const trendingCache = reactive({ movie: [], tv: [], person: [] })
+const defaultCache = reactive({ movie: [], tv: [], person: [] })
 const searchCache = reactive({ movie: [], tv: [], person: [] })
 const genreMap = ref({})
 let genresLoaded = false
@@ -157,7 +158,6 @@ function initialsOf(name) {
 }
 
 function metaOf(item, type) {
-  if (type === 'person') return item.popularity ? 'Popularity ' + item.popularity.toFixed(1) : ''
   const date = type === 'movie' ? item.release_date : item.first_air_date
   return formatDate(date, 'YYYY')
 }
@@ -195,7 +195,7 @@ function blurbOf(item, type) {
 
 const displayResults = computed(() => {
   const q = query.value.trim()
-  return results.value.map(item => {
+  return results.value.map((item, index) => {
     const type = activeType.value
     const name = (type === 'movie' ? item.title : item.name) || ''
     let pre = name
@@ -224,6 +224,8 @@ const displayResults = computed(() => {
       isPerson,
       badge: badgeOf(item, type),
       meta: metaOf(item, type),
+      // Rank only means something in the default popularity list, not in search results.
+      rank: type === 'person' && !q ? index + 1 : 0,
       blurb: blurbOf(item, type),
       href: '#/' + type + '?id=' + item.id
     }
@@ -235,22 +237,29 @@ const heading = computed(() => {
   return counts[activeType.value] + ' ' + activeType.value + ' results'
 })
 
-function syncTrendingCounts() {
-  counts.movie = trendingCache.movie.length
-  counts.tv = trendingCache.tv.length
-  counts.person = trendingCache.person.length
+function syncDefaultCounts() {
+  counts.movie = defaultCache.movie.length
+  counts.tv = defaultCache.tv.length
+  counts.person = defaultCache.person.length
 }
 
-async function loadTrending() {
+// The default list with no search text is the same popularity order that Browse all opens with.
+function fetchDefault(type) {
+  if (type === 'person') return api.getPopularPeople()
+  if (type === 'tv') return api.getPopularTv()
+  return api.getPopularMovies()
+}
+
+async function loadDefault() {
   loading.value = true
   const types = ['movie', 'tv', 'person']
-  const toFetch = types.filter(t => !trendingCache[t].length)
+  const toFetch = types.filter(t => !defaultCache[t].length)
   if (toFetch.length) {
-    const settled = await Promise.allSettled(toFetch.map(t => api.getTrendingMovies(t, 'day')))
+    const settled = await Promise.allSettled(toFetch.map(t => fetchDefault(t)))
     settled.forEach((res, i) => {
       const t = toFetch[i]
       if (res.status === 'fulfilled') {
-        trendingCache[t] = filterResults(res.value.data.results || [], t).slice(0, 15)
+        defaultCache[t] = filterResults(res.value.data.results || [], t).slice(0, 15)
       }
     })
   }
@@ -258,21 +267,21 @@ async function loadTrending() {
     loading.value = false
     return
   }
-  syncTrendingCounts()
-  results.value = trendingCache[activeType.value]
+  syncDefaultCounts()
+  results.value = defaultCache[activeType.value]
   loading.value = false
   open.value = true
   activeIndex.value = 0
 }
 
-function showTrending() {
-  if (trendingCache[activeType.value].length) {
-    syncTrendingCounts()
-    results.value = trendingCache[activeType.value]
+function showDefault() {
+  if (defaultCache[activeType.value].length) {
+    syncDefaultCounts()
+    results.value = defaultCache[activeType.value]
     activeIndex.value = 0
     open.value = true
   } else {
-    loadTrending()
+    loadDefault()
   }
 }
 
@@ -299,26 +308,26 @@ async function runSearch(q) {
 
 const debouncedSearch = debounce(() => {
   const q = query.value.trim()
-  if (!q) showTrending()
+  if (!q) showDefault()
   else runSearch(q)
 }, 250)
 
 function onInput() {
   open.value = true
   activeIndex.value = 0
-  if (!query.value.trim()) showTrending()
+  if (!query.value.trim()) showDefault()
   else debouncedSearch()
 }
 
 function onFocus() {
   open.value = true
   if (!query.value.trim()) {
-    if (trendingCache[activeType.value].length) {
-      syncTrendingCounts()
-      results.value = trendingCache[activeType.value]
+    if (defaultCache[activeType.value].length) {
+      syncDefaultCounts()
+      results.value = defaultCache[activeType.value]
       activeIndex.value = 0
     } else {
-      loadTrending()
+      loadDefault()
     }
   }
 }
@@ -327,7 +336,7 @@ function selectTab(type) {
   activeType.value = type
   activeIndex.value = 0
   if (!query.value.trim()) {
-    showTrending()
+    showDefault()
   } else {
     results.value = searchCache[type] || []
     open.value = true
@@ -337,7 +346,7 @@ function selectTab(type) {
 function clearQuery() {
   query.value = ''
   activeIndex.value = 0
-  showTrending()
+  showDefault()
 }
 
 function openItem(item) {
@@ -693,6 +702,20 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   font-size: 10px;
   font-weight: 700;
   color: var(--mls-muted-2);
+}
+
+#search .ml-search-rank {
+  flex: none;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: rgba(var(--ml-brand-accent-rgb), .18);
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ml-brand-dark);
 }
 
 #search .ml-search-meta-text {

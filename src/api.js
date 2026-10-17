@@ -50,8 +50,8 @@ export default {
     return api.get('/configuration/countries')
   },
 
-  getTrendingMovies(mediaType, timeWindow) {
-    return api.get(`/trending/${mediaType}/${timeWindow}`)
+  getPopularTv() {
+    return api.get('/tv/popular')
   },
 
   getSearch(mediaType, searchText, page = 1) {
@@ -73,6 +73,11 @@ export default {
     })
   },
 
+  // Images: English and language-less only, so the galleries are not full of other-language artwork.
+  getMovieImages(movieId) {
+    return api.get(`/movie/${movieId}/images`, { params: { include_image_language: 'en,null' } })
+  },
+
   getMovieDetails(movieId) {
     return api.get(`/movie/${movieId}`)
   },
@@ -86,6 +91,15 @@ export default {
   },
 
   // People
+  getPersonImages(personId) {
+    return api.get(`/person/${personId}/images`)
+  },
+
+  // Photos of the person tagged in films and TV episodes, paged.
+  getPersonTaggedImages(personId, page = 1) {
+    return api.get(`/person/${personId}/tagged_images`, { params: { page } })
+  },
+
   getPersonDetails(personId) {
     return api.get(`/person/${personId}`)
   },
@@ -103,6 +117,10 @@ export default {
   },
 
   // TV
+  getTvImages(tvId) {
+    return api.get(`/tv/${tvId}/images`, { params: { include_image_language: 'en,null' } })
+  },
+
   getTvDetails(tvId) {
     return api.get(`/tv/${tvId}`)
   },
