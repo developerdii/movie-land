@@ -14,7 +14,7 @@
             </div>
             <h1 class="detail-title">{{ movieData.title }}</h1>
             <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="movieData.original_language">{{ originalTitle }}</span></p>
-            <score-summary :score="movieData.vote_average || 0" :votes="movieData.vote_count || 0" :facts="summaryFacts"></score-summary>
+            <score-summary :score="movieData.vote_average || 0" :votes="movieData.vote_count || 0" :facts="summaryFacts" :extras="summaryExtras"></score-summary>
             <bookmark-button v-if="movieData.id" type="movie" :id="movieData.id"></bookmark-button>
           </header>
 
@@ -89,11 +89,13 @@ import RoundPagination from '../components/RoundPagination.vue'
 import { formatDate } from '@/utils/date'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
+import { movieCertification, tvRating } from '@/utils/ratings'
 import ScoreSummary from '../components/ScoreSummary.vue'
 import BookmarkButton from '../components/BookmarkButton.vue'
 import AsyncImage from '../components/AsyncImage.vue'
 import MediaStrip from '../components/MediaStrip.vue'
 import MediaViewer from '../components/MediaViewer.vue'
+import { recordVisit } from '@/composables/useRecent'
 import { imageUrl, sortImages, toViewerItems } from '@/utils/images'
 
 const route = useRoute()
@@ -186,6 +188,12 @@ const summaryFacts = computed(() => [
   getLanguageName(movieData.value.original_language)
 ].filter(Boolean))
 
+// The US age rating, and for shows the network, shown as extra sections on the score block.
+const summaryExtras = computed(() => {
+  const rating = movieCertification(movieData.value.release_dates)
+  return rating ? [[{ value: rating, badge: true }]] : []
+})
+
 function formatRuntime(minutes) {
   if (!minutes) return ''
   const h = Math.floor(minutes / 60)
@@ -209,6 +217,7 @@ async function loadPage() {
       api.getRecommendationsMovies(route.query.id)
     ])
     movieData.value = d.data
+    recordVisit('movie', d.data.id)
     cast.value = (c.data.cast || [])
     crew.value = c.data.crew || []
     recommendations.value = trimToChunks(r.data.results || [])

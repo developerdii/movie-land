@@ -6,10 +6,10 @@
           <poster-card
             v-for="(movie, movieIndex) in row"
             :key="movieIndex"
-            :variant="variant"
+            :variant="movie.media_type === 'person' ? 'person' : variant"
             :item="movie"
-            :media-type="type"
-            :show-type="showType"
+            :media-type="movie.media_type || type"
+            :show-type="showType && movie.media_type !== 'person'"
             @navigate="route"
           />
         </div>
@@ -44,8 +44,9 @@ defineExpose({ goTo: (index) => slider.value?.goTo(index) })
 
 const router = useRouter()
 
+// Items from a mixed list (the recently viewed slider) carry their own media_type; the others use the slider's type.
 function route(item) {
-  router.push({ path: props.type, query: { id: item.id } })
+  router.push({ path: item.media_type || props.type, query: { id: item.id } })
 }
 </script>
 

@@ -8,7 +8,7 @@
           </button>
           <div v-else class="detail-poster person-detail-initials" aria-hidden="true">{{ personInitials }}</div>
         </div>
-        <div class="col-12 col-sm-8 col-lg-9">
+        <div class="col-7 col-sm-8 col-lg-9">
           <div class="detail-hero-header">
             <div v-if="person.known_for_department" class="person-eyebrow">
               <span class="person-eyebrow-dash" aria-hidden="true"></span>
@@ -66,6 +66,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } 
 import { useRoute } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/utils/date'
+import { recordVisit } from '@/composables/useRecent'
 import { sortImages, toViewerItems } from '@/utils/images'
 import AsyncImage from '../components/AsyncImage.vue'
 import BookmarkButton from '../components/BookmarkButton.vue'
@@ -308,6 +309,7 @@ async function load() {
       api.getPersonTvCredits(id)
     ])
     person.value = d.data
+    recordVisit('person', d.data.id)
     movieCredits.value = mergeCredits(m.data.cast, m.data.crew, 'movie', person.value.known_for_department)
     tvCredits.value = mergeCredits(t.data.cast, t.data.crew, 'tv', person.value.known_for_department)
     markUpcomingFor(requestId)

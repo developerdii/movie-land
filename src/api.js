@@ -82,8 +82,9 @@ export default {
     return api.get(`/movie/${movieId}/images`, { params: { include_image_language: 'en,null' } })
   },
 
+  // append_to_response adds the US certification (release_dates) to the same response.
   getMovieDetails(movieId) {
-    return api.get(`/movie/${movieId}`)
+    return api.get(`/movie/${movieId}`, { params: { append_to_response: 'release_dates' } })
   },
 
   getMovieCredits(movieId) {
@@ -125,8 +126,9 @@ export default {
     return api.get(`/tv/${tvId}/images`, { params: { include_image_language: 'en,null' } })
   },
 
+  // append_to_response adds the US content rating (content_ratings) to the same response.
   getTvDetails(tvId) {
-    return api.get(`/tv/${tvId}`)
+    return api.get(`/tv/${tvId}`, { params: { append_to_response: 'content_ratings' } })
   },
 
   getTvCredits(tvId) {

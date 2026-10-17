@@ -14,7 +14,7 @@
             </div>
             <h1 class="detail-title">{{ tv.name }}</h1>
             <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="tv.original_language">{{ originalTitle }}</span></p>
-            <score-summary :score="tv.vote_average || 0" :votes="tv.vote_count || 0" :facts="summaryFacts"></score-summary>
+            <score-summary :score="tv.vote_average || 0" :votes="tv.vote_count || 0" :facts="summaryFacts" :extras="summaryExtras"></score-summary>
             <bookmark-button v-if="tv.id" type="tv" :id="tv.id"></bookmark-button>
           </header>
 
@@ -88,11 +88,13 @@ import RoundPagination from '../components/RoundPagination.vue'
 import MovieSlider from '../components/MovieSlider.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
+import { movieCertification, tvRating } from '@/utils/ratings'
 import ScoreSummary from '../components/ScoreSummary.vue'
 import BookmarkButton from '../components/BookmarkButton.vue'
 import AsyncImage from '../components/AsyncImage.vue'
 import MediaStrip from '../components/MediaStrip.vue'
 import MediaViewer from '../components/MediaViewer.vue'
+import { recordVisit } from '@/composables/useRecent'
 import { imageUrl, sortImages, toViewerItems } from '@/utils/images'
 
 const route = useRoute()
@@ -219,6 +221,17 @@ const summaryFacts = computed(() => [
   ].filter(Boolean).join(' · ')
 ].filter(Boolean))
 
+// The US age rating, and for shows the network, shown as extra sections on the score block.
+// The rating and the network sit in one section, one under the other.
+const summaryExtras = computed(() => {
+  const items = []
+  const rating = tvRating(tv.value.content_ratings)
+  if (rating) items.push({ value: rating, badge: true })
+  const networks = (tv.value.networks || []).map((n) => n.name).filter(Boolean).join(', ')
+  if (networks) items.push({ value: networks })
+  return items.length ? [items] : []
+})
+
 function formatRuntime(minutes) {
   if (!minutes) return ''
   const h = Math.floor(minutes / 60)
@@ -244,6 +257,7 @@ async function load() {
       api.getTvRecommendations(id)
     ])
     tv.value = d.data
+    recordVisit('tv', d.data.id)
     cast.value = (c.data.cast || [])
     crew.value = ag.data.crew || []
     recommendations.value = trimToChunks(r.data.results || [])

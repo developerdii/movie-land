@@ -18,19 +18,30 @@
     <div v-if="facts.length" class="score-summary-facts">
       <span v-for="(fact, index) in facts" :key="index" class="score-summary-fact" :class="{ 'is-primary': index === 0 }">{{ fact }}</span>
     </div>
+
+    <template v-for="(section, sectionIndex) in extras" :key="sectionIndex">
+      <div v-if="hasScore || facts.length" class="score-summary-divider" aria-hidden="true"></div>
+      <div class="score-summary-extra">
+        <span v-for="(item, index) in section" :key="index" class="score-summary-extra-value" :class="{ 'is-badge': item.badge }">{{ item.value }}</span>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
 // The rating block on movie and TV pages: a gold ring with the score, the vote count, and two lines of facts
-// (the first line is the emphasised one, e.g. the release date or the air dates).
+// (the first line is the emphasised one, e.g. the release date or the air dates). `extras` adds sections after the
+// facts. Each section is a list of items stacked one under the other, without titles: the age rating (in a box)
+// and, on shows, the network.
 import { computed } from 'vue'
 import { exactVoteCount, formatVoteCount } from '@/utils/votes'
 
 const props = defineProps({
   score: { type: Number, default: 0 },
   votes: { type: Number, default: 0 },
-  facts: { type: Array, default: () => [] }
+  facts: { type: Array, default: () => [] },
+  // [[{ value, badge }, ...], ...]: one section per inner list.
+  extras: { type: Array, default: () => [] }
 })
 
 const CIRCUMFERENCE = 2 * Math.PI * 28
@@ -121,6 +132,28 @@ const scoreLabel = computed(() => (
   font-size: 19px;
   font-weight: 700;
   color: var(--ml-ink);
+}
+
+.score-summary-extra {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.score-summary-extra-value {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ml-ink);
+}
+/* The age rating is set in a box, the way it appears on the poster. */
+.score-summary-extra-value.is-badge {
+  align-self: flex-start;
+  padding: 2px 9px;
+  border: 1px solid var(--ml-control-line);
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 /* Phones: the ring stays beside the votes; the facts drop under them and the divider goes. */

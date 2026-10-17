@@ -38,6 +38,11 @@
         <list-section id="top-rated-carousel" eyebrow="All time" title="Top Rated Movies" type="movie" :load="api.getTopRatedMovies" />
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12 page-block">
+        <recently-viewed />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -46,6 +51,7 @@ import Slider from '../components/PopularMoviesSlider.vue'
 import UpComing from '@/components/UpComing.vue'
 import { onMounted, ref } from 'vue'
 import ListSection from '@/components/ListSection.vue'
+import RecentlyViewed from '@/components/RecentlyViewed.vue'
 import api from '@/api'
 import { useBookmarks } from '@/composables/useBookmarks'
 

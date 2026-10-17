@@ -20,6 +20,7 @@ npm run lint:fix   # ESLint autofix
 - TMDB auth comes from `VITE_TMDB_ACCESS_TOKEN` (see `.env.example`); `src/api.js` owns the axios instance, base URL and NProgress interceptors.
 - Dark mode: the navbar toggle sets `data-theme` on `<html>` and saves `movieland-theme` in localStorage (default light). See `coding.md` → Dark mode.
 - Bookmarks: movie, TV and person ids in localStorage (`movieland-bookmarks`), nothing else; see `data-model.md` → Bookmarks.
+- Recently viewed: the last eighteen movie, TV and person ids in localStorage (`movieland-recent`); the home page shows them in a slider of six per page, once there are six. See `data-model.md` → Recently viewed.
 - Search: a navbar trigger opens a centered Spotlight-style panel (⌘K / Ctrl+K from anywhere).
 - `public/service-worker.js` is a one-off cleanup worker that removes the old Vue CLI PWA service worker (which cached the previous site).
 - Live: https://developerdii.github.io/movie-land/

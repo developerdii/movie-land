@@ -1,6 +1,6 @@
 # Data Model (TMDB API)
 
-All title data comes from TMDB. The only things MovieLand saves on the device are the dark mode choice (`movieland-theme`) and the bookmarks (`movieland-bookmarks`, TMDB ids only, see Bookmarks below). This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
+All title data comes from TMDB. The only things MovieLand saves on the device are the dark mode choice (`movieland-theme`), the bookmarks (`movieland-bookmarks`, TMDB ids only, see Bookmarks below) and the recently viewed list (`movieland-recent`, TMDB ids only, see Recently viewed below). This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
 
 ## Auth
 - `src/api.js` sets `Authorization: Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}` (a TMDB **API Read Access Token**, a v4 JWT).
@@ -11,7 +11,7 @@ All title data comes from TMDB. The only things MovieLand saves on the device ar
 - **Non-commercial only.** No ads, paid tiers, accounts that pay, or sponsored content on any page. Commercial use needs a separate written agreement with TMDB.
 - **Required notice**, shown on the About page, which every page reaches with the navbar's info icon: "This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." There is no footer. TMDB's terms ask for the notice to be placed prominently in or on the application, not on every page.
 - **Logo:** TMDB's official "blue long" logo (shown on the About page). It stays smaller than our own wordmark, and it links to themoviedb.org. The logo is loaded from TMDB's own asset URL, not copied into the repo.
-- **Caching:** TMDB data may not be cached for more than six months. The app keeps no TMDB title data in localStorage or any store. The only saved TMDB values are the bookmark ids, so do not add persistent caching of API responses without checking the terms.
+- **Caching:** TMDB data may not be cached for more than six months. The app keeps no TMDB title data in localStorage or any store. The only saved TMDB values are the bookmark and recently viewed ids, so do not add persistent caching of API responses without checking the terms.
 - **No AI or machine learning** with TMDB data (training, datasets, or features built on it).
 
 ## Base URLs
@@ -36,14 +36,14 @@ All title data comes from TMDB. The only things MovieLand saves on the device ar
 | `getSearch(mediaType, searchText, page)` | `GET /search/{media_type}?query={text}&page={n}` | `SearchBar`, `BrowseView` (when a search text is set) |
 | `getDiscover(mediaType, params)` | `GET /discover/{media_type}` (movie or tv) | `BrowseView` |
 | `getUpComing(fromDate)` | `GET /discover/movie` (see Discover below) | `UpComing` |
-| `getMovieDetails(movieId)` | `GET /movie/{id}` | `MovieDetails` |
+| `getMovieDetails(movieId)` | `GET /movie/{id}?append_to_response=release_dates` | `MovieDetails` |
 | `getMovieCredits(movieId)` | `GET /movie/{id}/credits` | `MovieDetails` |
 | `getRecommendationsMovies(movieId)` | `GET /movie/{id}/recommendations` | `MovieDetails` |
 | `getPersonDetails(personId)` | `GET /person/{id}` | `PersonDetails` |
 | `getPersonMovieCredits(personId)` | `GET /person/{id}/movie_credits` | `PersonDetails` |
 | `getPersonTvCredits(personId)` | `GET /person/{id}/tv_credits` | `PersonDetails` |
 | `getPopularPeople(page)` | `GET /person/popular` | `BrowseView` (people, no search text), `SearchBar` (default list) |
-| `getTvDetails(tvId)` | `GET /tv/{id}` | `TvDetails` |
+| `getTvDetails(tvId)` | `GET /tv/{id}?append_to_response=content_ratings` | `TvDetails` |
 | `getTvCredits(tvId)` | `GET /tv/{id}/credits` | `TvDetails` |
 | `getTvAggregateCredits(tvId)` | `GET /tv/{id}/aggregate_credits` | `TvDetails` (writers) |
 | `getTvRecommendations(tvId)` | `GET /tv/{id}/recommendations` | `TvDetails` |
@@ -71,6 +71,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - `getPersonDetails` adds `biography`, `birthday`, `deathday`, `place_of_birth`, `known_for_department`, `popularity`.
 - Credits return `{ cast: [...], crew: [...] }`. Person pages merge cast and crew by title id, so a film is listed once even when the person acted and also worked behind the camera. The filmography and the "Credits" count (unique movies plus unique TV shows) both use the merged list. Christopher Nolan (id 525) has 33 cast and 78 crew movie credits, and his crew films are now included. Filmography rules (`visibleRoles` and `BADGE_PRIORITY` in PersonDetails). A film that has the person's main role (`known_for_department`) shows no roles at all, so a director's own films get no badge, and neither does a writer's written films. On every other film, the roles the person had there are shown. The grid card gets one badge, the first by priority: Directing, then Writing, then Acting. Directing comes from crew job Director, Writing from Writer, Screenplay, Story or Teleplay, Acting from cast. `PosterCard` shows the badge as a light pill, top right, the same style as the ACTING pill in the list view. Each entry also carries `allRoles` (Acting, Directing, Writing, whichever apply), which the list view shows as pills.
 - Upcoming: the credits have dates but no status, so a credit whose date is missing or still ahead gets one details request (`getMovieDetails` / `getTvDetails`) and is flagged `upcoming` when TMDB's `status` says it is not out yet (movies: Planned, In Production, Post Production, Rumored; TV: Planned, In Production). Flagged cards show a gold "Upcoming" badge in place of the rating, and the list view shows a gold pill. The lists render first and the flags are added when the requests finish; a newer person page ignores an older check.
+- Ratings and networks: the two detail calls use `append_to_response`, so no extra request is made. Films return `release_dates` and shows return `content_ratings`; the US age rating is read from them (`src/utils/ratings.js`). A show's `networks` (`[{name}]`) give the network shown on the score block.
 - Person search results may carry `known_for: [...]`.
 
 ## Images (detail pages)
@@ -102,3 +103,8 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - `src/composables/useBookmarks.js` is the one store, shared by every component: `ids(type)`, `count(type)`, `has`, `latest(type)`, `recent(types, limit)` (newest bookmarks across the given types), `toggle`, plus `firstBookmarkedType()` for the `/bookmarks` redirect. A `storage` listener keeps open tabs in step.
 - Bookmarks page `/bookmarks/:type` (movie, tv, person): tabs with counts, grid or list, 20 per page like the browse grid, page in `?page=`. Each page fetches only its own titles; a title TMDB no longer returns is skipped.
 - Home "For you": `recent(['movie','tv'], 3)` gives the three newest movie or TV bookmarks, going back from the newest; persons are skipped. Each one gets a section with `getRecommendationsMovies(id)` / `getTvRecommendations(id)`. The eyebrow is "Because you bookmarked {title}" (title from the details call) and the heading is short: "More Movies Like It" or "More Shows Like It". A section appears only when TMDB returns at least 6 titles (`ListSection` `minItems`).
+
+## Recently viewed (localStorage)
+- Key `movieland-recent`: one list of `[type, id]` pairs, newest first, at most eighteen (`RECENT_LIMIT` = 18 in `src/composables/useRecent.js`), e.g. `[["tv",1399],["movie",550]]`. Nothing else is stored.
+- `recordVisit(type, id)` runs once a film, TV or person page has loaded. A title opened again moves to the front, and the oldest one beyond eighteen is dropped.
+- The home page's last slider (`RecentlyViewed.vue`) fetches each title again with its details call. It is shown in slides of six (up to three pages) once six titles load, and the page control moves between them. Its cards mix films, shows and people, so `MovieSlider` takes each card's type from `media_type`.

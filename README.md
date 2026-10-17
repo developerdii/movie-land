@@ -11,6 +11,7 @@ Movie Land is a web app for browsing movies, TV shows and people. Search, filter
 - **Browse:** filter movies or TV shows by genre, year, country, language, rating, runtime, number of votes and sort order. Every filter lives in the page address, so a search can be shared as a link.
 - **Details:** movies, TV shows and people, with cast and crew, recommendations, a photo viewer, biographies and filmographies.
 - **Bookmarks:** bookmark movies, TV shows and people from their pages or from the hero. The Bookmarks page lists them in grids or lists, and the home page adds sections based on your newest bookmarks.
+- **Recently viewed:** the last eighteen films, TV shows and people you opened appear in a three-page slider at the end of the home page.
 - **Dark mode:** switch from the navbar. The choice is saved in your browser.
 - **Responsive:** the layout works on phones, tablets and desktops.
 
@@ -52,6 +53,6 @@ This website uses TMDB and the TMDB APIs but is not endorsed, certified, or othe
 
 - The notice and the TMDB logo appear on the About page, which the info icon in the navbar opens from every page. The logo links to [themoviedb.org](https://www.themoviedb.org/).
 - Movie Land is a personal, non-commercial project. It has no ads, no accounts and no paid features. TMDB's terms do not allow commercial use without a separate agreement, so keep it that way.
-- The app keeps no TMDB data in local storage or on a server. On your device it saves only the dark mode choice and the bookmarks, and bookmarks are TMDB ids only; titles are fetched from TMDB when they are shown. TMDB's terms limit how long data may be cached (six months at most), so do not add persistent caching without checking them.
+- The app keeps no TMDB data in local storage or on a server. On your device it saves only the dark mode choice, the bookmarks and the eighteen most recently opened titles. These are TMDB ids only; titles are fetched from TMDB when they are shown. TMDB's terms limit how long data may be cached (six months at most), so do not add persistent caching without checking them.
 - Titles, posters, backdrops and photos belong to their rights holders. The app does not use TMDB data for AI or machine learning.
 - The full terms are in TMDB's [API terms of use](https://www.themoviedb.org/api-terms-of-use).
