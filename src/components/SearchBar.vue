@@ -10,7 +10,6 @@
       @click="openPanel"
     >
       <i class="bi bi-search ml-search-trigger-icon" aria-hidden="true"></i>
-      <span class="ml-search-trigger-label">Search</span>
       <span class="ml-search-trigger-hint">Movies, TV &amp; people</span>
     </button>
 
@@ -530,12 +529,6 @@ onBeforeUnmount(() => {
 
 #search .ml-search-trigger-icon { flex: none; font-size: 1rem; }
 
-#search .ml-search-trigger-label {
-  flex: none;
-  font-weight: 700;
-  color: var(--ml-ink);
-}
-
 #search .ml-search-trigger-hint {
   flex: 1 1 auto;
   min-width: 0;
@@ -955,14 +948,10 @@ html.ml-search-lock { overflow: hidden; }
   .ml-spotlight-leave-active .ml-spotlight-panel { animation: none; }
 }
 
+/* Below 992 px the navbar holds the logo, Home, Browse and the icon buttons, so the field shrinks to its icon. */
 @media (max-width: 991.98px) {
-  #search .ml-search-trigger { width: 200px; }
+  #search .ml-search-trigger { width: 40px; justify-content: center; padding: 0; }
   #search .ml-search-trigger-hint { display: none; }
-}
-
-/* Large phones and small tablets: the bar also holds Browse, Bookmarks, the theme button and About. */
-@media (max-width: 767.98px) {
-  #search .ml-search-trigger { width: 160px; }
 }
 
 /* Phones: the navbar keeps only the icon, and the panel sits at the top so the keyboard never covers the field. */
@@ -972,7 +961,6 @@ html.ml-search-lock { overflow: hidden; }
     justify-content: center;
     padding: 0;
   }
-  #search .ml-search-trigger-label { display: none; }
 
   .ml-spotlight {
     align-items: flex-start;
