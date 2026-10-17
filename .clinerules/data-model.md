@@ -94,7 +94,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
 - Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (default popular lists) / 5 (search); tab counts use `total_results` (search) or list length (default list). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department`; in the default list they show their rank instead of `popularity`.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM D, YYYY'`, and `'ddd, MMM D, YYYY'`.
-- Lists are paginated client-side by `MediaSection` (its own `page`/`pageSize` state + round pagination controls). `usePagination` + `PaginationControls` are legacy and currently unused.
+- Lists are paginated by `MediaSection`: client-side with its own `page`/`pageSize` state, or server-side with the parent's `page` (browse, bookmarks). Both use the shared `RoundPagination` control.
 
 
 ## Bookmarks (localStorage)

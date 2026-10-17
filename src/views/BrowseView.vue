@@ -1,5 +1,5 @@
 <template>
-  <div class="container-xxl detail-page browse-page">
+  <div class="detail-page browse-page">
     <div class="browse-top">
       <div class="browse-seg" role="group" aria-label="Media type">
         <button

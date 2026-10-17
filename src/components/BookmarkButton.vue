@@ -70,13 +70,14 @@ const active = computed(() => has(props.type, props.id))
 }
 .bookmark-btn--pill:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
 
-/* Ribbon: a bookmark tab that hangs from the top edge of the page card, at the top right. It sits on the
-   detail page's own box (see .detail-page), so its top edge is the card's top edge. Not bookmarked it is
-   neutral with a plus; bookmarked it turns gold with a check, the same selected colour as the browse tabs. */
+/* Ribbon: a bookmark tab that hangs from the top edge of the header card (.page-card), at the top right. Its right
+   offset is the card padding (--card-pad) plus its own inset, so it sits where it did inside the old page card.
+   Not bookmarked it is neutral with a plus; bookmarked it turns gold with a check, the same selected colour as the
+   browse tabs. */
 .bookmark-btn--ribbon {
   position: absolute;
-  top: calc(-1 * clamp(1rem, 2.5vw, 2rem));
-  right: clamp(12px, 3vw, 40px);
+  top: 0;
+  right: calc(var(--card-pad) + clamp(12px, 3vw, 40px));
   z-index: 3;
   width: 44px;
   height: 60px;
@@ -96,6 +97,6 @@ const active = computed(() => has(props.type, props.id))
 .bookmark-btn--ribbon:focus-visible { outline: none; background: rgba(var(--ml-brand-accent-rgb), .55); }
 
 @media (max-width: 575.98px) {
-  .bookmark-btn--ribbon { top: -.85rem; right: 12px; width: 36px; height: 52px; font-size: 15px; }
+  .bookmark-btn--ribbon { right: calc(var(--card-pad) + 12px); width: 36px; height: 52px; font-size: 15px; }
 }
 </style>

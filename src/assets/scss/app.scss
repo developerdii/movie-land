@@ -30,6 +30,11 @@
   /* Fixed white for text on dark overlays (posters, photo viewer); the surface token flips in dark mode. */
   --ml-white: #ffffff;
   --ml-surface-rgb: 255, 255, 255;
+
+  /* Layout shared by every page: the first panel of each page (hero, film header, browse filters, About) has the
+     same corners, and the space between blocks is the same everywhere. */
+  --ml-panel-radius: 20px;
+  --page-gap: clamp(2rem, 4vw, 3rem);
 }
 
 /* Dark mode is chosen with the navbar toggle and saved in localStorage (see utils/theme.js). */
@@ -82,33 +87,34 @@ body {
   }
 }
 
+/* Every page sits on the page background, inside the navbar's gutter. A page that needs a card adds .page-card to
+   its own root. */
 #app .router-view {
-  padding: clamp(1rem, 2.5vw, 2rem);
   margin-top: 1.25rem;
-  /* The same space below the card as above it, so a long page does not end flush with the card. */
   margin-bottom: 1.25rem;
-  min-height: calc(100vh - 240px);
-  border: 0;
+}
+
+/* The bordered card: the About page, and the header and photos of the film, TV and person pages. It has the same
+   corners and line as the other first panels (the hero, the browse filters), on every screen size.
+   --card-pad is also read by the bookmark ribbon, so the ribbon lines up with the content. */
+.page-card {
+  --card-pad: clamp(1rem, 2.5vw, 2rem);
+  position: relative;
+  padding: var(--card-pad);
+  border: 1px solid var(--ml-line);
+  border-radius: var(--ml-panel-radius);
   background: var(--ml-surface);
+  box-shadow: var(--bs-box-shadow-sm);
 }
 
-/* Desktop: the page card has rounded corners like the hero, search panel and filter bar. In dark mode its
-   shadow disappears, so a thin line keeps the card separate from the page. Phones keep it square and edge to edge. */
+/* Short pages (About): the card is narrower on desktop. 744px is the 720px card plus the container gutter on each side. */
 @media (min-width: 768px) {
-  #app .router-view { border-radius: 20px; }
-  :root[data-theme="dark"] #app .router-view { border: 1px solid var(--ml-line); }
+  #app .router-view--compact { width: min(100%, 744px); margin-inline: auto; }
 }
 
-/* Short pages (About): the card is narrower on desktop, and its height follows the content instead of the
-   viewport. Other pages keep the full-width card with its minimum height. */
-#app .router-view--compact { min-height: 0; }
-@media (min-width: 768px) {
-  #app .router-view--compact { width: min(100%, 720px); margin-inline: auto; }
-}
-
-/* Position context for the bookmark ribbon, which hangs from the top edge of the page card. flow-root stops a
-   child's negative margin (the person page's Bootstrap row) from collapsing into this box and moving it. */
-.detail-page { position: relative; display: flow-root; max-width: 1440px; margin-inline: auto; }
+/* flow-root stops a child's negative margin (the person page's Bootstrap row) from collapsing into this box and
+   moving it. */
+.detail-page { display: flow-root; max-width: 1440px; margin-inline: auto; }
 .detail-poster { width: 100%; max-height: 620px; aspect-ratio: 2 / 3; border-radius: 16px; overflow: hidden; isolation: isolate; box-shadow: 0 24px 48px rgba(23, 27, 37, .12); }
 
 .detail-hero { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 56px; }
@@ -169,7 +175,9 @@ a.detail-tag { text-decoration: none; }
 .view-toggle-btn:focus-visible { outline: 2px solid #727985; outline-offset: 2px; }
 .detail-content { margin-inline: 0; padding: 0; align-items: stretch; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .person-detail-content { background: transparent; }
-.detail-section { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.detail-section { margin-top: var(--page-gap); }
+/* Blocks on the home page: the same gap as the sections on the detail pages. */
+.page-block { margin-top: var(--page-gap); }
 .movie-card-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; padding-top: 8px; }
 @media (max-width: 767.98px) {
   .movie-card-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -181,19 +189,7 @@ a.detail-tag { text-decoration: none; }
 .media-image { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .22s ease; }
 .media-image.is-loaded { opacity: 1; }
 
-.pagination-switch { display: flex; width: fit-content; align-items: center; gap: 2px; margin-left: auto; padding: 3px; border: 1px solid var(--ml-control-line); border-radius: 9px; background: var(--ml-control-bg); }
-.pagination-switch-btn { display: grid; width: 38px; height: 32px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--ml-ink); transition: background-color .15s ease, color .15s ease; }
-.pagination-switch-btn:hover:not(:disabled) { background: var(--ml-hover); }
-.pagination-switch-btn:disabled { color: var(--ml-disabled); cursor: not-allowed; }
-.pagination-switch-count { min-width: 3.25rem; text-align: center; color: var(--ml-ink); font-size: .9rem; font-weight: 600; font-variant-numeric: tabular-nums; }
-.pagination-switch-count span { color: #7b8492; font-weight: 400; }
 
-.round-pagination { display: flex; align-items: center; gap: 8px; }
-.round-pagination-btn { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid var(--ml-control-line); border-radius: 999px; background: var(--ml-surface); color: var(--ml-ink); cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
-.round-pagination-btn:hover:not(:disabled) { border-color: var(--ml-brand-accent); color: var(--ml-brand-accent); }
-.round-pagination-btn:disabled { color: rgba(var(--ml-muted-rgb), .4); cursor: not-allowed; }
-.round-pagination-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
-.round-pagination-count { min-width: 56px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ml-muted); font-variant-numeric: tabular-nums; }
 
 @media (max-width: 767.98px) {
   .detail-hero { gap: 32px; }
@@ -201,7 +197,8 @@ a.detail-tag { text-decoration: none; }
 }
 
 @media (max-width: 575.98px) {
-  #app .router-view { padding: .85rem; margin-top: .75rem; margin-bottom: .75rem; }
+  #app .router-view { margin-top: .75rem; margin-bottom: .75rem; }
+  .page-card { --card-pad: .85rem; }
   .detail-overview { font-size: .95rem; }
   .detail-hero-poster { flex: 0 1 160px; min-width: 140px; }
 }
@@ -265,9 +262,9 @@ a.detail-tag { text-decoration: none; }
   color: #17171b;
 }
 
-/* Shared list pages: the browse and bookmarks pages use the same top row, type tabs and results grid. */
-.browse-page { padding-top: 2rem; padding-bottom: 3rem; }
-.browse-page .detail-section { margin-top: 2rem; }
+/* Shared list pages: the browse and bookmarks pages use the same top row, type tabs and results grid. The top row
+   starts where the first panel starts on the other pages. */
+.browse-page { padding-bottom: 3rem; }
 
 /* Top row: media type tabs and the search field. Switching type is not a filter. */
 .browse-top {

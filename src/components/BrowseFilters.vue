@@ -252,7 +252,7 @@ const chips = computed(() => {
   gap: 14px;
   padding: 18px 20px;
   border: 1px solid var(--ml-line);
-  border-radius: 14px;
+  border-radius: var(--ml-panel-radius);
   background: var(--ml-surface);
 }
 

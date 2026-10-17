@@ -52,7 +52,6 @@ const remaining = computed(() => Math.max(props.items.length - props.max, 0))
 
 /* Tighter spacing around the photo strip than the default section gap. */
 .detail-section.media-strip { margin-top: 2rem; }
-.detail-section.media-strip + .cast-section { margin-top: 2rem; }
 
 .media-strip__grid {
   display: grid;

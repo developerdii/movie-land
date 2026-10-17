@@ -41,7 +41,7 @@ const routes = [
     path: '/about',
     name: 'About',
     component: () => import('../views/About.vue'),
-    // Short page: the card gets narrower and its height follows the text (see .router-view--compact).
+    // Short page: its card is narrower on desktop (see .router-view--compact).
     meta: { compactCard: true }
   }
 ]

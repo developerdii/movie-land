@@ -70,6 +70,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   carousel?.dispose()
 })
+
+// Moves to a 0-based slide. The shared page control uses it; 'slid' still reports the new slide.
+function goTo(index) {
+  carousel?.to(index)
+}
+
+defineExpose({ goTo })
 </script>
 
 <style lang="scss">
@@ -89,6 +96,14 @@ onBeforeUnmount(() => {
   top: 0.5rem;
   right: 1.25rem;
   z-index: 2;
+}
+
+/* A poster card lifts and gets a gold ring on hover, and the carousel box would cut both off at its left, right
+   and top edges. The padding leaves room for that, and the negative margin and width keep the slides where they were. */
+.carousel-inner {
+  width: calc(100% + 20px);
+  margin: -10px;
+  padding: 10px;
 }
 
 

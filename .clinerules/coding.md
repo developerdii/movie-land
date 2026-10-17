@@ -21,6 +21,9 @@
 - Poster cards use the theme tokens: `--ml-brand-dark` surface, `16px` radius, gold `--ml-brand-accent` accents, and a soft shadow (no border). Film/coming-soon cards show the poster clean on top with a blurred info band below; person cards keep a full-bleed photo with a bottom scrim and the name overlaid.
 - The three `PosterCard` variants differ in media badges and info-band metadata: **comingSoon** (date chip + countdown + full release date), **movie** (rating badge, year · genre; a MOVIE/TV type badge shows only in mixed-type lists like search "Known for"), and **person** (name + "as {role}", VOICE badge, initials fallback).
 - Detail route pages share `.detail-page`, `.detail-hero`, `.detail-poster`, `.detail-overview`, and `.detail-section` styles from `src/assets/scss/app.scss`; film and TV details use a two-column `.detail-hero` (poster + display title, genre/rating metadata, and Director/Writers fact cards).
+- Bordered surfaces use `.page-card` (`app.scss`): it holds the padding (`--card-pad`), the surface background, the desktop corner radius, the dark mode line and the shadow. Don't write a card border per page.
+- Paging: every paged list uses `RoundPagination` (`src/components/RoundPagination.vue`). Don't add another page control.
+- Page rhythm: the first panel of each page (the home hero, the film header card, the browse filters, About) uses `--ml-panel-radius` (20px). The space between blocks is `--page-gap` (`.page-block` on the home page, `.detail-section` on the detail and list pages), so every page has the same gaps. Don't add other margins between blocks.
 - Keep the search panel (trigger, tabs, result rows, footer) and its styles in `SearchBar.vue`. The trigger is scoped with the `#search` id; the teleported panel uses the `.ml-spotlight` class, because it is no longer inside `#search`. Keep accents on the brand gold token.
 
 ## Dark mode

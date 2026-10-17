@@ -2,18 +2,10 @@
   <div v-if="slides.length">
     <section-heading :eyebrow="eyebrow" :title="title">
       <template #actions>
-        <div v-if="slides.length > 1" class="round-pagination">
-          <button type="button" class="round-pagination-btn" :disabled="index <= 1" :aria-disabled="index <= 1" aria-label="Previous" :data-bs-target="'#' + id" data-bs-slide="prev">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
-          </button>
-          <span class="round-pagination-count" aria-live="polite">{{ index }} / {{ slides.length }}</span>
-          <button type="button" class="round-pagination-btn" :disabled="index >= slides.length" :aria-disabled="index >= slides.length" aria-label="Next" :data-bs-target="'#' + id" data-bs-slide="next">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
-          </button>
-        </div>
+        <round-pagination :page="index" :page-count="slides.length" @update:page="goToSlide" />
       </template>
     </section-heading>
-    <movie-slider :id="id" :movie-data="slides" :type="type" variant="movie" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
+    <movie-slider ref="slider" :id="id" :movie-data="slides" :type="type" variant="movie" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
   </div>
 </template>
 
@@ -23,6 +15,7 @@
 import { onMounted, ref } from 'vue'
 import MovieSlider from '@/components/MovieSlider.vue'
 import SectionHeading from '@/components/SectionHeading.vue'
+import RoundPagination from '@/components/RoundPagination.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
 
 const props = defineProps({
@@ -43,6 +36,13 @@ const index = ref(1)
 // The slider reports a 1-based slide number, the same as the page count shown beside the arrows.
 function onSlid(payload) {
   index.value = payload.index
+}
+
+const slider = ref(null)
+
+// The page control is 1-based; the carousel is 0-based.
+function goToSlide(page) {
+  slider.value?.goTo(page - 1)
 }
 
 onMounted(async () => {

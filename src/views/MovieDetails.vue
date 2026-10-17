@@ -1,75 +1,69 @@
 <template>
-  <div v-if="!loading" class="container-xxl detail-page">
-    <div class="detail-hero">
-      <div class="detail-hero-poster">
-        <button type="button" class="detail-poster-btn" aria-label="View posters" @click="openPosters">
-          <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
-        </button>
-      </div>
-      <div class="detail-hero-content">
-        <header class="detail-hero-header">
-          <div v-if="movieData.genres && movieData.genres.length" class="detail-tags">
-            <router-link v-for="g in movieData.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/movie', query: { genre: g.id } }">{{ g.name }}</router-link>
-          </div>
-          <h1 class="detail-title">{{ movieData.title }}</h1>
-          <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="movieData.original_language">{{ originalTitle }}</span></p>
-          <score-summary :score="movieData.vote_average || 0" :votes="movieData.vote_count || 0" :facts="summaryFacts"></score-summary>
-          <bookmark-button v-if="movieData.id" type="movie" :id="movieData.id"></bookmark-button>
-        </header>
+  <div v-if="!loading" class="detail-page">
+    <div class="page-card">
+      <div class="detail-hero">
+        <div class="detail-hero-poster">
+          <button type="button" class="detail-poster-btn" aria-label="View posters" @click="openPosters">
+            <async-image frame-class="detail-poster" :src="movieData.poster_path ? 'https://image.tmdb.org/t/p/w500' + movieData.poster_path : ''" :alt="movieData.title" />
+          </button>
+        </div>
+        <div class="detail-hero-content">
+          <header class="detail-hero-header">
+            <div v-if="movieData.genres && movieData.genres.length" class="detail-tags">
+              <router-link v-for="g in movieData.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/movie', query: { genre: g.id } }">{{ g.name }}</router-link>
+            </div>
+            <h1 class="detail-title">{{ movieData.title }}</h1>
+            <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="movieData.original_language">{{ originalTitle }}</span></p>
+            <score-summary :score="movieData.vote_average || 0" :votes="movieData.vote_count || 0" :facts="summaryFacts"></score-summary>
+            <bookmark-button v-if="movieData.id" type="movie" :id="movieData.id"></bookmark-button>
+          </header>
 
-        <dl v-if="directors.length || writers.length" class="detail-facts">
-          <div v-if="mergedDirectorWriter" class="detail-fact">
-            <dt>Director &amp; Writer</dt>
-            <dd>
-              <a class="detail-person" :href="`/person?id=${mergedDirectorWriter.id}`" @click.prevent="goTo('person', mergedDirectorWriter.id)">{{ mergedDirectorWriter.name }}</a>
-            </dd>
-          </div>
-          <template v-else>
-            <div v-if="directors.length" class="detail-fact">
-              <dt>Director</dt>
+          <dl v-if="directors.length || writers.length" class="detail-facts">
+            <div v-if="mergedDirectorWriter" class="detail-fact">
+              <dt>Director &amp; Writer</dt>
               <dd>
-                <template v-for="(person, index) in directors" :key="person.id">
-                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
-                </template>
+                <a class="detail-person" :href="`/person?id=${mergedDirectorWriter.id}`" @click.prevent="goTo('person', mergedDirectorWriter.id)">{{ mergedDirectorWriter.name }}</a>
               </dd>
             </div>
-            <div v-if="writers.length" class="detail-fact">
-              <dt>{{ writerLabel }}</dt>
-              <dd>
-                <template v-for="(person, index) in writers" :key="person.id">
-                  <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
-                </template>
-              </dd>
-            </div>
-          </template>
-        </dl>
+            <template v-else>
+              <div v-if="directors.length" class="detail-fact">
+                <dt>Director</dt>
+                <dd>
+                  <template v-for="(person, index) in directors" :key="person.id">
+                    <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < directors.length - 1" class="detail-fact-sep">,</span>
+                  </template>
+                </dd>
+              </div>
+              <div v-if="writers.length" class="detail-fact">
+                <dt>{{ writerLabel }}</dt>
+                <dd>
+                  <template v-for="(person, index) in writers" :key="person.id">
+                    <a class="detail-person" :href="`/person?id=${person.id}`" @click.prevent="goTo('person', person.id)">{{ person.name }}</a><span v-if="index < writers.length - 1" class="detail-fact-sep">,</span>
+                  </template>
+                </dd>
+              </div>
+            </template>
+          </dl>
 
-        <div class="detail-overview-block">
-          <p v-if="movieData.tagline" class="detail-tagline">{{ movieData.tagline }}</p>
-          <p class="detail-overview">{{ movieData.overview }}</p>
+          <div class="detail-overview-block">
+            <p v-if="movieData.tagline" class="detail-tagline">{{ movieData.tagline }}</p>
+            <p class="detail-overview">{{ movieData.overview }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <media-strip v-if="imagesLoading || images.backdrops.length" :items="images.backdrops" :loading="imagesLoading" @open="openViewer('backdrops', $event)" />
+      <media-strip v-if="imagesLoading || images.backdrops.length" :items="images.backdrops" :loading="imagesLoading" @open="openViewer('backdrops', $event)" />
+    </div>
 
     <media-section v-if="cast.length" :items="cast" />
 
     <section v-if="recommendations.length" class="detail-section">
       <section-heading eyebrow="More Like This" title="Recommended Movies">
         <template #actions>
-          <div v-if="recTotal > 1" class="round-pagination">
-            <button type="button" class="round-pagination-btn" :disabled="recIndex <= 1" :aria-disabled="recIndex <= 1" aria-label="Previous recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="prev">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
-            </button>
-            <span class="round-pagination-count" aria-live="polite">{{ recIndex }} / {{ recTotal }}</span>
-            <button type="button" class="round-pagination-btn" :disabled="recIndex >= recTotal" :aria-disabled="recIndex >= recTotal" aria-label="Next recommendations" data-bs-target="#recommendations-carousel" data-bs-slide="next">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
-            </button>
-          </div>
+          <round-pagination :page="recIndex" :page-count="recTotal" @update:page="goToRec" />
         </template>
       </section-heading>
-      <movie-slider id="recommendations-carousel" variant="movie" :movie-data="recommendationChunks" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
+      <movie-slider ref="recSlider" id="recommendations-carousel" variant="movie" :movie-data="recommendationChunks" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
     </section>
 
     <media-viewer
@@ -91,6 +85,7 @@ import api from '@/api'
 import MovieSlider from '../components/MovieSlider.vue'
 import MediaSection from '../components/MediaSection.vue'
 import SectionHeading from '../components/SectionHeading.vue'
+import RoundPagination from '../components/RoundPagination.vue'
 import { formatDate } from '@/utils/date'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
@@ -160,6 +155,13 @@ const recTotal = computed(() => recommendationChunks.value.length)
 
 function onRecSlid(payload) {
   recIndex.value = payload.index
+}
+
+const recSlider = ref(null)
+
+// The page control is 1-based; the carousel is 0-based.
+function goToRec(page) {
+  recSlider.value?.goTo(page - 1)
 }
 const directors = computed(() => [...new Map(crew.value.filter(person => person.job === 'Director').map(person => [person.id, person])).values()])
 const writers = computed(() => [...new Map(crew.value.filter(person => ['Writer', 'Screenplay', 'Story'].includes(person.job)).map(person => [person.id, person])).values()])

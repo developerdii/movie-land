@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <navbar></navbar>
-    <div class="router-view container-xxl shadow-sm" :class="{ 'router-view--compact': route.meta.compactCard }">
+    <div class="router-view container-xxl" :class="{ 'router-view--compact': route.meta.compactCard }">
       <router-view />
     </div>
   </div>

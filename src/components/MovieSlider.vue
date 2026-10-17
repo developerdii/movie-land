@@ -1,5 +1,5 @@
 <template>
-  <slider :id="id" :show-indicators="showIndicators" :show-position="showPosition" :show-arrows="showArrows" @slid="$emit('slid', $event)">
+  <slider ref="slider" :id="id" :show-indicators="showIndicators" :show-position="showPosition" :show-arrows="showArrows" @slid="$emit('slid', $event)">
     <template #card>
       <div class="carousel-item" :class="index === 0 ? 'active' : ''" v-for="(row, index) in movieData" :key="index">
         <div class="movie-card-row">
@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Slider from './Slider.vue'
 import PosterCard from './PosterCard.vue'
@@ -35,6 +36,11 @@ const props = defineProps({
 })
 
 defineEmits(['slid'])
+
+const slider = ref(null)
+
+// Moves to a 0-based slide, for the shared page control.
+defineExpose({ goTo: (index) => slider.value?.goTo(index) })
 
 const router = useRouter()
 

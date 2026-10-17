@@ -1,5 +1,5 @@
 <template>
-  <article class="about-page">
+  <article class="about-page page-card">
     <h1 class="about-title">About Movie Land</h1>
 
     <p>

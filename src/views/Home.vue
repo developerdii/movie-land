@@ -6,13 +6,13 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 mt-5 mb-5">
+      <div class="col-md-12 page-block">
         <up-coming />
       </div>
     </div>
     <!-- Sections from the newest movie and TV bookmarks. Each one stays hidden unless TMDB has at least 6 titles for it. -->
     <div v-for="source in forYou" :key="source.type + source.id" class="row">
-      <div class="col-md-12 mt-5 mb-5">
+      <div class="col-md-12 page-block">
         <list-section
           :id="'for-you-' + source.type + '-' + source.id"
           :eyebrow="'Because you bookmarked ' + source.title"
@@ -24,17 +24,17 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 mt-5 mb-5">
+      <div class="col-md-12 page-block">
         <list-section id="popular-movies-carousel" eyebrow="Right now" title="Popular Movies" type="movie" :load="api.getPopularMovies" />
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 mt-5 mb-5">
+      <div class="col-md-12 page-block">
         <list-section id="popular-tv-carousel" eyebrow="Right now" title="Popular TV Shows" type="tv" :load="api.getPopularTv" />
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 mt-5 mb-5">
+      <div class="col-md-12 page-block">
         <list-section id="top-rated-carousel" eyebrow="All time" title="Top Rated Movies" type="movie" :load="api.getTopRatedMovies" />
       </div>
     </div>

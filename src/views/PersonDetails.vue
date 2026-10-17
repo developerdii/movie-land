@@ -1,48 +1,50 @@
 <template>
-  <div v-if="!loading" class="container-xxl detail-page">
-    <div class="row g-4 detail-content person-detail-content">
-      <div class="col-5 col-sm-4 col-lg-3">
-        <button v-if="person.profile_path" type="button" class="detail-poster-btn" aria-label="View photos" @click="openPhotos">
-          <async-image kind="person" frame-class="detail-poster" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name" />
-        </button>
-        <div v-else class="detail-poster person-detail-initials" aria-hidden="true">{{ personInitials }}</div>
-      </div>
-      <div class="col-12 col-sm-8 col-lg-9">
-        <div class="detail-hero-header">
-          <div v-if="person.known_for_department" class="person-eyebrow">
-            <span class="person-eyebrow-dash" aria-hidden="true"></span>
-            <span class="section-heading-eyebrow">{{ person.known_for_department }}</span>
-          </div>
-          <h1 class="detail-title">{{ person.name }}</h1>
-          <bookmark-button v-if="person.id" type="person" :id="person.id"></bookmark-button>
-          <dl class="detail-facts">
-            <div v-if="bornValue" class="detail-fact">
-              <dt>{{ bornLabel }}</dt>
-              <dd class="detail-fact-stack">
-                <span>{{ bornValue }}</span>
-                <span v-if="person.place_of_birth" class="detail-fact-sub">{{ person.place_of_birth }}</span>
-              </dd>
-            </div>
-            <div v-if="person.known_for_department" class="detail-fact">
-              <dt>Known for</dt>
-              <dd>{{ person.known_for_department }}</dd>
-            </div>
-            <div v-if="creditCount" class="detail-fact">
-              <dt>Credits</dt>
-              <dd>{{ creditCount }}</dd>
-            </div>
-          </dl>
-        </div>
-        <div v-if="person.biography" class="person-biography-wrap">
-          <p ref="bioElement" class="detail-overview person-biography" :class="{ 'is-collapsed': !bioExpanded }">{{ person.biography }}</p>
-          <button v-if="bioNeedsToggle" type="button" class="read-more-link" :aria-expanded="bioExpanded" @click="bioExpanded = !bioExpanded">
-            {{ bioExpanded ? 'Show less' : 'Read more' }}
+  <div v-if="!loading" class="detail-page">
+    <div class="page-card">
+      <div class="row g-4 detail-content person-detail-content">
+        <div class="col-5 col-sm-4 col-lg-3">
+          <button v-if="person.profile_path" type="button" class="detail-poster-btn" aria-label="View photos" @click="openPhotos">
+            <async-image kind="person" frame-class="detail-poster" :src="'https://image.tmdb.org/t/p/w500' + person.profile_path" :alt="person.name" />
           </button>
+          <div v-else class="detail-poster person-detail-initials" aria-hidden="true">{{ personInitials }}</div>
+        </div>
+        <div class="col-12 col-sm-8 col-lg-9">
+          <div class="detail-hero-header">
+            <div v-if="person.known_for_department" class="person-eyebrow">
+              <span class="person-eyebrow-dash" aria-hidden="true"></span>
+              <span class="section-heading-eyebrow">{{ person.known_for_department }}</span>
+            </div>
+            <h1 class="detail-title">{{ person.name }}</h1>
+            <bookmark-button v-if="person.id" type="person" :id="person.id"></bookmark-button>
+            <dl class="detail-facts">
+              <div v-if="bornValue" class="detail-fact">
+                <dt>{{ bornLabel }}</dt>
+                <dd class="detail-fact-stack">
+                  <span>{{ bornValue }}</span>
+                  <span v-if="person.place_of_birth" class="detail-fact-sub">{{ person.place_of_birth }}</span>
+                </dd>
+              </div>
+              <div v-if="person.known_for_department" class="detail-fact">
+                <dt>Known for</dt>
+                <dd>{{ person.known_for_department }}</dd>
+              </div>
+              <div v-if="creditCount" class="detail-fact">
+                <dt>Credits</dt>
+                <dd>{{ creditCount }}</dd>
+              </div>
+            </dl>
+          </div>
+          <div v-if="person.biography" class="person-biography-wrap">
+            <p ref="bioElement" class="detail-overview person-biography" :class="{ 'is-collapsed': !bioExpanded }">{{ person.biography }}</p>
+            <button v-if="bioNeedsToggle" type="button" class="read-more-link" :aria-expanded="bioExpanded" @click="bioExpanded = !bioExpanded">
+              {{ bioExpanded ? 'Show less' : 'Read more' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <media-strip v-if="taggedPreviewLoading || tagged.length" :items="tagged" :loading="taggedPreviewLoading" @open="openTagged" />
+      <media-strip v-if="taggedPreviewLoading || tagged.length" :items="tagged" :loading="taggedPreviewLoading" @open="openTagged" />
+    </div>
 
     <media-section v-if="movieCredits.length" kind="movie" eyebrow="Filmography" title="Movies" :items="movieCredits" />
 

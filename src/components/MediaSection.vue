@@ -12,30 +12,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"></path></svg>
           </button>
         </div>
-        <div v-if="pageCount > 1" class="round-pagination">
-          <button type="button" class="round-pagination-btn" :disabled="!canPrev || loading" :aria-disabled="!canPrev || loading" aria-label="Previous" @click="prevPage">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
-          </button>
-          <div class="round-pagination-jump">
-            <input
-              type="number"
-              inputmode="numeric"
-              class="round-pagination-input"
-              :value="pageIndex + 1"
-              :min="1"
-              :max="pageCount"
-              :style="{ width: 'calc(' + String(pageCount).length + 'ch + 6px)' }"
-              :disabled="loading"
-              :aria-label="'Current page, 1 to ' + pageCount"
-              @change="jumpTo"
-              @keydown.enter.prevent="$event.target.blur()"
-            >
-            <span class="round-pagination-total" aria-live="polite">/ {{ pageCount }}</span>
-          </div>
-          <button type="button" class="round-pagination-btn" :disabled="!canNext || loading" :aria-disabled="!canNext || loading" aria-label="Next" @click="nextPage">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
-          </button>
-        </div>
+        <round-pagination :page="pageIndex + 1" :page-count="pageCount" :disabled="loading" @update:page="goToPage($event - 1)" />
       </template>
     </section-heading>
 
@@ -93,6 +70,7 @@ import { useRouter } from 'vue-router'
 import PosterCard from './PosterCard.vue'
 import PosterCardSkeleton from './PosterCardSkeleton.vue'
 import SectionHeading from './SectionHeading.vue'
+import RoundPagination from './RoundPagination.vue'
 
 const props = defineProps({
   items: { type: Array, default: () => [] },
@@ -132,32 +110,9 @@ const pagedItems = computed(() => (
     ? props.items
     : props.items.slice(localPage.value * pageSize.value, (localPage.value + 1) * pageSize.value)
 ))
-const canPrev = computed(() => pageIndex.value > 0)
-const canNext = computed(() => pageIndex.value < pageCount.value - 1)
-const pageLabel = computed(() => (pageIndex.value + 1) + ' / ' + pageCount.value)
-
 function goToPage(index) {
   if (props.serverPaged) emit('update:page', index + 1)
   else localPage.value = index
-}
-
-// Typed page numbers are clamped to 1..pageCount; anything unreadable goes back to the current page.
-function jumpTo(event) {
-  const input = event.target
-  const requested = Math.round(Number(input.value))
-  const target = Number.isFinite(requested) && input.value !== ''
-    ? Math.min(Math.max(requested, 1), pageCount.value)
-    : pageIndex.value + 1
-  input.value = String(target)
-  if (target - 1 !== pageIndex.value) goToPage(target - 1)
-}
-
-function nextPage() {
-  if (canNext.value) goToPage(pageIndex.value + 1)
-}
-
-function prevPage() {
-  if (canPrev.value) goToPage(pageIndex.value - 1)
 }
 
 watch(view, () => { localPage.value = 0 })
@@ -228,44 +183,6 @@ function initials(name) {
 .cast-row-skeleton-bar--name { flex: 1 1 auto; max-width: 260px; height: 14px; }
 .cast-row-skeleton-bar--role { flex: none; width: 90px; }
 
-.round-pagination-jump {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  height: 48px;
-  min-width: 112px;
-  padding: 0 18px;
-  border: 1px solid var(--ml-control-line);
-  border-radius: 999px;
-  background: var(--ml-surface);
-  color: var(--ml-muted);
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.round-pagination-jump:focus-within { border-color: var(--ml-brand-accent); }
-.round-pagination-input {
-  flex: none;
-  width: 3ch;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ml-ink);
-  font: inherit;
-  font-weight: 700;
-  text-align: center;
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-.round-pagination-input::-webkit-outer-spin-button,
-.round-pagination-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.round-pagination-input:hover { background: var(--ml-control-bg); }
-.round-pagination-input:focus { outline: none; background: var(--ml-control-bg); }
-.round-pagination-total { white-space: nowrap; }
-
 .cast-list {
   list-style: none; margin: 0; padding: 0;
   display: grid;
@@ -323,10 +240,6 @@ function initials(name) {
 @media (max-width: 767.98px) {
   /* Two cards per row on phones, like the browse grid, instead of one card per screen. */
   .cast-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
-  /* 16px stops iOS from zooming the page when the page number is typed. */
-  .round-pagination-input { font-size: 16px; }
-  .round-pagination-btn { width: 44px; height: 44px; }
-  .round-pagination-jump { height: 44px; min-width: 96px; padding: 0 12px; }
   .cast-seg-btn { width: 40px; }
 }
 </style>
