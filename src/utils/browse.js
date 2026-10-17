@@ -36,6 +36,27 @@ export const MAX_RATING_OPTIONS = [
   { value: '8', label: 'Up to 8' }
 ]
 
+// Minimum number of votes (TMDB vote_count.gte), to leave out titles with only a few ratings.
+export const MIN_VOTES_OPTIONS = [
+  { value: '10', label: '10+' },
+  { value: '50', label: '50+' },
+  { value: '100', label: '100+' },
+  { value: '500', label: '500+' },
+  { value: '1000', label: '1,000+' },
+  { value: '5000', label: '5,000+' },
+  { value: '10000', label: '10,000+' }
+]
+
+// Maximum number of votes (TMDB vote_count.lte), to find lesser-known titles.
+export const MAX_VOTES_OPTIONS = [
+  { value: '10', label: 'Up to 10' },
+  { value: '50', label: 'Up to 50' },
+  { value: '100', label: 'Up to 100' },
+  { value: '500', label: 'Up to 500' },
+  { value: '1000', label: 'Up to 1,000' },
+  { value: '5000', label: 'Up to 5,000' }
+]
+
 // Runtime buckets in minutes (TMDB with_runtime.gte / with_runtime.lte).
 export const RUNTIME_OPTIONS = [
   { value: 'short', label: 'Under 90 min', params: { 'with_runtime.lte': 89 } },
@@ -53,6 +74,8 @@ const SORT_PATTERN = /^(popularity|release_date|vote_average)\.(asc|desc)$/
 const RATING_VALUES = RATING_OPTIONS.map((option) => option.value)
 const MAX_RATING_VALUES = MAX_RATING_OPTIONS.map((option) => option.value)
 const RUNTIME_VALUES = RUNTIME_OPTIONS.map((option) => option.value)
+const MIN_VOTES_VALUES = MIN_VOTES_OPTIONS.map((option) => option.value)
+const MAX_VOTES_VALUES = MAX_VOTES_OPTIONS.map((option) => option.value)
 
 function first(value) {
   return Array.isArray(value) ? value[0] : value
@@ -66,6 +89,8 @@ export function parseBrowseQuery(query = {}) {
   const rating = first(query.rating) || ''
   const maxRating = first(query.maxRating) || ''
   const runtime = first(query.runtime) || ''
+  const minVotes = first(query.minVotes) || ''
+  const maxVotes = first(query.maxVotes) || ''
   const sort = first(query.sort) || ''
   const page = parseInt(first(query.page), 10)
   return {
@@ -77,6 +102,8 @@ export function parseBrowseQuery(query = {}) {
     rating: RATING_VALUES.includes(rating) ? rating : '',
     maxRating: MAX_RATING_VALUES.includes(maxRating) ? maxRating : '',
     runtime: RUNTIME_VALUES.includes(runtime) ? runtime : '',
+    minVotes: MIN_VOTES_VALUES.includes(minVotes) ? minVotes : '',
+    maxVotes: MAX_VOTES_VALUES.includes(maxVotes) ? maxVotes : '',
     sort: SORT_PATTERN.test(sort) ? sort : DEFAULT_SORT,
     page: page >= 1 && page <= MAX_PAGES ? page : 1
   }
@@ -93,14 +120,16 @@ export function toBrowseQuery(state) {
   if (state.rating) query.rating = state.rating
   if (state.maxRating) query.maxRating = state.maxRating
   if (state.runtime) query.runtime = state.runtime
+  if (state.minVotes) query.minVotes = state.minVotes
+  if (state.maxVotes) query.maxVotes = state.maxVotes
   if (state.sort !== DEFAULT_SORT) query.sort = state.sort
   if (state.page > 1) query.page = String(state.page)
   return query
 }
 
-// True when a filter in the collapsible second row is set (language, min rating, runtime).
+// True when a filter in the collapsible rows below the main bar is set (language, ratings, runtime, votes).
 export function hasMoreFilters(state) {
-  return Boolean(state.language || state.rating || state.maxRating || state.runtime)
+  return Boolean(state.language || state.rating || state.maxRating || state.runtime || state.minVotes || state.maxVotes)
 }
 
 export function sortField(sort) {
@@ -129,7 +158,10 @@ export function buildDiscoverParams(state, type) {
   if (state.rating) params['vote_average.gte'] = state.rating
   if (state.maxRating) params['vote_average.lte'] = state.maxRating
   if (state.runtime) Object.assign(params, RUNTIME_OPTIONS.find((option) => option.value === state.runtime).params)
-  if (field === 'vote_average' || state.rating || state.maxRating) params['vote_count.gte'] = MIN_VOTE_COUNT
+  // Rating sort and rating filters always need MIN_VOTE_COUNT votes; a chosen minimum can only raise it.
+  const minVotes = Math.max(Number(state.minVotes) || 0, (field === 'vote_average' || state.rating || state.maxRating) ? MIN_VOTE_COUNT : 0)
+  if (minVotes) params['vote_count.gte'] = minVotes
+  if (state.maxVotes) params['vote_count.lte'] = state.maxVotes
   return params
 }
 

@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import { BROWSE_TYPES } from '../utils/browse'
+import { BOOKMARK_TYPES, firstBookmarkedType } from '../composables/useBookmarks'
 
 const routes = [
   {
@@ -24,11 +25,24 @@ const routes = [
     component: () => import('../views/PersonDetails.vue')
   },
   {
-    // Filterable lists. Not linked from the navbar or home page: reached from
-    // the search "Browse all" link and from genre tags on detail pages.
+    // Filterable lists. Reached from the navbar Browse button, the search "Browse all" link
+    // and genre tags on detail pages.
     path: '/browse/:type',
     name: 'Browse',
     component: () => import('../views/BrowseView.vue')
+  },
+  {
+    // Saved titles, by type. /bookmarks alone opens the first type that has saved titles.
+    path: '/bookmarks/:type?',
+    name: 'Bookmarks',
+    component: () => import('../views/BookmarksView.vue')
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/About.vue'),
+    // Short page: the card gets narrower and its height follows the text (see .router-view--compact).
+    meta: { compactCard: true }
   }
 ]
 
@@ -43,6 +57,7 @@ const router = createRouter({
 // the :type param changes (e.g. /browse/movie -> /browse/banana).
 router.beforeEach((to) => {
   if (to.name === 'Browse' && !BROWSE_TYPES.includes(to.params.type)) return { path: '/browse/movie' }
+  if (to.name === 'Bookmarks' && !BOOKMARK_TYPES.includes(to.params.type)) return { path: '/bookmarks/' + firstBookmarkedType() }
 })
 
 export default router

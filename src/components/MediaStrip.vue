@@ -86,7 +86,7 @@ const remaining = computed(() => Math.max(props.items.length - props.max, 0))
 .media-strip__tile--skeleton {
   display: block;
   cursor: default;
-  background: #eceef2;
+  background: var(--ml-skeleton);
 }
 .media-strip__tile--skeleton:hover { transform: none; box-shadow: none; }
 

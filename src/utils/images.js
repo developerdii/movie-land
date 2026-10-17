@@ -12,7 +12,12 @@ export function sortImages(list = []) {
   ))
 }
 
-// Keeps only what the viewer needs: the TMDB file path and an optional caption.
+// Keeps only what the viewer needs: the TMDB file path, the image's shape (so its loading skeleton
+// has the same proportions) and an optional caption.
 export function toViewerItems(list = [], caption = () => '') {
-  return list.map((image) => ({ path: image.file_path, caption: caption(image) }))
+  return list.map((image) => ({
+    path: image.file_path,
+    ratio: image.width && image.height ? image.width / image.height : null,
+    caption: caption(image)
+  }))
 }

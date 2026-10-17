@@ -196,16 +196,16 @@ function initials(name) {
 
 
 <style lang="scss">
-.cast-seg { display: flex; gap: 4px; padding: 4px; background: #f4f5f7; border: 1px solid #d9dde3; border-radius: 999px; }
+.cast-seg { display: flex; gap: 4px; padding: 4px; background: var(--ml-control-bg); border: 1px solid var(--ml-control-line); border-radius: 999px; }
 .cast-seg-btn {
   width: 44px; height: 40px;
   border: 0; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
-  background: transparent; color: #8a93a0;
+  background: transparent; color: var(--ml-subtle);
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease;
 }
-.cast-seg-btn:hover:not(.active) { color: var(--ml-brand-dark); }
+.cast-seg-btn:hover:not(.active) { color: var(--ml-ink); }
 .cast-seg-btn.active { background: var(--ml-brand-accent); color: var(--ml-brand-dark); }
 .cast-seg-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
 
@@ -234,7 +234,7 @@ function initials(name) {
   height: 48px;
   min-width: 112px;
   padding: 0 18px;
-  border: 1px solid #d9dde3;
+  border: 1px solid var(--ml-control-line);
   border-radius: 999px;
   background: var(--ml-surface);
   color: var(--ml-muted);
@@ -260,8 +260,8 @@ function initials(name) {
 }
 .round-pagination-input::-webkit-outer-spin-button,
 .round-pagination-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.round-pagination-input:hover { background: #f4f5f7; }
-.round-pagination-input:focus { outline: none; background: #f4f5f7; }
+.round-pagination-input:hover { background: var(--ml-control-bg); }
+.round-pagination-input:focus { outline: none; background: var(--ml-control-bg); }
 .round-pagination-total { white-space: nowrap; }
 
 .cast-list {
@@ -279,16 +279,16 @@ function initials(name) {
   cursor: pointer;
   transition: background-color .15s ease;
 }
-.cast-row:hover { background: #f6f7fa; }
+.cast-row:hover { background: var(--ml-tint); }
 
 .cast-avatar {
   width: 48px; height: 48px; flex: none;
   border-radius: 999px;
-  background: #eef0f4;
+  background: var(--ml-avatar);
   border: 1px solid var(--ml-line);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  font-weight: 700; font-size: 15px; color: #8a93a0;
+  font-weight: 700; font-size: 15px; color: var(--ml-subtle);
 }
 .cast-avatar--poster { width: 36px; height: 54px; border-radius: 4px; }
 .cast-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -304,8 +304,8 @@ function initials(name) {
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
-  background: #f1f3f6;
-  color: #4a5568;
+  background: var(--ml-chip);
+  color: var(--ml-text-2);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .08em;
@@ -315,6 +315,16 @@ function initials(name) {
 
 @media (max-width: 639.98px) {
   .cast-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767.98px) {
+  /* Two cards per row on phones, like the browse grid, instead of one card per screen. */
+  .cast-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  /* 16px stops iOS from zooming the page when the page number is typed. */
+  .round-pagination-input { font-size: 16px; }
+  .round-pagination-btn { width: 44px; height: 44px; }
+  .round-pagination-jump { height: 44px; min-width: 96px; padding: 0 12px; }
+  .cast-seg-btn { width: 40px; }
 }
 </style>
 

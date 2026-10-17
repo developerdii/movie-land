@@ -37,11 +37,7 @@
               <router-link class="hero-btn hero-btn-primary" :to="{ path: '/movie', query: { id: activeMovie.id } }">
                 <i class="bi bi-play-fill" aria-hidden="true"></i>View details
               </router-link>
-              <!-- Watchlist: feature not implemented yet, keep for later
-              <button type="button" class="hero-btn hero-btn-ghost">
-                <i class="bi bi-plus-lg" aria-hidden="true"></i>Watchlist
-              </button>
-              -->
+              <bookmark-button variant="pill" type="movie" :id="activeMovie.id" class="hero-btn hero-btn-ghost"></bookmark-button>
             </div>
           </div>
         </div>
@@ -94,6 +90,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '@/api'
 import AsyncImage from '@/components/AsyncImage.vue'
+import BookmarkButton from '@/components/BookmarkButton.vue'
 import { formatDate } from '@/utils/date'
 
 const popularMovies = ref([])
@@ -370,6 +367,12 @@ onBeforeUnmount(() => {
   color: #f4f2ee;
 }
 .hero-btn-ghost:hover { background: rgba(255, 255, 255, .08); color: #f4f2ee; }
+/* Bookmarked on the hero: the ghost button in the accent colour. The hero is always dark, so the text stays light. */
+.hero-stage .hero-btn-ghost.is-active {
+  border-color: var(--ml-brand-accent);
+  background: rgba(233, 154, 22, .16);
+  color: #f4f2ee;
+}
 
 .hero-btn:focus-visible,
 .hero-nav-btn:focus-visible,
@@ -529,10 +532,17 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 767.98px) {
-  .hero-stage { height: 640px; }
-  .hero-content { padding: 20px; }
+  /* The height follows the content, so the copy is never clipped on narrow phones. */
+  .hero-stage { height: auto; min-height: 560px; }
+  /* The copy spans the full width here, so the scrim darkens from the bottom and keeps the text readable. */
+  .hero-scrim {
+    background:
+      linear-gradient(0deg, rgba(20, 20, 24, .97) 0%, rgba(20, 20, 24, .88) 50%, rgba(20, 20, 24, .6) 100%);
+  }
+  .hero-content { padding: 20px; overflow: visible; }
   .hero-main { gap: 16px; }
   .hero-poster.media-image-frame { width: clamp(90px, 24vw, 140px); }
+  .hero-eyebrow { font-size: 11px; letter-spacing: .14em; white-space: normal; }
   .hero-title { font-size: clamp(32px, 9vw, 48px); }
   .hero-overview { font-size: 14px; line-height: 1.5; }
   .hero-btn { height: 44px; padding: 0 18px; font-size: 14px; }
@@ -540,10 +550,12 @@ onBeforeUnmount(() => {
   .hero-upnext { gap: 12px 14px; padding: 12px 16px; }
   .hero-nav-btn { width: 42px; height: 42px; }
   .hero-progress { flex: 1 1 100%; min-width: 0; }
-  .hero-upnext-grid { flex: 1 1 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .hero-thumb { height: 56px; gap: 8px; padding: 6px; }
-  .hero-thumb-media.media-image-frame { width: 44px; }
+  .hero-upnext-grid { flex: 1 1 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  /* Up-next tiles stack: the still on top, the title under it, so neither is cut off. */
+  .hero-thumb { height: auto; flex-direction: column; align-items: stretch; gap: 6px; padding: 6px; }
+  .hero-thumb-media.media-image-frame { width: 100%; }
+  .hero-thumb-text { gap: 1px; }
   .hero-thumb-num { font-size: 10px; }
-  .hero-thumb-title { font-size: 12px; }
+  .hero-thumb-title { font-size: 12px; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
 </style>

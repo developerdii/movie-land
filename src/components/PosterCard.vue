@@ -179,7 +179,7 @@ function onClick() {
   border-radius: 16px;
   /* Transparent on purpose: a dark background under a white poster leaves a dark fringe on its edges. */
   background: transparent;
-  color: var(--ml-surface);
+  color: var(--ml-white);
   box-shadow: 0 2px 4px rgba(var(--ml-brand-dark-rgb), .04), 0 10px 24px rgba(var(--ml-brand-dark-rgb), .08);
   text-decoration: none;
   cursor: pointer;
@@ -254,7 +254,7 @@ function onClick() {
   font-weight: 800;
   font-size: 24px;
   line-height: 1;
-  color: var(--ml-surface);
+  color: var(--ml-white);
 }
 
 .poster-card__countdown {
@@ -287,7 +287,7 @@ function onClick() {
   gap: 4px;
   font-size: 12px;
   font-weight: 800;
-  color: var(--ml-surface);
+  color: var(--ml-white);
 }
 .poster-card__rating i { color: var(--ml-brand-accent); font-size: 12px; }
 
@@ -305,7 +305,7 @@ function onClick() {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .08em;
-  color: var(--ml-surface);
+  color: var(--ml-white);
 }
 
 .poster-card__voice {
@@ -323,7 +323,7 @@ function onClick() {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .08em;
-  color: var(--ml-surface);
+  color: var(--ml-white);
 }
 .poster-card__voice i { color: var(--ml-brand-accent); }
 
@@ -344,7 +344,7 @@ function onClick() {
   height: 22px;
   padding: 0 8px;
   border-radius: 6px;
-  background: #f1f3f6;
+  background: var(--ml-chip);
   display: inline-flex;
   align-items: center;
   font-size: 10px;
@@ -352,7 +352,7 @@ function onClick() {
   letter-spacing: .08em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: #4a5568;
+  color: var(--ml-text-2);
 }
 .card-info {
   position: relative;
@@ -390,7 +390,7 @@ function onClick() {
   font-size: 16px;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--ml-surface);
+  color: var(--ml-white);
   text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
   display: -webkit-box;
   overflow: hidden;

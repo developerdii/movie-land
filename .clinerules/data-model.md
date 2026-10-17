@@ -1,10 +1,18 @@
 # Data Model (TMDB API)
 
-MovieLand has no local persistence — all data comes from TMDB. This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
+All title data comes from TMDB. The only things MovieLand saves on the device are the dark mode choice (`movieland-theme`) and the bookmarks (`movieland-bookmarks`, TMDB ids only, see Bookmarks below). This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
 
 ## Auth
 - `src/api.js` sets `Authorization: Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}` (a TMDB **API Read Access Token**, a v4 JWT).
 - Provide the token in `.env.local` (local dev). For the deploy workflow, the read-only public token is embedded directly in `.github/workflows/deploy.yml` (no repo secret). See `.env.example`.
+
+## Attribution and terms
+- Read TMDB's [API terms of use](https://www.themoviedb.org/api-terms-of-use) and [logos & attribution](https://www.themoviedb.org/about/logos-attribution) before changing anything that touches TMDB data. The terms are the source of truth; this section is a summary.
+- **Non-commercial only.** No ads, paid tiers, accounts that pay, or sponsored content on any page. Commercial use needs a separate written agreement with TMDB.
+- **Required notice**, shown on the About page, which every page reaches with the navbar's info icon: "This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." There is no footer. TMDB's terms ask for the notice to be placed prominently in or on the application, not on every page.
+- **Logo:** TMDB's official "blue long" logo (shown on the About page). It stays smaller than our own wordmark, and it links to themoviedb.org. The logo is loaded from TMDB's own asset URL, not copied into the repo.
+- **Caching:** TMDB data may not be cached for more than six months. The app keeps no TMDB title data in localStorage or any store. The only saved TMDB values are the bookmark ids, so do not add persistent caching of API responses without checking the terms.
+- **No AI or machine learning** with TMDB data (training, datasets, or features built on it).
 
 ## Base URLs
 - API: `https://api.themoviedb.org/3/` (v3 — read-only data).
@@ -18,12 +26,13 @@ MovieLand has no local persistence — all data comes from TMDB. This file docum
 ## Endpoints (via `src/api.js`)
 | Method | Endpoint | Used by |
 | --- | --- | --- |
-| `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider`, `SearchBar` (default list) |
+| `getPopularMovies()` | `GET /movie/popular` | `PopularMoviesSlider`, `SearchBar` (default list), `Home` (Popular Movies section) |
+| `getTopRatedMovies()` | `GET /movie/top_rated` | `Home` (Top Rated Movies section) |
 | `getMovieGenres()` | `GET /genre/movie/list` | `SearchBar` (genre tags), `PopularMoviesSlider` (hero genre) |
 | `getTvGenres()` | `GET /genre/tv/list` | `SearchBar` (genre tags) |
 | `getLanguages()` | `GET /configuration/languages` | `BrowseView` (language filter) |
 | `getCountries()` | `GET /configuration/countries` | `BrowseView` (country filter) |
-| `getPopularTv()` | `GET /tv/popular` | `SearchBar` (default list) |
+| `getPopularTv()` | `GET /tv/popular` | `SearchBar` (default list), `Home` (Popular TV Shows section) |
 | `getSearch(mediaType, searchText, page)` | `GET /search/{media_type}?query={text}&page={n}` | `SearchBar`, `BrowseView` (when a search text is set) |
 | `getDiscover(mediaType, params)` | `GET /discover/{media_type}` (movie or tv) | `BrowseView` |
 | `getUpComing(fromDate)` | `GET /discover/movie` (see Discover below) | `UpComing` |
@@ -57,8 +66,8 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
   - movie: `id`, `title`, `poster_path`, `backdrop_path`, `release_date`, `overview`, `vote_average`, `genre_ids`, `runtime`.
   - tv: `id`, `name`, `poster_path`, `first_air_date`, `overview`, `vote_average`, `number_of_seasons`, `episode_run_time`.
   - person: `id`, `name`, `profile_path`, `popularity`, `known_for_department`.
-- `getMovieDetails` adds `genres: [{id, name}]`, `tagline`, `runtime`, `original_language`.
-- `getTvDetails` adds `genres`, `tagline`, `number_of_seasons`, `number_of_episodes`, `episode_run_time`, `first_air_date`, `last_air_date`, `status`, `created_by`.
+- `getMovieDetails` adds `genres: [{id, name}]`, `tagline`, `runtime`, `original_language`, `original_title`, `vote_count`.
+- `getTvDetails` adds `genres`, `tagline`, `number_of_seasons`, `number_of_episodes`, `episode_run_time`, `first_air_date`, `last_air_date`, `status`, `created_by`, `original_name`, `vote_count`. The detail pages show the original title (`original_title` / `original_name`) as a small muted "Original title: …" line under the page title, only when it differs from the displayed title (compared case-insensitively), with `lang` set from `original_language`. The detail pages show the score in `ScoreSummary`: a gold ring with `vote_average` (one decimal), "User score", and the compact vote count (`33K votes`, exact number in a tooltip; formatting in `src/utils/votes.js`). Beside it, two or three facts: on films the release date (emphasised), runtime and a non-English language; on TV the air dates (emphasised), seasons and episodes, then episode runtime and language.
 - `getPersonDetails` adds `biography`, `birthday`, `deathday`, `place_of_birth`, `known_for_department`, `popularity`.
 - Credits return `{ cast: [...], crew: [...] }`. Person pages merge cast and crew by title id, so a film is listed once even when the person acted and also worked behind the camera. The filmography and the "Credits" count (unique movies plus unique TV shows) both use the merged list. Christopher Nolan (id 525) has 33 cast and 78 crew movie credits, and his crew films are now included. Filmography rules (`visibleRoles` and `BADGE_PRIORITY` in PersonDetails). A film that has the person's main role (`known_for_department`) shows no roles at all, so a director's own films get no badge, and neither does a writer's written films. On every other film, the roles the person had there are shown. The grid card gets one badge, the first by priority: Directing, then Writing, then Acting. Directing comes from crew job Director, Writing from Writer, Screenplay, Story or Teleplay, Acting from cast. `PosterCard` shows the badge as a light pill, top right, the same style as the ACTING pill in the list view. Each entry also carries `allRoles` (Acting, Directing, Writing, whichever apply), which the list view shows as pills.
 - Person search results may carry `known_for: [...]`.
@@ -72,13 +81,13 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 
 ## Browse (filtered lists)
 `/browse/:type` (`movie`, `tv`, `person`) is a full-page, server-paged list. The URL is its only state:
-- Query params: `q` (search text), `genre` (one genre id), `year`, `language` (ISO 639-1, e.g. `fr`), `country` (ISO 3166-1, e.g. `FR`), `rating` (minimum, `5`–`8`), `maxRating` (maximum, `4`–`8`), `runtime` (`short` | `medium` | `long`), `sort` (default `popularity.desc`; also `release_date.*` and `vote_average.*`), `page` (1-based). Only non-default values are written, so the default view is `/browse/{type}`.
-- Movies and TV use `getDiscover`. `sort` maps per type: `release_date` → `primary_release_date` (movie) or `first_air_date` (TV). `year` maps to `primary_release_year` (movie) or `first_air_date_year` (TV). `language` → `with_original_language`, `country` → `with_origin_country`, `rating` → `vote_average.gte`, `maxRating` → `vote_average.lte`, `runtime` → `with_runtime.gte` / `with_runtime.lte` (short: lte 89; medium: 90–120; long: gte 121). Rating sort and either rating filter add `vote_count.gte=100`, so unrated titles don't float to the top or pass the filter.
+- Query params: `q` (search text), `genre` (one genre id), `year`, `language` (ISO 639-1, e.g. `fr`), `country` (ISO 3166-1, e.g. `FR`), `rating` (minimum, `5`–`8`), `maxRating` (maximum, `4`–`8`), `runtime` (`short` | `medium` | `long`), `minVotes` (`10`, `50`, `100`, `500`, `1000`, `5000`, `10000`), `maxVotes` (`10`, `50`, `100`, `500`, `1000`, `5000`), `sort` (default `popularity.desc`; also `release_date.*` and `vote_average.*`), `page` (1-based). Only non-default values are written, so the default view is `/browse/{type}`.
+- Movies and TV use `getDiscover`. `sort` maps per type: `release_date` → `primary_release_date` (movie) or `first_air_date` (TV). `year` maps to `primary_release_year` (movie) or `first_air_date_year` (TV). `language` → `with_original_language`, `country` → `with_origin_country`, `rating` → `vote_average.gte`, `maxRating` → `vote_average.lte`, `runtime` → `with_runtime.gte` / `with_runtime.lte` (short: lte 89; medium: 90–120; long: gte 121). `minVotes` → `vote_count.gte`, `maxVotes` → `vote_count.lte`. Rating sort and either rating filter always add `vote_count.gte=100`, so unrated titles don't float to the top or pass the filter; a chosen `minVotes` above 100 wins.
 - People use `getPopularPeople` (`/person/popular`). TMDB has no sort, filter or direction parameters for people, so the search field is the only filter on that page. A department filter could only work client-side on the 20 people already loaded, so it is not offered.
 - A search text uses `getSearch` (`/search/{type}`), which ignores genre, year and sort. While `q` is set the filter controls are disabled.
 - The search field writes `q` with `router.replace` (the history entry is replaced while typing), while every other filter pushes a new entry.
 - TMDB returns 20 results per page and stops at page 500. The view caps `total_pages` at 500. Movie and TV rows without a `poster_path` are kept and show the initials placeholder, so every page stays full. (Dropping them left `popularity.asc` pages with 5 or 11 cards.)
-- Entry points: a genre tag on a movie or TV detail page opens `/browse/{movie|tv}?genre={id}`. The search footer's "Browse all" opens `/browse/{active tab}` with `q` when the search box has text, and shows popular results otherwise.
+- Entry points: the navbar Browse button opens `/browse/movie`; a genre tag on a movie or TV detail page opens `/browse/{movie|tv}?genre={id}`. The search footer's "Browse all" opens `/browse/{active tab}` with `q` when the search box has text, and shows popular results otherwise.
 
 ## Domain conventions
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
@@ -86,3 +95,9 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM D, YYYY'`, and `'ddd, MMM D, YYYY'`.
 - Lists are paginated client-side by `MediaSection` (its own `page`/`pageSize` state + round pagination controls). `usePagination` + `PaginationControls` are legacy and currently unused.
 
+
+## Bookmarks (localStorage)
+- Key `movieland-bookmarks`: one list of `[type, id]` pairs, newest first, e.g. `[["movie",550],["tv",1399],["person",525]]`, with TMDB numeric ids. Nothing else is stored; titles, posters and facts are fetched from TMDB when they are shown (`getMovieDetails`, `getTvDetails`, `getPersonDetails`). Entries that are not a known type with an integer id are dropped on read. The first version (ids per type, `{ "movie": [...], ... }`) is converted once when it is read.
+- `src/composables/useBookmarks.js` is the one store, shared by every component: `ids(type)`, `count(type)`, `has`, `latest(type)`, `recent(types, limit)` (newest bookmarks across the given types), `toggle`, plus `firstBookmarkedType()` for the `/bookmarks` redirect. A `storage` listener keeps open tabs in step.
+- Bookmarks page `/bookmarks/:type` (movie, tv, person): tabs with counts, grid or list, 20 per page like the browse grid, page in `?page=`. Each page fetches only its own titles; a title TMDB no longer returns is skipped.
+- Home "For you": `recent(['movie','tv'], 3)` gives the three newest movie or TV bookmarks, going back from the newest; persons are skipped. Each one gets a section with `getRecommendationsMovies(id)` / `getTvRecommendations(id)`. The eyebrow is "Because you bookmarked {title}" (title from the details call) and the heading is short: "More Movies Like It" or "More Shows Like It". A section appears only when TMDB returns at least 6 titles (`ListSection` `minItems`).

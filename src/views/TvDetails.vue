@@ -12,17 +12,9 @@
             <router-link v-for="g in tv.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/tv', query: { genre: g.id } }">{{ g.name }}</router-link>
           </div>
           <h1 class="detail-title">{{ tv.name }}</h1>
-          <div class="detail-meta-row">
-            <span v-if="tv.vote_average" class="detail-rating-badge">
-              <i class="bi bi-star-fill" aria-hidden="true"></i>
-              <span class="detail-rating-value">{{ tv.vote_average.toFixed(1) }}</span>
-              <span class="detail-rating-scale">/ 10</span>
-            </span>
-            <span v-if="tv.episode_run_time && tv.episode_run_time.length" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(tv.episode_run_time[0]) }}</span>
-            <span v-if="airDates" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ airDates }}</span>
-            <span v-if="seasonsEpisodes" class="detail-meta-item"><i class="bi bi-collection" aria-hidden="true"></i>{{ seasonsEpisodes }}</span>
-            <span v-if="getLanguageName(tv.original_language)" class="detail-meta-item"><i class="bi bi-globe2" aria-hidden="true"></i>{{ getLanguageName(tv.original_language) }}</span>
-          </div>
+          <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="tv.original_language">{{ originalTitle }}</span></p>
+          <score-summary :score="tv.vote_average || 0" :votes="tv.vote_count || 0" :facts="summaryFacts"></score-summary>
+          <bookmark-button v-if="tv.id" type="tv" :id="tv.id"></bookmark-button>
         </header>
 
         <dl v-if="creators.length || writers.length" class="detail-facts">
@@ -101,6 +93,8 @@ import SectionHeading from '../components/SectionHeading.vue'
 import MovieSlider from '../components/MovieSlider.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
+import ScoreSummary from '../components/ScoreSummary.vue'
+import BookmarkButton from '../components/BookmarkButton.vue'
 import AsyncImage from '../components/AsyncImage.vue'
 import MediaStrip from '../components/MediaStrip.vue'
 import MediaViewer from '../components/MediaViewer.vue'
@@ -206,6 +200,22 @@ const seasonsEpisodes = computed(() => {
   const e = episodes ? `${episodes} ${episodes === 1 ? 'episode' : 'episodes'}` : ''
   return [s, e].filter(Boolean).join(' · ')
 })
+
+// Shown under the title only when it differs from it (TV shows use original_name).
+const originalTitle = computed(() => {
+  const original = (tv.value.original_name || '').trim()
+  return original && original.toLowerCase() !== (tv.value.name || '').trim().toLowerCase() ? original : ''
+})
+
+// Facts beside the score: air dates (the emphasised line), seasons and episodes, then the episode runtime and language.
+const summaryFacts = computed(() => [
+  airDates.value,
+  seasonsEpisodes.value,
+  [
+    tv.value.episode_run_time && tv.value.episode_run_time.length ? `${formatRuntime(tv.value.episode_run_time[0])} per episode` : '',
+    getLanguageName(tv.value.original_language)
+  ].filter(Boolean).join(' · ')
+].filter(Boolean))
 
 function formatRuntime(minutes) {
   if (!minutes) return ''

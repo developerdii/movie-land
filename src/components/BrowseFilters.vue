@@ -18,7 +18,7 @@
         </select>
       </div>
 
-      <div class="browse-field">
+      <div class="browse-field browse-field--wide">
         <label class="browse-label" for="browse-country">Country</label>
         <select id="browse-country" v-model="countryModel" class="browse-select" :disabled="locked">
           <option value="">Any country</option>
@@ -26,9 +26,9 @@
         </select>
       </div>
 
-      <div class="browse-field">
+      <div class="browse-field browse-field--wide browse-field--sort">
         <label class="browse-label" for="browse-sort">Sort by</label>
-        <div class="browse-sort">
+        <div class="browse-sort" :class="{ 'is-locked': locked }">
           <select id="browse-sort" v-model="sortModel" class="browse-select" :disabled="locked">
             <option v-for="option in SORT_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
           </select>
@@ -94,6 +94,26 @@
             <option v-for="option in RUNTIME_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
           </select>
         </div>
+
+        <!-- Third row: the pair spans two columns, so it starts a new row instead of using the empty collapse column,
+             and each field takes one column, like Min and Max rating above. -->
+        <div class="browse-votes">
+          <div class="browse-field">
+            <label class="browse-label" for="browse-min-votes">Min votes</label>
+            <select id="browse-min-votes" v-model="minVotesModel" class="browse-select" :disabled="locked">
+              <option value="">Any votes</option>
+              <option v-for="option in MIN_VOTES_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
+            </select>
+          </div>
+
+          <div class="browse-field">
+            <label class="browse-label" for="browse-max-votes">Max votes</label>
+            <select id="browse-max-votes" v-model="maxVotesModel" class="browse-select" :disabled="locked">
+              <option value="">Any votes</option>
+              <option v-for="option in MAX_VOTES_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -125,6 +145,8 @@ import { computed, ref } from 'vue'
 import {
   DEFAULT_SORT,
   MAX_RATING_OPTIONS,
+  MAX_VOTES_OPTIONS,
+  MIN_VOTES_OPTIONS,
   RATING_OPTIONS,
   RUNTIME_OPTIONS,
   SORT_OPTIONS,
@@ -146,7 +168,7 @@ const props = defineProps({
 const emit = defineEmits(['change'])
 
 // Clear all resets the filters only; the search text has its own clear button.
-const RESET = { genre: '', year: '', sort: DEFAULT_SORT, language: '', country: '', rating: '', maxRating: '', runtime: '' }
+const RESET = { genre: '', year: '', sort: DEFAULT_SORT, language: '', country: '', rating: '', maxRating: '', runtime: '', minVotes: '', maxVotes: '' }
 
 // TMDB search takes none of the discover filters, so they are off while a search text is set.
 const isSearching = computed(() => Boolean(props.state.q))
@@ -172,6 +194,8 @@ const languageModel = fieldModel('language')
 const ratingModel = fieldModel('rating')
 const maxRatingModel = fieldModel('maxRating')
 const runtimeModel = fieldModel('runtime')
+const minVotesModel = fieldModel('minVotes')
+const maxVotesModel = fieldModel('maxVotes')
 
 const sortModel = computed({
   get: () => sortField(props.state.sort),
@@ -205,6 +229,14 @@ const chips = computed(() => {
     const label = RUNTIME_OPTIONS.find((option) => option.value === s.runtime).label
     list.push({ key: 'runtime', label: `Runtime: ${label}`, reset: { runtime: '' } })
   }
+  if (s.minVotes) {
+    const label = MIN_VOTES_OPTIONS.find((option) => option.value === s.minVotes).label
+    list.push({ key: 'minVotes', label: `Min votes: ${label}`, reset: { minVotes: '' } })
+  }
+  if (s.maxVotes) {
+    const label = MAX_VOTES_OPTIONS.find((option) => option.value === s.maxVotes).label
+    list.push({ key: 'maxVotes', label: `Max votes: ${label}`, reset: { maxVotes: '' } })
+  }
   if (s.sort !== DEFAULT_SORT) {
     const label = SORT_OPTIONS.find((option) => option.value === sortField(s.sort)).label
     list.push({ key: 'sort', label: `Sort: ${label} (${directionLabel.value.toLowerCase()})`, reset: { sort: DEFAULT_SORT } })
@@ -232,8 +264,17 @@ const chips = computed(() => {
   align-items: end;
 }
 
-/* Wrapper only groups row 2; its children are grid items of .browse-bar. */
+/* Wrapper only groups the collapsible rows; its children are grid items of .browse-bar. */
 .browse-more { display: contents; }
+
+/* The votes pair spans two columns, so it starts a third row and skips the 44px collapse column. Inside it,
+   each field is one column wide. */
+.browse-votes {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
 
 .browse-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; }
 
@@ -250,7 +291,7 @@ const chips = computed(() => {
   min-width: 0;
   height: 44px;
   padding: 0 14px;
-  border: 1px solid #d9dde3;
+  border: 1px solid var(--ml-control-line);
   border-radius: 12px;
   background-color: var(--ml-surface);
   color: var(--ml-ink);
@@ -260,27 +301,35 @@ const chips = computed(() => {
 }
 .browse-select:hover:not(:disabled) { border-color: var(--ml-brand-accent); }
 .browse-select:focus { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
-.browse-select:disabled { background-color: #f6f7fa; color: rgba(var(--ml-muted-rgb), .6); cursor: not-allowed; }
+.browse-select:disabled { background-color: var(--ml-tint); color: rgba(var(--ml-muted-rgb), .6); cursor: not-allowed; }
 
-/* Sort select and direction toggle sit side by side. Each piece draws its own outer border with the
-   same 12px radius as the other fields, so the outer corners match exactly; no clipping wrapper. */
+/* Sort select and direction toggle are one joined control. The outer box owns the border and the 12px
+   radius, the same as the other fields; the two parts inside have no border of their own, only a divider. */
 .browse-sort {
   display: flex;
   align-items: stretch;
   height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--ml-control-line);
+  border-radius: 12px;
+  background: var(--ml-surface);
+  transition: border-color .15s ease;
 }
+.browse-sort:focus-within,
+.browse-sort:hover:not(.is-locked) { border-color: var(--ml-brand-accent); }
+.browse-sort.is-locked { background: var(--ml-tint); }
 .browse-sort .browse-select {
   flex: 1 1 auto;
+  min-width: 0;
   height: 100%;
-  border: 1px solid #d9dde3;
-  border-right: 0;
-  border-radius: 12px 0 0 12px;
-  background-color: var(--ml-surface);
+  padding-left: 14px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
 }
-.browse-sort .browse-select:focus { outline: none; }
-.browse-sort .browse-select:disabled { background-color: #f6f7fa; }
-.browse-sort:focus-within .browse-select,
-.browse-sort .browse-select:hover:not(:disabled) { border-color: var(--ml-brand-accent); }
+.browse-sort .browse-select:focus,
+.browse-sort .browse-select:hover:not(:disabled) { outline: none; border-color: transparent; }
+.browse-sort .browse-select:disabled { background-color: transparent; }
 
 /* Fixed width, so switching between Asc and Desc does not resize the control. */
 .browse-sort-dir {
@@ -291,19 +340,18 @@ const chips = computed(() => {
   justify-content: center;
   gap: 6px;
   padding: 0 12px;
-  border: 1px solid #d9dde3;
-  border-radius: 0 12px 12px 0;
-  background: var(--ml-surface);
+  border: 0;
+  border-left: 1px solid var(--ml-control-line);
+  border-radius: 0;
+  background: transparent;
   color: var(--ml-ink);
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  transition: background-color .15s ease, color .15s ease;
 }
-.browse-sort:focus-within .browse-sort-dir,
-.browse-sort-dir:hover:not(:disabled) { border-color: var(--ml-brand-accent); }
-.browse-sort-dir:hover:not(:disabled) { background: rgba(var(--ml-brand-accent-rgb), .14); color: var(--ml-brand-dark); }
+.browse-sort-dir:hover:not(:disabled) { background: rgba(var(--ml-brand-accent-rgb), .14); color: var(--ml-ink); }
 .browse-sort-dir:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
 .browse-sort-dir:disabled { color: rgba(var(--ml-muted-rgb), .6); cursor: not-allowed; }
 
@@ -313,7 +361,7 @@ const chips = computed(() => {
   height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid #d9dde3;
+  border: 1px solid var(--ml-control-line);
   border-radius: 12px;
   background: var(--ml-surface);
   color: var(--ml-ink);
@@ -322,7 +370,7 @@ const chips = computed(() => {
   transition: border-color .15s ease, background-color .15s ease, color .15s ease;
 }
 .browse-more-toggle:hover { border-color: var(--ml-brand-accent); color: var(--ml-brand-accent); }
-.browse-more-toggle.is-open { border-color: var(--ml-brand-accent); background: rgba(var(--ml-brand-accent-rgb), .12); color: var(--ml-brand-dark); }
+.browse-more-toggle.is-open { border-color: var(--ml-brand-accent); background: rgba(var(--ml-brand-accent-rgb), .12); color: var(--ml-ink); }
 .browse-more-toggle:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
 .browse-more-dot {
   position: absolute;
@@ -364,7 +412,7 @@ const chips = computed(() => {
   padding: 0 4px 0 12px;
   border-radius: 999px;
   background: rgba(var(--ml-brand-accent-rgb), .12);
-  color: var(--ml-brand-dark);
+  color: var(--ml-ink);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
@@ -409,8 +457,23 @@ const chips = computed(() => {
 
 .browse-filters button:disabled { opacity: .5; cursor: not-allowed; }
 
+/* Tablet widths: the sort field spans the first three columns of its own row, with the collapse chevron beside it. */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .browse-field--sort { grid-column: 1 / 4; }
+}
+
 @media (max-width: 767.98px) {
-  .browse-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .browse-filters { padding: 14px; gap: 12px; }
+  .browse-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .browse-votes { gap: 12px; }
+  /* Country and sort get a full row, so the sort name and its direction button both fit. */
+  .browse-field--wide { grid-column: 1 / -1; }
   .browse-more-toggle { grid-column: 1 / -1; justify-self: end; }
+  /* 16px stops iOS from zooming the page when a select is opened. */
+  .browse-select { font-size: 16px; }
+  /* Active filter chips wrap onto new lines instead of being cut off at the edge. */
+  .browse-chip-row { flex-wrap: wrap; }
+  .browse-chips { flex-wrap: wrap; overflow: visible; }
+  .browse-chip { max-width: 100%; }
 }
 </style>

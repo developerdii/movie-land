@@ -12,16 +12,9 @@
             <router-link v-for="g in movieData.genres" :key="g.id" class="detail-tag" :to="{ path: '/browse/movie', query: { genre: g.id } }">{{ g.name }}</router-link>
           </div>
           <h1 class="detail-title">{{ movieData.title }}</h1>
-          <div class="detail-meta-row">
-            <span v-if="movieData.vote_average" class="detail-rating-badge">
-              <i class="bi bi-star-fill" aria-hidden="true"></i>
-              <span class="detail-rating-value">{{ movieData.vote_average.toFixed(1) }}</span>
-              <span class="detail-rating-scale">/ 10</span>
-            </span>
-            <span v-if="movieData.runtime" class="detail-meta-item"><i class="bi bi-clock" aria-hidden="true"></i>{{ formatRuntime(movieData.runtime) }}</span>
-            <span v-if="movieData.release_date" class="detail-meta-item"><i class="bi bi-calendar3" aria-hidden="true"></i>{{ formatDate(movieData.release_date, 'MMM D, YYYY') }}</span>
-            <span v-if="getLanguageName(movieData.original_language)" class="detail-meta-item"><i class="bi bi-globe2" aria-hidden="true"></i>{{ getLanguageName(movieData.original_language) }}</span>
-          </div>
+          <p v-if="originalTitle" class="detail-original-title">Original title: <span :lang="movieData.original_language">{{ originalTitle }}</span></p>
+          <score-summary :score="movieData.vote_average || 0" :votes="movieData.vote_count || 0" :facts="summaryFacts"></score-summary>
+          <bookmark-button v-if="movieData.id" type="movie" :id="movieData.id"></bookmark-button>
         </header>
 
         <dl v-if="directors.length || writers.length" class="detail-facts">
@@ -101,6 +94,8 @@ import SectionHeading from '../components/SectionHeading.vue'
 import { formatDate } from '@/utils/date'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'
+import ScoreSummary from '../components/ScoreSummary.vue'
+import BookmarkButton from '../components/BookmarkButton.vue'
 import AsyncImage from '../components/AsyncImage.vue'
 import MediaStrip from '../components/MediaStrip.vue'
 import MediaViewer from '../components/MediaViewer.vue'
@@ -175,6 +170,19 @@ const mergedDirectorWriter = computed(() => {
   return null
 })
 const writerLabel = computed(() => (writers.value.length === 1 ? 'Writer' : 'Writers'))
+
+// Shown under the title only when it differs from it, so a film with the same title is not repeated.
+const originalTitle = computed(() => {
+  const original = (movieData.value.original_title || '').trim()
+  return original && original.toLowerCase() !== (movieData.value.title || '').trim().toLowerCase() ? original : ''
+})
+
+// Facts beside the score: release date (the emphasised line), runtime, and the language when it is not English.
+const summaryFacts = computed(() => [
+  movieData.value.release_date ? formatDate(movieData.value.release_date, 'MMM D, YYYY') : '',
+  movieData.value.runtime ? formatRuntime(movieData.value.runtime) : '',
+  getLanguageName(movieData.value.original_language)
+].filter(Boolean))
 
 function formatRuntime(minutes) {
   if (!minutes) return ''

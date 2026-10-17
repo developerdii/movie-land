@@ -14,6 +14,7 @@
             <span class="section-heading-eyebrow">{{ person.known_for_department }}</span>
           </div>
           <h1 class="detail-title">{{ person.name }}</h1>
+          <bookmark-button v-if="person.id" type="person" :id="person.id"></bookmark-button>
           <dl class="detail-facts">
             <div v-if="bornValue" class="detail-fact">
               <dt>{{ bornLabel }}</dt>
@@ -65,6 +66,7 @@ import api from '@/api'
 import { formatDate } from '@/utils/date'
 import { sortImages, toViewerItems } from '@/utils/images'
 import AsyncImage from '../components/AsyncImage.vue'
+import BookmarkButton from '../components/BookmarkButton.vue'
 import MediaSection from '../components/MediaSection.vue'
 import MediaStrip from '../components/MediaStrip.vue'
 import MediaViewer from '../components/MediaViewer.vue'

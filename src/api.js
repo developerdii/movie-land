@@ -34,6 +34,10 @@ export default {
     return api.get('/movie/popular')
   },
 
+  getTopRatedMovies() {
+    return api.get('/movie/top_rated')
+  },
+
   getMovieGenres() {
     return api.get('/genre/movie/list')
   },

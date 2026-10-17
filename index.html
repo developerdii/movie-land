@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>Movie Land</title>
+    <script>
+      // Apply the saved dark mode choice before first paint (key: movieland-theme, see src/utils/theme.js).
+      try {
+        if (localStorage.getItem('movieland-theme') === 'dark') document.documentElement.dataset.theme = 'dark'
+      } catch (e) {
+        // Storage blocked: keep the light theme.
+      }
+    </script>
   </head>
   <body>
     <noscript>

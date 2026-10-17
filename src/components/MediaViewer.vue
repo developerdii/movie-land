@@ -41,7 +41,16 @@
       </button>
 
       <figure v-if="current" :key="current.path + safeIndex" class="media-viewer__figure">
-        <img class="media-viewer__img" :src="mainSrc(current)" :alt="current.caption || activeGroup.label">
+        <div v-if="!imageLoaded" class="media-viewer__skeleton" :style="skeletonStyle" aria-hidden="true"></div>
+        <!-- Stays in the DOM while loading so it can fetch; it is taken out of the layout until the load event. -->
+        <img
+          class="media-viewer__img"
+          :class="{ 'is-loaded': imageLoaded }"
+          :src="mainSrc(current)"
+          :alt="current.caption || activeGroup.label"
+          @load="imageLoaded = true"
+          @error="imageLoaded = true"
+        >
         <figcaption v-if="current.caption" class="media-viewer__caption">{{ current.caption }}</figcaption>
       </figure>
       <p v-else class="media-viewer__empty">{{ activeGroup.loading ? 'Loading photos…' : 'No photos yet.' }}</p>
@@ -107,6 +116,16 @@ const current = computed(() => activeGroup.value.items[safeIndex.value] || null)
 const backgroundStyle = computed(() => (props.background ? { backgroundImage: `url('${props.background}')` } : {}))
 const mainSrc = (item) => imageUrl(item.path, activeGroup.value.size || 'w780')
 const thumbSrc = (item) => imageUrl(item.path, 'w300')
+
+// The skeleton holds the photo's space until the full-size image has loaded. Its width matches the size
+// the group requests, and its ratio matches the photo, so the image does not jump when it appears.
+const SIZE_WIDTHS = { w500: 500, w780: 780, w1280: 1280 }
+const imageLoaded = ref(false)
+const skeletonStyle = computed(() => ({
+  '--ml-skeleton-ratio': current.value?.ratio || 16 / 9,
+  '--ml-skeleton-width': (SIZE_WIDTHS[activeGroup.value.size] || 780) + 'px'
+}))
+watch(current, () => { imageLoaded.value = false })
 
 function selectGroup(key) {
   activeKey.value = key
@@ -177,6 +196,7 @@ body.media-viewer-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .media-viewer { animation: none; }
+  .media-viewer__skeleton { animation: none; }
 }
 
 /* The page backdrop, blurred behind the photo. */
@@ -292,6 +312,7 @@ body.media-viewer-open { overflow: hidden; }
 
 .media-viewer__figure {
   margin: 0;
+  width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -308,6 +329,29 @@ body.media-viewer-open { overflow: hidden; }
   object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
+}
+
+/* Until the photo has loaded, the image is out of the layout (it still fetches) and the skeleton holds its place. */
+.media-viewer__img:not(.is-loaded) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.media-viewer__skeleton {
+  width: min(100%, var(--ml-skeleton-width), calc((100vh - 240px) * var(--ml-skeleton-ratio)));
+  aspect-ratio: var(--ml-skeleton-ratio);
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .06) 25%, rgba(255, 255, 255, .14) 37%, rgba(255, 255, 255, .06) 63%);
+  background-size: 400% 100%;
+  animation: media-viewer-shimmer 1.4s ease infinite;
+}
+
+@keyframes media-viewer-shimmer {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
 }
 
 .media-viewer__caption {
@@ -350,8 +394,27 @@ body.media-viewer-open { overflow: hidden; }
 }
 
 @media (max-width: 575.98px) {
-  .media-viewer__count { font-size: 13px; }
+  .media-viewer__count { flex: none; font-size: 13px; }
   .media-viewer__nav { width: 40px; height: 40px; }
   .media-viewer__img { max-height: calc(100vh - 260px); }
+  /* The tabs shrink and scroll sideways inside their pill, so "Logos" is never cut off by the count and close button. */
+  .media-viewer__bar { gap: 8px; }
+  .media-viewer__tabs { flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .media-viewer__tabs::-webkit-scrollbar { display: none; }
+  .media-viewer__tab { flex: none; padding: 0 10px; font-size: 13px; }
+  /* The arrows float over the photo's edges, so the photo uses the full phone width. */
+  .media-viewer__stage { position: relative; }
+  .media-viewer__figure { width: 100%; }
+  .media-viewer__img { width: 100%; max-width: none; }
+  .media-viewer__skeleton { width: 100%; max-height: calc(100vh - 260px); }
+  .media-viewer__stage > .media-viewer__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    transform: translateY(-50%);
+    background: rgba(12, 14, 20, .6);
+  }
+  .media-viewer__stage > .media-viewer__nav:first-child { left: 2px; }
+  .media-viewer__stage > .media-viewer__nav:last-child { right: 2px; }
 }
 </style>

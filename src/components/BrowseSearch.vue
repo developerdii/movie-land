@@ -75,7 +75,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   height: 44px;
   margin-left: auto;
   padding: 0 4px 0 12px;
-  border: 1px solid #d9dde3;
+  border: 1px solid var(--ml-control-line);
   border-radius: 12px;
   background: var(--ml-surface);
   transition: border-color .15s ease;
@@ -109,8 +109,15 @@ onBeforeUnmount(() => clearTimeout(timer))
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease;
 }
-.browse-search-btn:hover { background: #f1f3f6; color: var(--ml-ink); }
+.browse-search-btn:hover { background: var(--ml-chip); color: var(--ml-ink); }
 .browse-search-btn--go { margin-left: 2px; background: var(--ml-brand-accent); color: var(--ml-brand-dark); }
 .browse-search-btn--go:hover { background: var(--ml-brand-accent); color: var(--ml-brand-dark); filter: brightness(1.05); }
 .browse-search-btn:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
+
+@media (max-width: 767.98px) {
+  /* 16px stops iOS from zooming the page when the field is focused. */
+  .browse-search { width: 100%; height: 46px; }
+  .browse-search-input { font-size: 16px; }
+}
 </style>
+

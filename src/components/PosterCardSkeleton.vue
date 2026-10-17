@@ -15,7 +15,7 @@
 <style lang="scss">
 /* Shared shimmer for loading placeholders. Motion is dropped for reduced-motion users. */
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #eceef2 25%, #f7f8fa 37%, #eceef2 63%);
+  background: linear-gradient(90deg, var(--ml-skeleton) 25%, var(--ml-skeleton-hi) 37%, var(--ml-skeleton) 63%);
   background-size: 400% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;
 }
