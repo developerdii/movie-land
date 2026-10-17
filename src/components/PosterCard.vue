@@ -27,9 +27,10 @@
       </template>
 
       <template v-else-if="variant === 'movie'">
-        <span v-if="rating" class="poster-card__rating" aria-hidden="true">
+        <span v-if="rating && !upcoming" class="poster-card__rating" aria-hidden="true">
           <i class="bi bi-star-fill"></i>{{ rating.toFixed(1) }}
         </span>
+        <span v-if="upcoming" class="poster-card__upcoming" aria-hidden="true">Upcoming</span>
         <span v-if="showType" class="poster-card__type">{{ typeLabel }}</span>
       </template>
 
@@ -69,7 +70,9 @@ const props = defineProps({
   mediaType: { type: String, default: 'movie' },
   showType: { type: Boolean, default: false },
   // Roles the person had on this title (e.g. Acting, Directing, Writing), shown as badges.
-  roles: { type: Array, default: () => [] }
+  roles: { type: Array, default: () => [] },
+  // The title has not been released yet (TMDB status). Shown as an Upcoming badge in place of the rating.
+  upcoming: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['navigate'])
@@ -160,7 +163,7 @@ const ariaLabel = computed(() => {
   if (props.variant === 'person') {
     return `${title.value}${roleName.value ? ', as ' + roleName.value : ''}`
   }
-  return `${title.value}, ${year.value}`
+  return `${title.value}, ${year.value}${props.upcoming ? ', upcoming' : ''}`
 })
 
 function onClick() {
@@ -290,6 +293,25 @@ function onClick() {
   color: var(--ml-white);
 }
 .poster-card__rating i { color: var(--ml-brand-accent); font-size: 12px; }
+
+/* Unreleased title: the gold of the coming-soon countdown, in the rating's corner. */
+.poster-card__upcoming {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: var(--ml-brand-accent);
+  color: var(--ml-brand-dark);
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 
 .poster-card__type {
   position: absolute;

@@ -256,6 +256,39 @@ async function updateBioOverflow() {
   if (!bioExpanded.value) bioNeedsToggle.value = element.scrollHeight > element.clientHeight + 1
 }
 
+// TMDB status values that mean the title is not out yet. The credits list has dates but no status, so only a
+// title whose date is missing or still ahead gets a details request; that keeps the number of requests small.
+const UNRELEASED_STATUS = {
+  movie: ['Planned', 'In Production', 'Post Production', 'Rumored'],
+  tv: ['Planned', 'In Production']
+}
+
+async function markUpcoming(list, kind) {
+  const today = new Date().toISOString().slice(0, 10)
+  const field = kind === 'tv' ? 'first_air_date' : 'release_date'
+  const candidates = list.filter((item) => !item[field] || item[field] > today)
+  const results = await Promise.allSettled(candidates.map((item) => (
+    kind === 'tv' ? api.getTvDetails(item.id) : api.getMovieDetails(item.id)
+  )))
+  const upcomingIds = new Set(candidates
+    .filter((item, index) => results[index].status === 'fulfilled' && UNRELEASED_STATUS[kind].includes(results[index].value.data.status))
+    .map((item) => item.id))
+  return list.map((item) => (upcomingIds.has(item.id) ? { ...item, upcoming: true } : item))
+}
+
+// The lists show at once; the Upcoming flags are added when the statuses are known. A newer load wins.
+let loadRequest = 0
+
+async function markUpcomingFor(requestId) {
+  const [movies, shows] = await Promise.all([
+    markUpcoming(movieCredits.value, 'movie'),
+    markUpcoming(tvCredits.value, 'tv')
+  ])
+  if (requestId !== loadRequest) return
+  movieCredits.value = movies
+  tvCredits.value = shows
+}
+
 async function load() {
   loading.value = true
   bioExpanded.value = false
@@ -265,6 +298,7 @@ async function load() {
   taggedLoaded.value = false
   viewer.open = false
   const id = route.query.id
+  const requestId = ++loadRequest
   try {
     const [d, m, t] = await Promise.all([
       api.getPersonDetails(id),
@@ -274,6 +308,7 @@ async function load() {
     person.value = d.data
     movieCredits.value = mergeCredits(m.data.cast, m.data.crew, 'movie', person.value.known_for_department)
     tvCredits.value = mergeCredits(t.data.cast, t.data.crew, 'tv', person.value.known_for_department)
+    markUpcomingFor(requestId)
     loadProfiles(id)
     loadTaggedPreview(id)
     await updateBioOverflow()

@@ -54,6 +54,7 @@
             :item="item"
             :media-type="kind"
             :roles="item.roles || []"
+            :upcoming="!!item.upcoming"
             @navigate="open"
           />
         </li>
@@ -75,6 +76,7 @@
             <span v-else>{{ initials(titleOf(item)) }}</span>
           </span>
           <span class="cast-row-name">{{ titleOf(item) }}</span>
+          <span v-if="item.upcoming" class="cast-row-pill cast-row-pill--upcoming">Upcoming</span>
           <span v-if="item.allRoles && item.allRoles.length" class="cast-row-roles">
             <span v-for="role in item.allRoles" :key="role" class="cast-row-pill">{{ role }}</span>
           </span>
@@ -312,6 +314,7 @@ function initials(name) {
   text-transform: uppercase;
   white-space: nowrap;
 }
+.cast-row-pill--upcoming { background: var(--ml-brand-accent); color: var(--ml-brand-dark); }
 
 @media (max-width: 639.98px) {
   .cast-list { grid-template-columns: 1fr; }
