@@ -58,7 +58,8 @@ const totalSlides = ref(0)
 let carousel = null
 
 onMounted(() => {
-  carousel = new Carousel(carouselEl.value, { wrap: true })
+  // Touch swipes are left to the poster rows, which scroll sideways on phones; the page control moves the slides.
+  carousel = new Carousel(carouselEl.value, { wrap: true, touch: false })
   totalSlides.value = carouselEl.value.querySelectorAll('.carousel-item').length
   emit('slid', { index: activeSlide.value, total: totalSlides.value })
   carouselEl.value.addEventListener('slid.bs.carousel', (e) => {

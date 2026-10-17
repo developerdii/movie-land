@@ -179,8 +179,20 @@ a.detail-tag { text-decoration: none; }
 /* Blocks on the home page: the same gap as the sections on the detail pages. */
 .page-block { margin-top: var(--page-gap); }
 .movie-card-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; padding-top: 8px; }
+/* Phones: each slide is one row that swipes sideways, with about two and a half posters visible, instead of
+   stacked rows of two. The padding leaves room for the hover lift and ring. */
 @media (max-width: 767.98px) {
-  .movie-card-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .movie-card-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 8px 2px 14px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .movie-card-row::-webkit-scrollbar { display: none; }
+  .movie-card-row > * { flex: 0 0 42%; scroll-snap-align: start; }
 }
 .cast-list-grid { align-content: start; }
 .cast-list-placeholder { visibility: hidden; pointer-events: none; }
@@ -191,16 +203,29 @@ a.detail-tag { text-decoration: none; }
 
 
 
+/* Phones: the poster sits beside the title block, in the same proportions as the person page (5 to 7). The title,
+   facts and overview all sit in the right-hand column, as they do on the person page. */
 @media (max-width: 767.98px) {
-  .detail-hero { gap: 32px; }
-  .detail-hero-poster { flex-basis: 220px; min-width: 180px; }
+  .detail-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .detail-hero-poster,
+  .detail-hero-content { min-width: 0; }
+  /* The title scales with the narrow column, so a long one-word title (CLAYFACE) does not run past the card edge. */
+  .detail-hero-header .detail-title { font-size: clamp(32px, 11vw, 48px); }
+  /* The bookmark ribbon hangs over the top right corner; the genre tags leave room for it. */
+  .detail-hero .detail-tags { padding-right: 44px; }
+  /* One fact card per line in the narrow column; the grid's 240px minimum would overflow it. */
+  .detail-facts { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 575.98px) {
   #app .router-view { margin-top: .75rem; margin-bottom: .75rem; }
   .page-card { --card-pad: .85rem; }
   .detail-overview { font-size: .95rem; }
-  .detail-hero-poster { flex: 0 1 160px; min-width: 140px; }
 }
 
 @media (max-width: 639.98px) {

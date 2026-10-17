@@ -18,13 +18,12 @@
         :value="page"
         :min="1"
         :max="pageCount"
-        :style="{ width: 'calc(' + String(pageCount).length + 'ch + 6px)' }"
         :disabled="disabled"
         :aria-label="'Current page, 1 to ' + pageCount"
         @change="jump"
         @keydown.enter.prevent="$event.target.blur()"
       >
-      <span class="round-pagination-total" aria-live="polite">/ {{ pageCount }}</span>
+      <span class="round-pagination-total" aria-live="polite">of {{ pageCount }}</span>
     </div>
     <button
       type="button"
@@ -92,10 +91,10 @@ function jump(event) {
 .round-pagination-jump {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 4px;
   height: 48px;
-  min-width: 112px;
+  width: 128px;
   padding: 0 18px;
   border: 1px solid var(--ml-control-line);
   border-radius: 999px;
@@ -108,7 +107,7 @@ function jump(event) {
 .round-pagination-jump:focus-within { border-color: var(--ml-brand-accent); }
 .round-pagination-input {
   flex: none;
-  width: 3ch;
+  width: 36px;
   height: 36px;
   padding: 0;
   border: 0;
@@ -117,7 +116,7 @@ function jump(event) {
   color: var(--ml-ink);
   font: inherit;
   font-weight: 700;
-  text-align: center;
+  text-align: right;
   -moz-appearance: textfield;
   appearance: textfield;
 }
@@ -131,6 +130,6 @@ function jump(event) {
 @media (max-width: 767.98px) {
   .round-pagination-input { font-size: 16px; }
   .round-pagination-btn { width: 44px; height: 44px; }
-  .round-pagination-jump { height: 44px; min-width: 96px; padding: 0 12px; }
+  .round-pagination-jump { height: 44px; width: 120px; padding: 0 12px; }
 }
 </style>

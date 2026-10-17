@@ -2,8 +2,8 @@
   <nav id="nav" class="navbar">
     <div class="container-xxl ml-nav-inner">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <img class="ml-brand-logo ml-brand-logo--light" src="../assets/movieland-logo.svg" alt="Movieland">
-        <img class="ml-brand-logo ml-brand-logo--dark" src="../assets/movieland-logo-dark.svg" alt="" aria-hidden="true">
+        <img class="ml-brand-logo ml-brand-logo--light" src="../assets/movieland-logo.svg" alt="Movieland" draggable="false">
+        <img class="ml-brand-logo ml-brand-logo--dark" src="../assets/movieland-logo-dark.svg" alt="" aria-hidden="true" draggable="false">
       </router-link>
       <div class="ml-nav-links">
         <router-link
@@ -85,14 +85,23 @@ const onBookmarks = computed(() => route.name === 'Bookmarks')
 #nav .navbar-brand {
   flex: none;
   border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: opacity .15s ease;
 }
 #nav .navbar-brand:hover { opacity: .85; }
 #nav .navbar-brand:focus-visible { outline: 2px solid var(--ml-brand-accent); outline-offset: 2px; }
+/* The image is only a picture of the link. The link takes the pointer, so the image cannot show a text cursor or
+   a text selection (Safari's Live Text reads the words inside an image). */
 #nav .ml-brand-logo {
   display: block;
   width: calc(40px * 520 / 112);
   height: 40px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 #nav .ml-brand-logo--dark { display: none; }
 :root[data-theme="dark"] #nav .ml-brand-logo--light { display: none; }

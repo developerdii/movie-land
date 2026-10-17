@@ -18,7 +18,7 @@
 
     <span v-if="loading" class="visually-hidden" role="status">Loading results</span>
 
-    <ul v-if="view === 'grid'" class="cast-grid">
+    <ul v-if="view === 'grid'" class="cast-grid" :class="{ 'cast-grid--row': !serverPaged }">
       <template v-if="showSkeleton">
         <li v-for="n in SERVER_PAGE_SIZE" :key="'skeleton-' + n" class="cast-grid-item" aria-hidden="true">
           <poster-card-skeleton />
@@ -240,6 +240,19 @@ function initials(name) {
 @media (max-width: 767.98px) {
   /* Two cards per row on phones, like the browse grid, instead of one card per screen. */
   .cast-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  /* Client-paged lists (cast, filmography) hold six at a time, so on phones they swipe sideways like the poster
+     rows. Browse results are long and stay a two-column grid. */
+  .cast-grid--row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 8px 2px 14px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cast-grid--row::-webkit-scrollbar { display: none; }
+  .cast-grid--row > li { flex: 0 0 42%; scroll-snap-align: start; }
   .cast-seg-btn { width: 40px; }
 }
 </style>

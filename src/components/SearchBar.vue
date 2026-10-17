@@ -60,6 +60,7 @@
                 role="tab"
                 :aria-selected="tab.type === activeType"
                 @click="selectTab(tab.type)"
+                @focus="onTabFocus(tab.type)"
               >
                 <span>{{ tab.label }}</span>
                 <span class="ml-search-count">{{ counts[tab.type] }}</span>
@@ -351,6 +352,11 @@ function onFocus() {
       loadDefault()
     }
   }
+}
+
+// Tab moves between the result types: focusing a type's tab selects it, so Tab and Shift+Tab switch the results.
+function onTabFocus(type) {
+  if (type !== activeType.value) selectTab(type)
 }
 
 function selectTab(type) {

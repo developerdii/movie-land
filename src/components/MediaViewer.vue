@@ -320,6 +320,13 @@ body.media-viewer-open { overflow: hidden; }
   gap: 10px;
 }
 
+/* Only the photo takes clicks. The figure and caption boxes span the whole stage, so they let the click through to
+   the stage, which closes the viewer like the dark area around the photo does. */
+.media-viewer__figure,
+.media-viewer__caption,
+.media-viewer__skeleton { pointer-events: none; }
+.media-viewer__img { pointer-events: auto; }
+
 .media-viewer__img {
   display: block;
   width: auto;
