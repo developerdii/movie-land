@@ -40,6 +40,11 @@
     </div>
     <div class="row">
       <div class="col-md-12 page-block">
+        <born-today />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 page-block">
         <recently-viewed />
       </div>
     </div>
@@ -51,6 +56,7 @@ import Slider from '../components/PopularMoviesSlider.vue'
 import UpComing from '@/components/UpComing.vue'
 import { onMounted, ref } from 'vue'
 import ListSection from '@/components/ListSection.vue'
+import BornToday from '@/components/BornToday.vue'
 import RecentlyViewed from '@/components/RecentlyViewed.vue'
 import api from '@/api'
 import { useBookmarks } from '@/composables/useBookmarks'

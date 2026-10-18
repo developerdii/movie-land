@@ -23,8 +23,9 @@
 
     <p>
       Movie Land is a personal, non-commercial project. It has no ads, no accounts and no paid features. On your device
-      it saves only your dark mode choice, your bookmarks and the eighteen titles you opened most recently, all as TMDB ids: titles are fetched
-      again from TMDB each time. Browse filters live in the page address, so you can share a search by copying the link.
+      it saves only your dark mode choice, your bookmarks, the eighteen titles you opened most recently and the people born today, all as
+      TMDB ids: titles are fetched again from TMDB each time. The people born today come from Wikidata, a public database, which is asked
+      only for today's date. Browse filters live in the page address, so you can share a search by copying the link.
     </p>
 
     <p>

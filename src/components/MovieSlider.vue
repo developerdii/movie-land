@@ -6,7 +6,7 @@
           <poster-card
             v-for="(movie, movieIndex) in row"
             :key="movieIndex"
-            :variant="movie.media_type === 'person' ? 'person' : variant"
+            :variant="movie.media_type === 'person' ? 'person-v2' : variant"
             :item="movie"
             :media-type="movie.media_type || type"
             :show-type="showType && movie.media_type !== 'person'"

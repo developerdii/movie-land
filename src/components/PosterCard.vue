@@ -12,7 +12,7 @@
         v-if="imageUrl"
         :src="imageUrl"
         :alt="title"
-        :kind="variant === 'person' ? 'person' : 'movie'"
+        :kind="isPerson ? 'person' : 'movie'"
         aspect-ratio="auto"
         frame-class="poster-card__frame"
       />
@@ -32,6 +32,14 @@
         </span>
         <span v-if="upcoming" class="poster-card__upcoming" aria-hidden="true">Upcoming</span>
         <span v-if="showType" class="poster-card__type">{{ typeLabel }}</span>
+      </template>
+
+      <template v-else-if="isPersonV2">
+        <span v-if="age !== null" class="poster-card__date-chip" aria-hidden="true">
+          <span class="poster-card__chip-month">Age</span>
+          <span class="poster-card__chip-day">{{ age }}</span>
+        </span>
+        <span v-else class="poster-card__type">PERSON</span>
       </template>
 
       <span v-else-if="isVoice" class="poster-card__voice" aria-hidden="true">
@@ -79,13 +87,19 @@ const emit = defineEmits(['navigate'])
 
 const isTv = computed(() => props.mediaType === 'tv')
 
+// The v2 person card is laid out like a title card: the photo in the 2:3 frame and the name under it.
+const isPersonV2 = computed(() => props.variant === 'person-v2')
+const isPerson = computed(() => props.variant === 'person' || isPersonV2.value)
+// Born Today people carry their age, which the date chip shows top left. Other person cards keep the PERSON badge.
+const age = computed(() => (Number.isInteger(props.item.age) ? props.item.age : null))
+
 const title = computed(() => {
-  if (props.variant === 'person') return props.item.name || ''
+  if (isPerson.value) return props.item.name || ''
   return isTv.value ? (props.item.name || '') : (props.item.title || '')
 })
 
 const imagePath = computed(() =>
-  props.variant === 'person' ? props.item.profile_path : props.item.poster_path
+  isPerson.value ? props.item.profile_path : props.item.poster_path
 )
 const imageUrl = computed(() =>
   imagePath.value ? 'https://image.tmdb.org/t/p/w500' + imagePath.value : ''
@@ -144,6 +158,7 @@ async function resolveGenre() {
 watch(() => [props.item, props.mediaType], resolveGenre, { immediate: true })
 
 const subtitle = computed(() => {
+  if (isPersonV2.value) return props.item.known_for_department || ''
   if (props.variant === 'comingSoon') {
     return formatDate(releaseDate.value, 'ddd, MMM D, YYYY')
   }
@@ -152,13 +167,16 @@ const subtitle = computed(() => {
 })
 
 const href = computed(() => {
-  const type = props.variant === 'person' ? 'person' : props.mediaType
+  const type = isPerson.value ? 'person' : props.mediaType
   return `#/${type}?id=${props.item.id}`
 })
 
 const ariaLabel = computed(() => {
   if (props.variant === 'comingSoon') {
     return `${title.value}, ${formatDate(releaseDate.value, 'ddd, MMM D, YYYY')}`
+  }
+  if (isPersonV2.value) {
+    return `${title.value}${props.item.known_for_department ? ', ' + props.item.known_for_department : ''}`
   }
   if (props.variant === 'person') {
     return `${title.value}${roleName.value ? ', as ' + roleName.value : ''}`
@@ -388,7 +406,8 @@ function onClick() {
   min-height: 96px;
 }
 .poster-card--comingSoon .card-info::before,
-.poster-card--movie .card-info::before {
+.poster-card--movie .card-info::before,
+.poster-card--person-v2 .card-info::before {
   content: "";
   position: absolute;
   inset: -40px;
@@ -397,7 +416,8 @@ function onClick() {
   z-index: -2;
 }
 .poster-card--comingSoon .card-info::after,
-.poster-card--movie .card-info::after {
+.poster-card--movie .card-info::after,
+.poster-card--person-v2 .card-info::after {
   content: "";
   position: absolute;
   inset: 0;
