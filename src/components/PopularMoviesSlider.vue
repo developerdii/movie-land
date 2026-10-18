@@ -56,16 +56,7 @@
       <span class="hero-upnext-label">Up next</span>
       <div class="hero-progress">
         <span class="hero-progress-current">{{ current }}</span>
-        <div
-          class="hero-progress-track"
-          role="progressbar"
-          aria-label="Slide progress"
-          :aria-valuemin="1"
-          :aria-valuemax="total"
-          :aria-valuenow="activeIndex + 1"
-        >
-          <div class="hero-progress-fill" :style="{ width: progress }"></div>
-        </div>
+        <progress-track label="Slide" :value="activeIndex + 1" :page-count="total" @change="goToPage" />
         <span class="hero-progress-total">{{ totalLabel }}</span>
       </div>
       <div class="hero-upnext-grid">
@@ -90,6 +81,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '@/api'
 import AsyncImage from '@/components/AsyncImage.vue'
+import ProgressTrack from '@/components/ProgressTrack.vue'
 import BookmarkButton from '@/components/BookmarkButton.vue'
 import { formatDate } from '@/utils/date'
 
@@ -104,10 +96,6 @@ const pad = (n) => String(n).padStart(2, '0')
 
 const current = computed(() => pad(activeIndex.value + 1))
 const totalLabel = computed(() => pad(total.value))
-const progress = computed(() => {
-  if (!total.value) return '0%'
-  return ((activeIndex.value + 1) / total.value * 100).toFixed(1) + '%'
-})
 const atStart = computed(() => activeIndex.value === 0)
 const atEnd = computed(() => total.value <= 1 || activeIndex.value >= total.value - 1)
 
@@ -159,6 +147,11 @@ function startAutoplay() {
 function goTo(index) {
   activeIndex.value = index
   startAutoplay()
+}
+
+// The progress track counts pages from 1; the slides count from 0.
+function goToPage(page) {
+  goTo(page - 1)
 }
 function prev() {
   if (!atStart.value) {
@@ -421,20 +414,9 @@ onBeforeUnmount(() => {
   color: #f4f2ee;
 }
 
-.hero-progress-track {
-  flex: 1 1 auto;
-  height: 3px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #2a2a30;
-}
-
-.hero-progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--ml-brand-accent);
-  transition: width .3s ease;
-}
+/* The track is the shared ProgressTrack. The hero is always dark, so its line and knob ring keep the hero's colours. */
+.hero-progress { --progress-line: #2a2a30; --progress-ring: #141418; }
+.hero-progress .progress-track { flex: 1 1 auto; width: auto; min-width: 0; }
 
 .hero-progress-total {
   font-size: 14px;

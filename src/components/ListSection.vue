@@ -2,7 +2,7 @@
   <div v-if="slides.length">
     <section-heading :eyebrow="eyebrow" :title="title">
       <template #actions>
-        <round-pagination :page="index" :page-count="slides.length" @update:page="goToSlide" />
+        <progress-pagination :page="index" :page-count="slides.length" @update:page="goToSlide" />
       </template>
     </section-heading>
     <movie-slider ref="slider" :id="id" :movie-data="slides" :type="type" variant="movie" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
@@ -15,7 +15,7 @@
 import { onMounted, ref } from 'vue'
 import MovieSlider from '@/components/MovieSlider.vue'
 import SectionHeading from '@/components/SectionHeading.vue'
-import RoundPagination from '@/components/RoundPagination.vue'
+import ProgressPagination from '@/components/ProgressPagination.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
 
 const props = defineProps({

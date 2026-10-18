@@ -2,7 +2,7 @@
   <div v-if="slides.length">
     <section-heading eyebrow="Your history" title="Recently Viewed">
       <template #actions>
-        <round-pagination :page="index" :page-count="slides.length" @update:page="goToSlide" />
+        <progress-pagination :page="index" :page-count="slides.length" @update:page="goToSlide" />
       </template>
     </section-heading>
     <movie-slider ref="slider" id="recent-carousel" :movie-data="slides" :show-type="true" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
@@ -16,7 +16,7 @@
 import { computed, onMounted, ref } from 'vue'
 import api from '@/api'
 import MovieSlider from '@/components/MovieSlider.vue'
-import RoundPagination from '@/components/RoundPagination.vue'
+import ProgressPagination from '@/components/ProgressPagination.vue'
 import SectionHeading from '@/components/SectionHeading.vue'
 import { chunk } from '@/utils/collection'
 import { recentVisits } from '@/composables/useRecent'

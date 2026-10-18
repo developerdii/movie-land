@@ -39,9 +39,8 @@
 </template>
 
 <script setup>
-// The one page switcher for every paged list: the cast and filmography lists, the browse and bookmark results,
-// and the carousels on the home and detail pages. `page` is 1-based. The parent decides what a page change does,
-// and only the parent knows whether its list is paged on the server or in the browser.
+// The browse page's switcher for its server-paged results, which can run to 500 pages, so the page number is typed in
+// directly ("n of N"). Every other list uses ProgressPagination. `page` is 1-based. The parent decides what a page change does.
 const props = defineProps({
   page: { type: Number, required: true },
   pageCount: { type: Number, required: true },

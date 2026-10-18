@@ -2,7 +2,7 @@
   <div v-if="upComingMovies.length">
     <section-heading eyebrow="In Theaters" title="Coming Soon">
       <template #actions>
-        <round-pagination :page="recIndex" :page-count="recTotal" @update:page="goToRec" />
+        <progress-pagination :page="recIndex" :page-count="recTotal" @update:page="goToRec" />
       </template>
     </section-heading>
     <movie-slider ref="slider" id="upcoming-carousel" variant="comingSoon" :movie-data="upComingMovies" :show-position="false" :show-arrows="false" @slid="onSlid"></movie-slider>
@@ -14,7 +14,7 @@ import { computed, onMounted, ref } from 'vue'
 import api from '@/api'
 import MovieSlider from '../components/MovieSlider.vue'
 import SectionHeading from '../components/SectionHeading.vue'
-import RoundPagination from '../components/RoundPagination.vue'
+import ProgressPagination from '../components/ProgressPagination.vue'
 import { chunk, trimToChunks } from '@/utils/collection'
 
 const upComingMovies = ref([])

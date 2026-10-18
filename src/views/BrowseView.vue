@@ -38,6 +38,7 @@
       :eyebrow="eyebrow"
       :title="pageTitle"
       server-paged
+      numbered-pages
       :page="state.page"
       :total-pages="totalPages"
       :loading="loading"

@@ -60,7 +60,7 @@
     <section v-if="recommendations.length" class="detail-section">
       <section-heading eyebrow="More Like This" title="Recommended Movies">
         <template #actions>
-          <round-pagination :page="recIndex" :page-count="recTotal" @update:page="goToRec" />
+          <progress-pagination :page="recIndex" :page-count="recTotal" @update:page="goToRec" />
         </template>
       </section-heading>
       <movie-slider ref="recSlider" id="recommendations-carousel" variant="movie" :movie-data="recommendationChunks" :show-arrows="false" :show-position="false" @slid="onRecSlid"></movie-slider>
@@ -85,7 +85,7 @@ import api from '@/api'
 import MovieSlider from '../components/MovieSlider.vue'
 import MediaSection from '../components/MediaSection.vue'
 import SectionHeading from '../components/SectionHeading.vue'
-import RoundPagination from '../components/RoundPagination.vue'
+import ProgressPagination from '../components/ProgressPagination.vue'
 import { formatDate } from '@/utils/date'
 import { chunk, trimToChunks } from '@/utils/collection'
 import { getLanguageName } from '@/utils/language'

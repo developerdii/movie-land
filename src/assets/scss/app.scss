@@ -168,7 +168,7 @@ a.detail-tag { text-decoration: none; }
 .person-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .person-eyebrow-dash { width: 24px; height: 2px; background: var(--ml-brand-accent); flex: none; }
 .person-detail-initials { display: flex; align-items: center; justify-content: center; font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 800; font-size: 40px; color: rgba(var(--ml-muted-rgb), .4); background: linear-gradient(145deg, rgba(var(--ml-brand-dark-rgb), .6), var(--ml-brand-dark)); }
-.view-toggle { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--ml-control-line); border-radius: 9px; background: var(--ml-control-bg); }
+.view-toggle { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--ml-control-line); border-radius: 9px; background: var(--ml-surface); }
 .view-toggle-btn { display: grid; width: 38px; height: 32px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--ml-ink); font-size: 1rem; transition: background-color .15s ease, color .15s ease; }
 .view-toggle-btn:hover:not(.active) { background: var(--ml-hover); color: var(--ml-ink); }
 .view-toggle-btn.active { background: var(--ml-ink); color: var(--ml-surface); }
@@ -299,7 +299,7 @@ a.detail-tag { text-decoration: none; }
   gap: 12px;
   margin-bottom: 14px;
 }
-.browse-seg { display: flex; width: fit-content; max-width: 100%; gap: 4px; padding: 4px; background: var(--ml-control-bg); border: 1px solid var(--ml-control-line); border-radius: 999px; }
+.browse-seg { display: flex; width: fit-content; max-width: 100%; gap: 4px; padding: 4px; background: var(--ml-surface); border: 1px solid var(--ml-control-line); border-radius: 999px; }
 .browse-seg-btn {
   height: 40px;
   padding: 0 18px;

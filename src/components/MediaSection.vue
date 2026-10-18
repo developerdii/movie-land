@@ -12,7 +12,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"></path></svg>
           </button>
         </div>
-        <round-pagination :page="pageIndex + 1" :page-count="pageCount" :disabled="loading" @update:page="goToPage($event - 1)" />
+        <round-pagination v-if="numberedPages" :page="pageIndex + 1" :page-count="pageCount" :disabled="loading" @update:page="goToPage($event - 1)" />
+        <progress-pagination v-else :page="pageIndex + 1" :page-count="pageCount" :disabled="loading" @update:page="goToPage($event - 1)" />
       </template>
     </section-heading>
 
@@ -71,6 +72,7 @@ import PosterCard from './PosterCard.vue'
 import PosterCardSkeleton from './PosterCardSkeleton.vue'
 import SectionHeading from './SectionHeading.vue'
 import RoundPagination from './RoundPagination.vue'
+import ProgressPagination from './ProgressPagination.vue'
 
 const props = defineProps({
   items: { type: Array, default: () => [] },
@@ -80,6 +82,8 @@ const props = defineProps({
   // Server-paged mode (browse page): `items` is one TMDB page and paging is
   // driven by `page` (1-based) and `totalPages`, via the update:page event.
   serverPaged: { type: Boolean, default: false },
+  // Browse results can run to 500 pages, so they keep the typed "n of N" page number. Other lists show the progress control.
+  numberedPages: { type: Boolean, default: false },
   page: { type: Number, default: 1 },
   totalPages: { type: Number, default: 1 },
   loading: { type: Boolean, default: false }
@@ -153,7 +157,7 @@ function initials(name) {
 
 
 <style lang="scss">
-.cast-seg { display: flex; gap: 4px; padding: 4px; background: var(--ml-control-bg); border: 1px solid var(--ml-control-line); border-radius: 999px; }
+.cast-seg { display: flex; gap: 4px; padding: 4px; background: var(--ml-surface); border: 1px solid var(--ml-control-line); border-radius: 999px; }
 .cast-seg-btn {
   width: 44px; height: 40px;
   border: 0; border-radius: 999px;
