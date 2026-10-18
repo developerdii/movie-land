@@ -1,6 +1,6 @@
 # Data Model (TMDB API)
 
-All title data comes from TMDB. The only things MovieLand saves on the device are the dark mode choice (`movieland-theme`), the bookmarks (`movieland-bookmarks`, TMDB ids only, see Bookmarks below) and the recently viewed list (`movieland-recent`, TMDB ids only, see Recently viewed below). This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
+All title data comes from TMDB. The only things MovieLand saves on the device are the dark mode choice (`movieland-theme`), the bookmarks (`movieland-bookmarks`, TMDB ids only, see Bookmarks below) the recently viewed list (`movieland-recent`, TMDB ids only, see Recently viewed below) and the birthday list (`movieland-born-today`, TMDB ids and a date, see Born today below). The birthday list also asks Wikidata, which is not TMDB; see its section. This file documents the complete TMDB API surface the app depends on, so future work does not require re-researching the API.
 
 ## Auth
 - `src/api.js` sets `Authorization: Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}` (a TMDB **API Read Access Token**, a v4 JWT).
@@ -11,7 +11,7 @@ All title data comes from TMDB. The only things MovieLand saves on the device ar
 - **Non-commercial only.** No ads, paid tiers, accounts that pay, or sponsored content on any page. Commercial use needs a separate written agreement with TMDB.
 - **Required notice**, shown on the About page, which every page reaches with the navbar's info icon: "This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." There is no footer. TMDB's terms ask for the notice to be placed prominently in or on the application, not on every page.
 - **Logo:** TMDB's official "blue long" logo (shown on the About page). It stays smaller than our own wordmark, and it links to themoviedb.org. The logo is loaded from TMDB's own asset URL, not copied into the repo.
-- **Caching:** TMDB data may not be cached for more than six months. The app keeps no TMDB title data in localStorage or any store. The only saved TMDB values are the bookmark and recently viewed ids, so do not add persistent caching of API responses without checking the terms.
+- **Caching:** TMDB data may not be cached for more than six months. The app keeps no TMDB title data in localStorage or any store. The only saved TMDB values are the bookmark, recently viewed and birthday-list ids (the birthday list is kept for one day), so do not add persistent caching of API responses without checking the terms.
 - **No AI or machine learning** with TMDB data (training, datasets, or features built on it).
 
 ## Base URLs
@@ -95,7 +95,7 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Sliders chunk results into pages of **6** with `chunk(results, 6)` (`@/utils/collection`); recommendation/upcoming lists are trimmed with `trimToChunks(results, 6)` first so the last slide is never partial. The `MediaSection` grid paginates **6** per page and its list view **12** per page.
 - Search drops results with null `poster_path` (movie/tv); people without a `profile_path` fall back to an initials tile. Lists cap at 15 (default popular lists) / 5 (search); tab counts use `total_results` (search) or list length (default list). Movie/tv rows show a genre tag (mapped from `genre_ids` via `/genre/{movie,tv}/list`); person rows show `known_for_department`; in the default list they show their rank instead of `popularity`.
 - Dates via `formatDate(date, format)` from `@/utils/date` — supports `'YYYY'`, `'MMM D, YYYY'`, and `'ddd, MMM D, YYYY'`.
-- Lists are paginated by `MediaSection`: client-side with its own `page`/`pageSize` state, or server-side with the parent's `page` (browse, bookmarks). Both use the shared `RoundPagination` control.
+- Lists are paginated by `MediaSection`: client-side with its own `page`/`pageSize` state, or server-side with the parent's `page` (browse, bookmarks). Browse (`numbered-pages`) uses `RoundPagination` ("n of N"). Every other list (cast, filmography, bookmarks and the carousels) uses `ProgressPagination`, the hero-style progress control.
 
 
 ## Bookmarks (localStorage)
@@ -108,3 +108,10 @@ Other useful discover params: `sort_by=primary_release_date.asc`, `vote_average.
 - Key `movieland-recent`: one list of `[type, id]` pairs, newest first, at most eighteen (`RECENT_LIMIT` = 18 in `src/composables/useRecent.js`), e.g. `[["tv",1399],["movie",550]]`. Nothing else is stored.
 - `recordVisit(type, id)` runs once a film, TV or person page has loaded. A title opened again moves to the front, and the oldest one beyond eighteen is dropped.
 - The home page's last slider (`RecentlyViewed.vue`) fetches each title again with its details call. It is shown in slides of six (up to three pages) once six titles load, and the page control moves between them. Its cards mix films, shows and people, so `MovieSlider` takes each card's type from `media_type`.
+
+## Born today (Wikidata and localStorage)
+- TMDB has no search by birthday, so the list uses Wikidata (`https://query.wikidata.org/sparql`, a POST with the query in the `query` field). Wikidata's TMDB person id property (P4985) links each person to TMDB, and its birth date (P569) gives the day. This is the only non-TMDB request in the app, and only today's date is sent.
+- The query lists one exact date per year from 1800 to this year (`VALUES ?born { "1984-10-18T00:00:00Z"^^xsd:dateTime ... }`) and orders them by sitelink count, limit 60. Exact values are indexed, so this takes about five seconds. A month and day filter scans every person and times out (504 after 65 seconds), so do not use one.
+- Each candidate gets a `getPersonDetails` call (batches of 15). Only people whose TMDB profile has a photo and a birthday with the same month and day are kept. They are sorted by TMDB `popularity` and the first eighteen are the list (`LIST_SIZE` in `src/composables/useBornToday.js`).
+- Storage: `movieland-born-today` holds `{ "date": "2026-10-18", "ids": [...] }`, the eighteen ids in order. On later visits that day only those ids are fetched. A failed lookup is not saved, so the next visit tries again. The date is the visitor's local date.
+- Each card gets `age`: whole years from the birthday to today, or to the death date when TMDB has one (the age at death). `BornToday.vue` sits on the home page above Recently Viewed. It shows slides of six (up to three, with `ProgressPagination`) once six people load, and its cards are `person-v2` with the age in the date-style chip top left.

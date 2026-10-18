@@ -21,6 +21,7 @@ npm run lint:fix   # ESLint autofix
 - Dark mode: the navbar toggle sets `data-theme` on `<html>` and saves `movieland-theme` in localStorage (default light). See `coding.md` → Dark mode.
 - Bookmarks: movie, TV and person ids in localStorage (`movieland-bookmarks`), nothing else; see `data-model.md` → Bookmarks.
 - Recently viewed: the last eighteen movie, TV and person ids in localStorage (`movieland-recent`); the home page shows them in a slider of six per page, once there are six. See `data-model.md` → Recently viewed.
+- Born today: the day's birthday list is saved as TMDB person ids with the date (`movieland-born-today`). Its lookup asks Wikidata for today's birthdays, once a day; see `data-model.md` → Born today.
 - Search: a navbar trigger opens a centered Spotlight-style panel (⌘K / Ctrl+K from anywhere).
 - `public/service-worker.js` is a one-off cleanup worker that removes the old Vue CLI PWA service worker (which cached the previous site).
 - Live: https://developerdii.github.io/movie-land/
